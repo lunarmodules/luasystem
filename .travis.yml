@@ -1,0 +1,23 @@
+language: c
+
+env:
+  - LUA='Lua 5.1'
+  - LUA='Lua 5.2'
+  - LUA='Lua 5.3'
+  - LUA='LuaJIT 2.0'
+
+before_install:
+  - bash .travis_setup.sh
+
+install:
+  - sudo luarocks install busted
+  - sudo luarocks make
+
+script: busted spec
+
+branches:
+  only:
+    - master
+
+notifications:
+  email: false
