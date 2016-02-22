@@ -2,7 +2,14 @@ local system = require 'system.core'
 
 describe('Test time functions', function()
   it('gettime returns current time', function()
-    assert.is_near(os.time(), system.gettime(), 1.0)
+    local starttime = system.gettime()
+    local expected = os.time()
+    local endtime = system.gettime()
+    local delta = endtime - starttime
+    local avg = starttime + delta/2
+    assert.is_true(expected >= math.floor(starttime))
+    assert.is_true(expected <= math.ceil(endtime))
+    assert.is_near(expected, avg, 1 + delta)
   end)
 
   it('sleep will wait for specified amount of time', function()
