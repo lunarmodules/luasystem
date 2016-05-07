@@ -9,6 +9,7 @@ Supports Lua >= 5.1 and luajit >= 2.0.0.
 
 Currently the following functions are supported:
 * gettime
+* monotime
 * sleep
 
 License

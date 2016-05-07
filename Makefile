@@ -7,6 +7,21 @@
 #   install-all        install for lua51 lua52 lua53
 #   print              print the build settings
 
+ifeq ($(origin PLAT),undefined)
+UNAME_S:=$(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+    PLAT=linux
+endif
+ifeq ($(UNAME_S),Darwin)
+    PLAT=macosx
+endif
+ifeq ($(UNAME_S),FreeBSD)
+    PLAT=freebsd
+endif
+ifeq ($(patsubst MINGW%,MINGW,$(UNAME_S)),MINGW)
+    PLAT=mingw
+endif
+endif
 PLAT?= linux
 PLATS= macosx linux win32 mingw freebsd
 

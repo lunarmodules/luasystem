@@ -10,6 +10,10 @@
 #include <sys/time.h>
 #endif
 
+#ifdef __APPLE__
+#include "time_osx.h"
+#endif
+
 #include "compat.h"
 
 /*-------------------------------------------------------------------------
@@ -23,7 +27,7 @@ static double time_gettime(void) {
     double t;
     GetSystemTimeAsFileTime(&ft);
     /* Windows file time (time since January 1, 1601 (UTC)) */
-    t  = ft.dwLowDateTime/1.0e7 + ft.dwHighDateTime*(4294967296.0/1.0e7);
+    t  = ft.dwLowDateTime*1.0e-7 + ft.dwHighDateTime*(4294967296.0*1.0e-7);
     /* convert to Unix Epoch time (time since January 1, 1970 (UTC)) */
     return (t - 11644473600.0);
 }
@@ -32,16 +36,45 @@ static double time_gettime(void) {
     struct timeval v;
     gettimeofday(&v, (struct timezone *) NULL);
     /* Unix Epoch time (time since January 1, 1970 (UTC)) */
-    return v.tv_sec + v.tv_usec/1.0e6;
+    return v.tv_sec + v.tv_usec*1.0e-6;
 }
 #endif
 
 /*-------------------------------------------------------------------------
- * Returns the time the system has been up, in secconds.
+ * Gets monotonic time in s
+ * Returns
+ *   time in s.
+ *-------------------------------------------------------------------------*/
+#ifdef _WIN32
+WINBASEAPI ULONGLONG WINAPI GetTickCount64(VOID);
+
+static double time_monotime(void) {
+    ULONGLONG ms = GetTickCount64();
+    return ms*1.0e-3;
+}
+#else
+static double time_monotime(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec + ts.tv_nsec*1.0e-9;
+}
+#endif
+
+/*-------------------------------------------------------------------------
+ * Returns the current system time, 1970 (UTC), in secconds.
  *-------------------------------------------------------------------------*/
 static int time_lua_gettime(lua_State *L)
 {
     lua_pushnumber(L, time_gettime());
+    return 1;
+}
+
+/*-------------------------------------------------------------------------
+ * Returns the monotonic time the system has been up, in secconds.
+ *-------------------------------------------------------------------------*/
+static int time_lua_monotime(lua_State *L)
+{
+    lua_pushnumber(L, time_monotime());
     return 1;
 }
 
@@ -79,6 +112,7 @@ static int time_lua_sleep(lua_State *L)
 
 static luaL_Reg func[] = {
     { "gettime", time_lua_gettime },
+    { "monotime", time_lua_monotime },
     { "sleep", time_lua_sleep },
     { NULL, NULL }
 };

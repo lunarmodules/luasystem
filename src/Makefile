@@ -4,13 +4,28 @@
 # environment.
 #
 
-# PLAT: linux macosx win32 mingw
+# PLAT: linux macosx win32 mingw freebsd
 # platform to build for
+ifeq ($(origin PLAT),undefined)
+UNAME_S:=$(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+    PLAT=linux
+endif
+ifeq ($(UNAME_S),Darwin)
+    PLAT=macosx
+endif
+ifeq ($(UNAME_S),FreeBSD)
+    PLAT=freebsd
+endif
+ifeq ($(patsubst MINGW%,MINGW,$(UNAME_S)),MINGW)
+    PLAT=mingw
+endif
+endif
 PLAT?=linux
 
 # LUA_VERSION: 5.1 5.2 5.3
 # lua version to build against
-LUA_VERSION?=5.1
+LUA_VERSION?=$(basename $(word 2,$(shell lua -v)))
 
 # MYCFLAGS: to be set by user if needed
 MYCFLAGS=
@@ -130,7 +145,7 @@ CC_linux=gcc
 DEF_linux=
 CFLAGS_linux= -I$(LUAINC) $(DEF) -Wall -Wshadow -Wextra \
 	-Wimplicit -O2 -ggdb3 -fpic -fvisibility=hidden
-LDFLAGS_linux=-O -shared -fpic -o
+LDFLAGS_linux=-lrt -O -shared -fpic -o
 LD_linux=gcc
 
 #------
@@ -151,7 +166,7 @@ LD_freebsd=gcc
 SO_mingw=dll
 O_mingw=o
 CC_mingw=gcc
-DEF_mingw=-DWINVER=0x0501
+DEF_mingw=-DWINVER=0x0600 -D_WIN32_WINNT=0x0600
 CFLAGS_mingw= -I$(LUAINC) $(DEF) -Wall -O2 -fno-common \
 	-fvisibility=hidden
 LDFLAGS_mingw= $(LUALIB) -shared -Wl,-s -o
@@ -165,7 +180,8 @@ SO_win32=dll
 O_win32=obj
 CC_win32=cl
 DEF_win32= //D "WIN32" //D "NDEBUG" //D "_WINDOWS" //D "_USRDLL" \
-     //D "_CRT_SECURE_NO_WARNINGS" //D "_WINDLL"
+     //D "_CRT_SECURE_NO_WARNINGS" //D "_WINDLL" \
+     //D"WINVER=0x0600" //D"_WIN32_WINNT=0x0600"
 CFLAGS_win32=//I "$(LUAINC)" $(DEF) //O2 //Ot //MD //W3 //nologo
 LDFLAGS_win32= //nologo //link //NOLOGO //DLL //INCREMENTAL:NO \
     //MANIFEST //MANIFESTFILE:"intermediate.manifest" \
