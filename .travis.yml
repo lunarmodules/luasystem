@@ -1,5 +1,11 @@
 language: c
 
+sudo: false
+
+os:
+  - linux
+  - osx
+
 env:
   global:
     - LUAROCKS=2.3.0
