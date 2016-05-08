@@ -1,7 +1,7 @@
 #include <lua.h>
 #include <lauxlib.h>
 
-#define LUASYSTEM_VERSION   "LuaSystem 0.1.1"
+#define LUASYSTEM_VERSION   "LuaSystem 0.2.0"
 
 #ifdef _WIN32
 #define LUAEXPORT __declspec(dllexport)

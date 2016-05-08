@@ -1,8 +1,8 @@
 package = 'luasystem'
-version = '0.1.1-0'
+version = '0.2.0-0'
 source = {
-  url = "https://github.com/o-lim/luasystem/archive/v0.1.1.tar.gz",
-  dir = "luasystem-0.1.1"
+  url = "https://github.com/o-lim/luasystem/archive/v0.2.0.tar.gz",
+  dir = "luasystem-0.2.0"
 }
 description = {
   summary = 'Platform independent system calls for Lua.',
