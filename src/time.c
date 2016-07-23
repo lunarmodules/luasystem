@@ -10,8 +10,10 @@
 #include <sys/time.h>
 #endif
 
+#ifndef HAVE_CLOCK_GETTIME
 #ifdef __APPLE__
 #include "time_osx.h"
+#endif
 #endif
 
 #include "compat.h"
