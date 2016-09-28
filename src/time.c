@@ -10,8 +10,16 @@
 #include <sys/time.h>
 #endif
 
-#ifndef HAVE_CLOCK_GETTIME
 #ifdef __APPLE__
+#include <AvailabilityMacros.h>
+
+#ifndef MAC_OS_X_VERSION_10_12
+#define MAC_OS_X_VERSION_10_12 101200
+#endif
+
+#define HAVE_CLOCK_GETTIME   (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12 || defined(CLOCK_MONOTONIC))
+
+#if !(HAVE_CLOCK_GETTIME)
 #include "time_osx.h"
 #endif
 #endif
