@@ -1,0 +1,29 @@
+# this fails for some reason. Disabled for now.
+
+shallow_clone: true
+
+environment:
+  matrix:
+  - LUA: "lua 5.1"
+  - LUA: "lua 5.2"
+  - LUA: "lua 5.3"
+  - LUA: "lua 5.4"
+  - LUA: "luajit 2.0"
+  - LUA: "luajit 2.0 --compat 5.2"
+  - LUA: "luajit 2.1"
+  - LUA: "luajit 2.1 --compat 5.2"
+
+before_build:
+  - set PATH=C:\Python27\Scripts;%PATH%
+  - pip install --upgrade certifi
+  - FOR /F "tokens=* USEBACKQ" %%F IN (`python -c "import certifi;print(certifi.where())"`) DO ( SET SSL_CERT_FILE=%%F )
+  - pip install hererocks
+  - hererocks here --%LUA% -rlatest
+  - call here\bin\activate
+  - luarocks install busted
+
+build_script:
+  - luarocks make
+
+test_script:
+  - busted
