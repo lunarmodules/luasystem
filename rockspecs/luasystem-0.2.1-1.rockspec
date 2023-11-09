@@ -1,6 +1,6 @@
 local package_name = "luasystem"
-local package_version = "scm"
-local rockspec_revision = "0"
+local package_version = "0.2.1"
+local rockspec_revision = "1"
 local github_account_name = "lunarmodules"
 local github_repo_name = "luasystem"
 
