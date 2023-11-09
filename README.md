@@ -1,20 +1,21 @@
-LuaSystem
-======
+[![Unix build](https://img.shields.io/github/actions/workflow/status/lunarmodules/luasystem/unix_build.yml?branch=master&label=Unix%20build&logo=linux)](https://github.com/lunarmodules/luasystem/actions/workflows/unix_build.yml)
+[![AppVeyor build status](https://img.shields.io/appveyor/build/Tieske/luasystem/master?label=Windows%20build&logo=windows)](https://ci.appveyor.com/project/Tieske/luasystem/branch/master)
+[![Lint](https://github.com/lunarmodules/luasystem/workflows/Lint/badge.svg)](https://github.com/lunarmodules/luasystem/actions/workflows/lint.yml)
+[![SemVer](https://img.shields.io/github/v/tag/lunarmodules/luasystem?color=brightgreen&label=SemVer&logo=semver&sort=semver)](CHANGELOG.md)
 
-[![travis-ci status](https://travis-ci.org/o-lim/luasystem.svg?branch=master)](https://travis-ci.org/o-lim/luasystem/builds)
-
+# LuaSystem
 
 luasystem is a platform independent system call library for Lua.
-Supports Lua >= 5.1 and luajit >= 2.0.0.
+Supports Unix, Windows, MacOS, `Lua >= 5.1` and `luajit >= 2.0.0`.
 
-Currently the following functions are supported:
-* gettime
-* monotime
-* sleep
+## License and copyright
 
-License
--------
+See [LICENSE.md](LICENSE.md)
 
-This code and its accompanying README are
-[MIT licensed](http://www.opensource.org/licenses/mit-license.php).
-See LICENSE for details.
+## Documentation
+
+See [online documentation](https://lunarmodules.github.io/luasystem/)
+
+## Changelog & Versioning
+
+See [CHANGELOG.md](CHANGELOG.md)

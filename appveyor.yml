@@ -26,4 +26,4 @@ build_script:
   - luarocks make
 
 test_script:
-  - busted
+  - busted --Xoutput "--color"
