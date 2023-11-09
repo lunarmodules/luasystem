@@ -1,3 +1,6 @@
+/// Platform independent system calls for Lua.
+// @module system
+
 #include <lua.h>
 #include <lauxlib.h>
 

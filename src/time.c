@@ -1,3 +1,4 @@
+/// @submodule system
 #include <lua.h>
 #include <lauxlib.h>
 
@@ -50,11 +51,8 @@ static double time_gettime(void) {
 }
 #endif
 
-/*-------------------------------------------------------------------------
- * Gets monotonic time in s
- * Returns
- *   time in s.
- *-------------------------------------------------------------------------*/
+
+
 #ifdef _WIN32
 WINBASEAPI ULONGLONG WINAPI GetTickCount64(VOID);
 
@@ -70,27 +68,77 @@ static double time_monotime(void) {
 }
 #endif
 
-/*-------------------------------------------------------------------------
- * Returns the current system time, 1970 (UTC), in secconds.
- *-------------------------------------------------------------------------*/
-static int time_lua_gettime(lua_State *L)
+
+
+/***
+Get Unix time.
+The time is returned as the seconds since the Unix epoch (1 January 1970 00:00:00).
+The return value cannot be used with `os.date` on Windows.
+@function unixtime
+@treturn number seconds (fractional)
+*/
+static int time_lua_nix_gettime(lua_State *L)
 {
     lua_pushnumber(L, time_gettime());
     return 1;
 }
 
-/*-------------------------------------------------------------------------
- * Returns the monotonic time the system has been up, in secconds.
- *-------------------------------------------------------------------------*/
+
+
+/***
+Get Windows time.
+The time is returned as the seconds since the Windows epoch (1 January 1601 00:00:00).
+The return value cannot be used with `os.date` on Unix.
+@function windowstime
+@treturn number seconds (fractional)
+*/
+static int time_lua_win_gettime(lua_State *L)
+{
+    lua_pushnumber(L, time_gettime() + 11644473600.0);
+    return 1;
+}
+
+
+
+/***
+Get system time.
+The time is returned as the seconds since the epoch, which differs between Unix
+and Windows. The return value can be used with `os.date` on both Unix and Windows.
+@function time
+@treturn number seconds (fractional)
+*/
+static int time_lua_sys_gettime(lua_State *L)
+{
+#ifdef _WIN32
+    return time_lua_win_gettime(L);
+#else
+    return time_lua_nix_gettime(L);
+#endif
+}
+
+
+
+/***
+Get monotonic time.
+The time is returned as the seconds since system start.
+@function monotime
+@treturn number seconds (fractional)
+*/
 static int time_lua_monotime(lua_State *L)
 {
     lua_pushnumber(L, time_monotime());
     return 1;
 }
 
-/*-------------------------------------------------------------------------
- * Sleep for n seconds.
- *-------------------------------------------------------------------------*/
+
+
+/***
+Sleep without a busy loop.
+This function will sleep, without doing a busy-loop and wasting CPU cycles.
+@function sleep
+@tparam number seconds to sleep (fractional).
+@return nothing
+*/
 #ifdef _WIN32
 static int time_lua_sleep(lua_State *L)
 {
@@ -121,7 +169,10 @@ static int time_lua_sleep(lua_State *L)
 #endif
 
 static luaL_Reg func[] = {
-    { "gettime", time_lua_gettime },
+    { "gettime", time_lua_nix_gettime },  // deprecated: backward compatibility
+    { "time", time_lua_sys_gettime },
+    { "unixtime", time_lua_nix_gettime },
+    { "windowstime", time_lua_win_gettime },
     { "monotime", time_lua_monotime },
     { "sleep", time_lua_sleep },
     { NULL, NULL }
