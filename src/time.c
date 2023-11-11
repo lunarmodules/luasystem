@@ -136,7 +136,7 @@ static int time_lua_monotime(lua_State *L)
 Sleep without a busy loop.
 This function will sleep, without doing a busy-loop and wasting CPU cycles.
 @function sleep
-@tparam number seconds to sleep (fractional).
+@tparam number seconds seconds to sleep (fractional).
 @return nothing
 */
 #ifdef _WIN32

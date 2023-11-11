@@ -14,15 +14,13 @@ The scope of what is covered by the version number excludes:
 
 - create a release branch
 - update the changelog below
-- update version and copyright-years in `./LICENSE.md` and `./src/[module-name]/init.lua` (in doc-comments
-  header, and in module constants)
+- update version and copyright-years in `./LICENSE.md` and `./src/time.c` (in module constants)
 - create a new rockspec and update the version inside the new rockspec:<br/>
-  `cp [module-name]-scm-1.rockspec ./rockspecs/[module-name]-X.Y.Z-1.rockspec`
-- test: run `make test` and `make lint`
-- clean and render the docs: run `make clean` and `make docs`
-- commit the changes as `release X.Y.Z`
+  `cp luasystem-scm-0.rockspec ./rockspecs/luasystem-X.Y.Z-1.rockspec`
+- clean and render the docs: run `ldoc .`
+- commit the changes as `Release vX.Y.Z`
 - push the commit, and create a release PR
-- after merging tag the release commit with `X.Y.Z`
+- after merging tag the release commit with `vX.Y.Z`
 - upload to LuaRocks:<br/>
   `luarocks upload ./rockspecs/[module-name]-X.Y.Z-1.rockspec --api-key=ABCDEFGH`
 - test the newly created rock:<br/>
@@ -32,9 +30,20 @@ The scope of what is covered by the version number excludes:
 
 ### Version X.Y.Z, unreleased
 
-- a fix
-- a change
+- Change: `gettime` is deprecated. Use `unixtime` instead.
+- Feat: `unixtime` returns the time since the Unix epoch.
+- Feat: `windowstime` returns the time since the Windows epoch.
+- Feat: `time` returns the system time.
+- Feat: `setenv` added to set environment variables.
+- Feat: `getenvs` added to list environment variables.
+- Feat: `random` added to return high-quality random bytes
 
-### Version 0.1.0, released 01-Jan-2022
+### Version 0.2.1, released 02-Oct-2016
+
+### Version 0.2.0, released 08-May-2016
+
+### Version 0.1.1, released 10-Apr-2016
+
+### Version 0.1.0, released 11-Feb-2016
 
 - initial release

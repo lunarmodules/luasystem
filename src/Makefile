@@ -85,7 +85,7 @@ PLATFORM_win32?=Release
 CDIR_win32?=bin/lua/$(LUA_VERSION)/$(PLATFORM_win32)
 LDIR_win32?=bin/lua/$(LUA_VERSION)/$(PLATFORM_win32)/lua
 LUALIB_win32?=$(LUAPREFIX_win32)/lib/lua/$(LUA_VERSION)/$(PLATFORM_win32)
-LUALIBNAME_win32?=lua$(subst .,,$(LUA_VERSION)).lib 
+LUALIBNAME_win32?=lua$(subst .,,$(LUA_VERSION)).lib
 
 
 # prefix: /usr/local /usr /opt/local /sw
@@ -217,7 +217,7 @@ LUALIB= $(LUALIB_$(PLAT))
 #------
 # Objects
 #
-OBJS=core.$(O) compat.$(O) time.$(O)
+OBJS=core.$(O) compat.$(O) time.$(O) environment.$(O) random.$(O)
 
 #------
 # Targets
