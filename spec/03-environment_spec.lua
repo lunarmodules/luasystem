@@ -7,22 +7,24 @@ describe("Environment Variables:", function()
 
     it("should set an environment variable", function()
       assert.is_true(system.setenv("TEST_VAR", "test_value"))
-      assert.is_equal("test_value", os.getenv("TEST_VAR"))
+      assert.is_equal("test_value", system.getenv("TEST_VAR"))
     end)
 
 
-    it("should set an empty environment variable value", function()
+    local func = system.windows and pending or it --pending on Windows
+    -- Windows will unset a variable if set as an empty string
+    func("should set an empty environment variable value", function()
       assert.is_true(system.setenv("TEST_VAR", ""))
-      assert.is_equal("", os.getenv("TEST_VAR"))
+      assert.is_equal("", system.getenv("TEST_VAR"))
     end)
 
 
     it("should unset an environment variable on nil", function()
       assert.is_true(system.setenv("TEST_VAR", "test_value"))
-      assert.is_equal("test_value", os.getenv("TEST_VAR"))
+      assert.is_equal("test_value", system.getenv("TEST_VAR"))
 
       assert.is_true(system.setenv("TEST_VAR", nil))
-      assert.is_nil(os.getenv("TEST_VAR"))
+      assert.is_nil(system.getenv("TEST_VAR"))
     end)
 
 
@@ -37,7 +39,7 @@ describe("Environment Variables:", function()
 
 
     it("should return success on deleting a variable that doesn't exist", function()
-      if os.getenv("TEST_VAR") ~= nil then
+      if system.getenv("TEST_VAR") ~= nil then
         -- clear if it was already set
         assert.is_true(system.setenv("TEST_VAR", nil))
       end

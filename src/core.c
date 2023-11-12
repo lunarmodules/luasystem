@@ -24,6 +24,13 @@ LUAEXPORT int luaopen_system_core(lua_State *L) {
     lua_pushstring(L, "_VERSION");
     lua_pushstring(L, LUASYSTEM_VERSION);
     lua_rawset(L, -3);
+    lua_pushstring(L, "windows");
+#ifdef _WIN32
+    lua_pushboolean(L, 1);
+#else
+    lua_pushboolean(L, 0);
+#endif
+    lua_rawset(L, -3);
     time_open(L);
     random_open(L);
     environment_open(L);

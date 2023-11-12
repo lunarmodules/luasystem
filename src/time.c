@@ -71,49 +71,15 @@ static double time_monotime(void) {
 
 
 /***
-Get Unix time.
-The time is returned as the seconds since the Unix epoch (1 January 1970 00:00:00).
-The return value cannot be used with `os.date` on Windows.
-@function unixtime
+Get system time.
+The time is returned as the seconds since the epoch (1 January 1970 00:00:00).
+@function gettime
 @treturn number seconds (fractional)
 */
-static int time_lua_nix_gettime(lua_State *L)
+static int time_lua_gettime(lua_State *L)
 {
     lua_pushnumber(L, time_gettime());
     return 1;
-}
-
-
-
-/***
-Get Windows time.
-The time is returned as the seconds since the Windows epoch (1 January 1601 00:00:00).
-The return value cannot be used with `os.date` on Unix.
-@function windowstime
-@treturn number seconds (fractional)
-*/
-static int time_lua_win_gettime(lua_State *L)
-{
-    lua_pushnumber(L, time_gettime() + 11644473600.0);
-    return 1;
-}
-
-
-
-/***
-Get system time.
-The time is returned as the seconds since the epoch, which differs between Unix
-and Windows. The return value can be used with `os.date` on both Unix and Windows.
-@function time
-@treturn number seconds (fractional)
-*/
-static int time_lua_sys_gettime(lua_State *L)
-{
-#ifdef _WIN32
-    return time_lua_win_gettime(L);
-#else
-    return time_lua_nix_gettime(L);
-#endif
 }
 
 
@@ -137,42 +103,54 @@ Sleep without a busy loop.
 This function will sleep, without doing a busy-loop and wasting CPU cycles.
 @function sleep
 @tparam number seconds seconds to sleep (fractional).
-@return nothing
+@tparam[opt=16] integer precision minimum stepsize in milliseconds (Windows only)
+@return `true` on success, or `nil+err` on failure
 */
 #ifdef _WIN32
 static int time_lua_sleep(lua_State *L)
 {
     double n = luaL_checknumber(L, 1);
-    if (n < 0.0) n = 0.0;
-    if (n < DBL_MAX/1000.0) n *= 1000.0;
-    if (n > INT_MAX) n = INT_MAX;
-    Sleep((int)n);
-    return 0;
+
+    int precision = luaL_optinteger(L, 2, 16);
+    if (precision < 0 || precision > 16) precision = 16;
+
+    if (n > 0.0) {
+        if (n < DBL_MAX/1000.0) n *= 1000.0;
+        if (n > INT_MAX) n = INT_MAX;
+        if (timeBeginPeriod(precision) != TIMERR_NOERROR) {
+            lua_pushnil(L);
+            lua_pushstring(L, "failed to set timer precision");
+            return 2;
+        };
+        Sleep((int)n);
+        timeEndPeriod(precision);
+    }
+    lua_pushboolean(L, 1);
+    return 1;
 }
 #else
 static int time_lua_sleep(lua_State *L)
 {
     double n = luaL_checknumber(L, 1);
     struct timespec t, r;
-    if (n < 0.0) n = 0.0;
-    if (n > INT_MAX) n = INT_MAX;
-    t.tv_sec = (int) n;
-    n -= t.tv_sec;
-    t.tv_nsec = (int) (n * 1000000000);
-    if (t.tv_nsec >= 1000000000) t.tv_nsec = 999999999;
-    while (nanosleep(&t, &r) != 0) {
-        t.tv_sec = r.tv_sec;
-        t.tv_nsec = r.tv_nsec;
+    if (n > 0.0) {
+        if (n > INT_MAX) n = INT_MAX;
+        t.tv_sec = (int) n;
+        n -= t.tv_sec;
+        t.tv_nsec = (int) (n * 1000000000);
+        if (t.tv_nsec >= 1000000000) t.tv_nsec = 999999999;
+        while (nanosleep(&t, &r) != 0) {
+            t.tv_sec = r.tv_sec;
+            t.tv_nsec = r.tv_nsec;
+        }
     }
-    return 0;
+    lua_pushboolean(L, 1);
+    return 1;
 }
 #endif
 
 static luaL_Reg func[] = {
-    { "gettime", time_lua_nix_gettime },  // deprecated: backward compatibility
-    { "time", time_lua_sys_gettime },
-    { "unixtime", time_lua_nix_gettime },
-    { "windowstime", time_lua_win_gettime },
+    { "gettime", time_lua_gettime },
     { "monotime", time_lua_monotime },
     { "sleep", time_lua_sleep },
     { NULL, NULL }

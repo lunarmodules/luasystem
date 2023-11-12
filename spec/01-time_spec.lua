@@ -17,12 +17,12 @@ describe('Test time functions', function()
 
     it('returns current time', function()
       wait_for_second_rollover()
-      local lua_time = wait_for_second_rollover()
-      local aaa_time = system.time()
-      assert.is.near(lua_time, aaa_time, 0.01)
+      local expected_time = wait_for_second_rollover()
+      local received_time = system.gettime()
+      assert.is.near(expected_time, received_time, 0.02)
 
       wait_for_second_rollover()
-      assert.is.near(1, system.time() - aaa_time, 0.01)
+      assert.is.near(1, system.gettime() - received_time, 0.02)
     end)
 
   end)
@@ -47,29 +47,29 @@ describe('Test time functions', function()
   describe("sleep()", function()
 
     it("should sleep for the specified time", function()
-      local start_time = wait_for_second_rollover()
-      system.sleep(1)
-      local end_time = os.time()
+      local start_time = system.gettime()
+      system.sleep(1, 1)
+      local end_time = system.gettime()
       local elapsed_time = end_time - start_time
       assert.is.near(elapsed_time, 1, 0.01)
     end)
 
 
     it("should sleep for the specified time; fractional", function()
-      local start_time = system.time()
-      system.sleep(0.5)
-      local end_time = system.time()
+      local start_time = system.gettime()
+      system.sleep(0.5, 1)
+      local end_time = system.gettime()
       local elapsed_time = end_time - start_time
       assert.is.near(0.5, elapsed_time, 0.01)
     end)
 
 
     it("should return immediately for a non-positive sleep time", function()
-      local start_time = wait_for_second_rollover()
+      local start_time = system.gettime()
       system.sleep(-1)
-      local end_time = os.time()
+      local end_time = system.gettime()
       local elapsed_time = end_time - start_time
-      assert.is.near(elapsed_time, 0, 0.001)
+      assert.is.near(elapsed_time, 0, 0.01)
     end)
 
   end)

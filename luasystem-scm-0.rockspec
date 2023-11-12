@@ -39,7 +39,7 @@ local function make_platform(plat)
     linux = { "rt" },
     unix = { },
     macosx = { },
-    win32 = { },
+    win32 = { "advapi32", "winmm" },
     mingw32 = { },
   }
   return {

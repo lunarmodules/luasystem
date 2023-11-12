@@ -3,10 +3,13 @@
 #include <lauxlib.h>
 #include "compat.h"
 #include <fcntl.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <stdio.h>
+
+#ifdef _WIN32
+#include "windows.h"
+#include "wincrypt.h"
+#else
 #include <unistd.h>
+#endif
 
 
 // Maximum buffer size for random bytes
@@ -32,15 +35,26 @@ static int lua_get_random_bytes(lua_State* L) {
     }
 
     unsigned char buffer[MAX_RANDOM_BUFFER_SIZE];
-    ssize_t n;
+    size_t n;
 
 #ifdef _WIN32
-    if (CryptGenRandom(NULL, num_bytes, buffer) == 0) {
-      DWORD error = GetLastError();
-      lua_pushnil(L);
-      lua_pushfstring(L, "failed to get random data: %lu", error);
-      return 2;
+    HCRYPTPROV hCryptProv;
+    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+        DWORD error = GetLastError();
+        lua_pushnil(L);
+        lua_pushfstring(L, "failed to acquire cryptographic context: %lu", error);
+        return 2;
     }
+
+    if (!CryptGenRandom(hCryptProv, num_bytes, buffer)) {
+        DWORD error = GetLastError();
+        lua_pushnil(L);
+        lua_pushfstring(L, "failed to get random data: %lu", error);
+        CryptReleaseContext(hCryptProv, 0);
+        return 2;
+    }
+
+    CryptReleaseContext(hCryptProv, 0);
 #else
 #ifndef __APPLE__
     // Neither Apple nor Windows
