@@ -45,7 +45,14 @@ local function make_platform(plat)
   return {
     modules = {
       ['system.core'] = {
-        sources = { 'src/core.c', 'src/compat.c', 'src/time.c', 'src/environment.c', 'src/random.c' },
+        sources = {
+          'src/core.c',
+          'src/compat.c',
+          'src/time.c',
+          'src/environment.c',
+          'src/random.c',
+          'src/term.c',
+        },
         defines = defines[plat],
         libraries = libraries[plat],
       },

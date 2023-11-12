@@ -217,7 +217,7 @@ LUALIB= $(LUALIB_$(PLAT))
 #------
 # Objects
 #
-OBJS=core.$(O) compat.$(O) time.$(O) environment.$(O) random.$(O)
+OBJS=core.$(O) compat.$(O) time.$(O) environment.$(O) random.$(O) term.$(O)
 
 #------
 # Targets
