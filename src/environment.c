@@ -12,8 +12,8 @@
 /***
 Gets the value of an environment variable.
 
-__NOTE__: Windows has multiple copies of environment variables. This function
-will work with Lua's `setenv` on Windows. If you want to use `setenv` then
+__NOTE__: Windows has multiple copies of environment variables. The `setenv` function
+will not work with Lua's `os.getenv` on Windows. If you want to use `setenv` then
 consider patching `os.getenv` with this implementation of `getenv`.
 @function getenv
 @tparam string name name of the environment variable

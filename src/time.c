@@ -103,7 +103,7 @@ Sleep without a busy loop.
 This function will sleep, without doing a busy-loop and wasting CPU cycles.
 @function sleep
 @tparam number seconds seconds to sleep (fractional).
-@tparam[opt=16] integer precision minimum stepsize in milliseconds (Windows only)
+@tparam[opt=16] integer precision minimum stepsize in milliseconds (Windows only, ignored elsewhere)
 @return `true` on success, or `nil+err` on failure
 */
 #ifdef _WIN32

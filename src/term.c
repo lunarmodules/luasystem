@@ -10,7 +10,7 @@
 
 
 /***
-Checks if a file is a TTY.
+Checks if a file-handle is a TTY.
 
 @function isatty
 @tparam file file the file-handle to check
