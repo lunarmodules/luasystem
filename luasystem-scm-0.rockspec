@@ -11,7 +11,7 @@ version = package_version.."-"..rockspec_revision
 source = {
   url = "git+https://github.com/"..github_account_name.."/"..github_repo_name..".git",
   branch = (package_version == "scm") and "master" or nil,
-  tag = (package_version ~= "scm") and package_version or nil,
+  tag = (package_version ~= "scm") and "v"..package_version or nil,
 }
 
 description = {
@@ -39,13 +39,20 @@ local function make_platform(plat)
     linux = { "rt" },
     unix = { },
     macosx = { },
-    win32 = { },
+    win32 = { "advapi32", "winmm" },
     mingw32 = { },
   }
   return {
     modules = {
       ['system.core'] = {
-        sources = { 'src/core.c', 'src/compat.c', 'src/time.c', },
+        sources = {
+          'src/core.c',
+          'src/compat.c',
+          'src/time.c',
+          'src/environment.c',
+          'src/random.c',
+          'src/term.c',
+        },
         defines = defines[plat],
         libraries = libraries[plat],
       },

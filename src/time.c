@@ -1,3 +1,4 @@
+/// @submodule system
 #include <lua.h>
 #include <lauxlib.h>
 
@@ -50,11 +51,8 @@ static double time_gettime(void) {
 }
 #endif
 
-/*-------------------------------------------------------------------------
- * Gets monotonic time in s
- * Returns
- *   time in s.
- *-------------------------------------------------------------------------*/
+
+
 #ifdef _WIN32
 WINBASEAPI ULONGLONG WINAPI GetTickCount64(VOID);
 
@@ -70,53 +68,84 @@ static double time_monotime(void) {
 }
 #endif
 
-/*-------------------------------------------------------------------------
- * Returns the current system time, 1970 (UTC), in secconds.
- *-------------------------------------------------------------------------*/
+
+
+/***
+Get system time.
+The time is returned as the seconds since the epoch (1 January 1970 00:00:00).
+@function gettime
+@treturn number seconds (fractional)
+*/
 static int time_lua_gettime(lua_State *L)
 {
     lua_pushnumber(L, time_gettime());
     return 1;
 }
 
-/*-------------------------------------------------------------------------
- * Returns the monotonic time the system has been up, in secconds.
- *-------------------------------------------------------------------------*/
+
+
+/***
+Get monotonic time.
+The time is returned as the seconds since system start.
+@function monotime
+@treturn number seconds (fractional)
+*/
 static int time_lua_monotime(lua_State *L)
 {
     lua_pushnumber(L, time_monotime());
     return 1;
 }
 
-/*-------------------------------------------------------------------------
- * Sleep for n seconds.
- *-------------------------------------------------------------------------*/
+
+
+/***
+Sleep without a busy loop.
+This function will sleep, without doing a busy-loop and wasting CPU cycles.
+@function sleep
+@tparam number seconds seconds to sleep (fractional).
+@tparam[opt=16] integer precision minimum stepsize in milliseconds (Windows only, ignored elsewhere)
+@return `true` on success, or `nil+err` on failure
+*/
 #ifdef _WIN32
 static int time_lua_sleep(lua_State *L)
 {
     double n = luaL_checknumber(L, 1);
-    if (n < 0.0) n = 0.0;
-    if (n < DBL_MAX/1000.0) n *= 1000.0;
-    if (n > INT_MAX) n = INT_MAX;
-    Sleep((int)n);
-    return 0;
+
+    int precision = luaL_optinteger(L, 2, 16);
+    if (precision < 0 || precision > 16) precision = 16;
+
+    if (n > 0.0) {
+        if (n < DBL_MAX/1000.0) n *= 1000.0;
+        if (n > INT_MAX) n = INT_MAX;
+        if (timeBeginPeriod(precision) != TIMERR_NOERROR) {
+            lua_pushnil(L);
+            lua_pushstring(L, "failed to set timer precision");
+            return 2;
+        };
+        Sleep((int)n);
+        timeEndPeriod(precision);
+    }
+    lua_pushboolean(L, 1);
+    return 1;
 }
 #else
 static int time_lua_sleep(lua_State *L)
 {
     double n = luaL_checknumber(L, 1);
     struct timespec t, r;
-    if (n < 0.0) n = 0.0;
-    if (n > INT_MAX) n = INT_MAX;
-    t.tv_sec = (int) n;
-    n -= t.tv_sec;
-    t.tv_nsec = (int) (n * 1000000000);
-    if (t.tv_nsec >= 1000000000) t.tv_nsec = 999999999;
-    while (nanosleep(&t, &r) != 0) {
-        t.tv_sec = r.tv_sec;
-        t.tv_nsec = r.tv_nsec;
+    if (n > 0.0) {
+        if (n > INT_MAX) n = INT_MAX;
+        t.tv_sec = (int) n;
+        n -= t.tv_sec;
+        t.tv_nsec = (int) (n * 1000000000);
+        if (t.tv_nsec >= 1000000000) t.tv_nsec = 999999999;
+        while (nanosleep(&t, &r) != 0) {
+            t.tv_sec = r.tv_sec;
+            t.tv_nsec = r.tv_nsec;
+        }
     }
-    return 0;
+    lua_pushboolean(L, 1);
+    return 1;
 }
 #endif
 
