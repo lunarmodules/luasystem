@@ -13,6 +13,17 @@ void luaL_setfuncs(lua_State *L, const luaL_Reg *l, int nup);
 #include <sys/types.h>
 #endif
 
+// Windows compatibility; define DWORD and TRUE/FALSE on non-Windows
+#ifndef _WIN32
+#ifndef DWORD
+#define DWORD unsigned long
+#endif
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
+#endif
+
 #ifdef _MSC_VER
 // MSVC Windows doesn't have ssize_t, so we define it here
 #if SIZE_MAX == UINT_MAX

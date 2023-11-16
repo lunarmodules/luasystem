@@ -91,4 +91,24 @@ describe("Terminal:", function()
 
   end)
 
+
+
+  describe("getconsoleflags()", function()
+
+    pending("returns the consoleflags, if called without flags", function()
+print"1"
+package.loaded["system"] = nil
+package.loaded["system.core"] = nil
+print"2"
+local system = require "system"
+print"3"
+for k,v in pairs(system) do print(k,v) end
+for k,v in pairs(debug.getinfo(system.isatty)) do print(k,v) end
+
+      local flags, err = system.getconsoleflags(io.stdin)
+      assert.is_nil(err)
+      assert.is_integer(flags)
+    end)
+
+  end)
 end)

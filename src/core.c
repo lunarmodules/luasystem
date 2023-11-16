@@ -16,6 +16,7 @@ void time_open(lua_State *L);
 void environment_open(lua_State *L);
 void random_open(lua_State *L);
 void term_open(lua_State *L);
+void bitflags_open(lua_State *L);
 
 /*-------------------------------------------------------------------------
  * Initializes all library modules.
@@ -32,6 +33,7 @@ LUAEXPORT int luaopen_system_core(lua_State *L) {
     lua_pushboolean(L, 0);
 #endif
     lua_rawset(L, -3);
+    bitflags_open(L); // must be first, used by others
     time_open(L);
     random_open(L);
     term_open(L);

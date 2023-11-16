@@ -59,6 +59,7 @@ local function make_platform(plat)
           'src/environment.c',
           'src/random.c',
           'src/term.c',
+          'src/bitflags.c',
         },
         defines = defines[plat],
         libraries = libraries[plat],
