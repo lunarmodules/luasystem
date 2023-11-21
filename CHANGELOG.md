@@ -14,7 +14,7 @@ The scope of what is covered by the version number excludes:
 
 - create a release branch
 - update the changelog below
-- update version and copyright-years in `./LICENSE.md` and `./src/time.c` (in module constants)
+- update version and copyright-years in `./LICENSE.md` and `./src/core.c` (in module constants)
 - create a new rockspec and update the version inside the new rockspec:<br/>
   `cp luasystem-scm-0.rockspec ./rockspecs/luasystem-X.Y.Z-1.rockspec`
 - clean and render the docs: run `ldoc .`
@@ -28,7 +28,7 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
-### Version X.Y.Z, unreleased
+### Version 0.3.0, released 15-Dec-2023
 
 - Feat: on Windows `sleep` now has a precision parameter
 - Feat: `setenv` added to set environment variables.
