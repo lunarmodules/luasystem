@@ -8,8 +8,13 @@
 void luaL_setfuncs(lua_State *L, const luaL_Reg *l, int nup);
 #endif
 
-// Windows doesn't have ssize_t, so we define it here
-#ifdef _WIN32
+
+#ifdef __MINGW32__
+#include <sys/types.h>
+#endif
+
+#ifdef _MSC_VER
+// MSVC Windows doesn't have ssize_t, so we define it here
 #if SIZE_MAX == UINT_MAX
 typedef int ssize_t;        /* common 32 bit case */
 #define SSIZE_MIN  INT_MIN
@@ -33,6 +38,7 @@ typedef intmax_t ssize_t;  /* last resort, chux suggestion */
 #else
 #error platform has exotic SIZE_MAX
 #endif
-#endif
 
-#endif
+#endif // _MSC_VER
+
+#endif // COMPAT_H
