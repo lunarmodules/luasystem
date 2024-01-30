@@ -43,6 +43,10 @@ local function make_platform(plat)
     mingw32 = { },
   }
   local libdirs = {
+    linux = nil,
+    unix = nil,
+    macosx = nil,
+    win32 = nil,
     mingw32 = { },
   }
   return {
