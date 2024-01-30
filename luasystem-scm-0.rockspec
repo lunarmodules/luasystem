@@ -42,6 +42,9 @@ local function make_platform(plat)
     win32 = { "advapi32", "winmm" },
     mingw32 = { },
   }
+  local libdirs = {
+    mingw32 = {}
+  }
   return {
     modules = {
       ['system.core'] = {
@@ -55,6 +58,7 @@ local function make_platform(plat)
         },
         defines = defines[plat],
         libraries = libraries[plat],
+        libdirs = libdirs[plat],
       },
     },
   }
