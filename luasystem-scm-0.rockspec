@@ -43,7 +43,7 @@ local function make_platform(plat)
     mingw32 = { },
   }
   local libdirs = {
-    mingw32 = {}
+    mingw32 = { },
   }
   return {
     modules = {
