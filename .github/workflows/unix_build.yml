@@ -47,7 +47,7 @@ jobs:
 
       - uses: hishamhm/gh-actions-luarocks@master
         with:
-          luarocksVersion: "3.9.2"
+          luarocksVersion: "3.10.0"
 
       - name: dependencies
         run: |
