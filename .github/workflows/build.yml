@@ -1,4 +1,4 @@
-name: "Unix build"
+name: "Build"
 
 concurrency:
   # for PR's cancel the running task, if another commit is pushed
