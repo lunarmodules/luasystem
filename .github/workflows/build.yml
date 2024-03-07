@@ -61,6 +61,7 @@ jobs:
           luarocks install busted
           luarocks config
           luarocks show luafilesystem
+          dir C:\Users\runneradmin\AppData\Roaming\luarocks\lib\lua\5.4\lfs.dll
           lua -e "print(require'lfs')"
           luarocks make
 
