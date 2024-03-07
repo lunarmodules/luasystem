@@ -59,6 +59,9 @@ jobs:
       - name: dependencies
         run: |
           luarocks install busted
+          luarocks config
+          luarocks show luafilesystem
+          lua -e "print(require'lfs')"
           luarocks make
 
       - name: test
