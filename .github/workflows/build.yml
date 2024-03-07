@@ -34,12 +34,19 @@ jobs:
             luaVersion: "5.4"
           - os: "windows-latest"
             luaVersion: "luajit"
+          - os: "windows-latest"
+            toolchain: "msvc"
+            luaVersion: "5.4"
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@master
+
+      - name: Setup MSVC
+        if: ${{ matrix.toolchain == 'msvc' }}
+        uses: ilammy/msvc-dev-cmd@v1
 
       - uses: leafo/gh-actions-lua@master
         with:
