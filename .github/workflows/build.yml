@@ -48,6 +48,30 @@ jobs:
         if: ${{ matrix.toolchain == 'msvc' }}
         uses: ilammy/msvc-dev-cmd@v1
 
+      - name: install Dependencies analyzer
+        if: ${{ matrix.toolchain == 'msvc' }}
+        run: |
+          $version = "1.11.1"
+          echo "Installing Dependencies version: $version"
+          $url = 'https://github.com/lucasg/Dependencies/releases/download/v' + $version + '/Dependencies_x64_Release.zip'
+          $dest = Join-Path -Path $PWD -ChildPath ".dependencies"
+
+          # Download and extract Dependencies
+          New-Item -ItemType Directory -Path "$dest"
+          Invoke-WebRequest -Uri $url -OutFile "$dest\dependencies.zip"
+          Expand-Archive -Path "$dest\dependencies.zip" -DestinationPath "$dest"
+          Remove-Item -Path "$dest\dependencies.zip"
+          # dir "$dest"
+
+          # Add Dependencies to PATH
+          $env:PATH += ";$dest"
+          echo $env:PATH
+
+          # Verify Dependencies Installation
+          dir "$dest\*.exe"
+          dir ".\.dependencies\Dependencies.exe"
+          .\.dependencies\Dependencies.exe -help
+
       - uses: leafo/gh-actions-lua@master
         with:
           luaVersion: ${{ matrix.luaVersion }}
@@ -64,6 +88,7 @@ jobs:
           dir C:\Users\runneradmin\AppData\Roaming\luarocks\lib\lua\5.4\lfs.dll
           lua -e "print(require'system.core')"
           lua -e "print(require'lfs')"
+          .\.dependencies\Dependencies.exe -json -exports C:\Users\runneradmin\AppData\Roaming\luarocks\lib\lua\5.4\lfs.dll
           luarocks make
 
       - name: test
