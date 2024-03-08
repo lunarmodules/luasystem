@@ -85,6 +85,10 @@ jobs:
           luarocks install busted
           luarocks config
           luarocks show luafilesystem
+
+      - name: check dependencies
+        if: ${{ matrix.toolchain == 'msvc' }}
+        run: |
           dir C:\Users\runneradmin\AppData\Roaming\luarocks\lib\lua\5.4\lfs.dll
           lua -e "print(require'system.core')"
           lua -e "print(require'lfs')"
