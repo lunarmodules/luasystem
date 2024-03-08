@@ -72,7 +72,7 @@ jobs:
           dir ".\.dependencies\Dependencies.exe"
           .\.dependencies\Dependencies.exe -help
 
-      - uses: leafo/gh-actions-lua@master
+      - uses: hishamhm/gh-actions-lua@master
         with:
           luaVersion: ${{ matrix.luaVersion }}
 
