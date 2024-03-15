@@ -34,9 +34,13 @@ jobs:
             luaVersion: "5.4"
           - os: "windows-latest"
             luaVersion: "luajit"
+          # for Windows we build 1 Lua version on msvc and 1 on mingw
           - os: "windows-latest"
             toolchain: "msvc"
             luaVersion: "5.4"
+          - os: "windows-latest"
+            toolchain: "mingw"
+            luaVersion: "5.3"
 
     runs-on: ${{ matrix.os }}
 
