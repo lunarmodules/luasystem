@@ -15,12 +15,6 @@ on:
     branches:
     - master
 
-
-# On Windows builds:
-# 'hishamhm/gh-actions-lua' will build the PuC Rio Lua versions using MSVC, and
-# the LuaJIT version using MinGW/gcc. By running against LuaJIT and Lua 5.4 below,
-# we test both toolchains.
-
 jobs:
   test:
     strategy:
@@ -37,6 +31,10 @@ jobs:
         include:
           - os: "macos-latest"
             luaVersion: "5.4"
+          # On Windows builds:
+          # 'hishamhm/gh-actions-lua' will build the PuC Rio Lua versions using MSVC, and
+          # the LuaJIT version using MinGW/gcc. By running against both below, we test
+          # both toolchains.
           - os: "windows-latest"
             toolchain: "msvc"
             luaVersion: "5.1"
@@ -50,7 +48,7 @@ jobs:
             toolchain: "msvc"
             luaVersion: "5.4"
           - os: "windows-latest"
-            toolchain: "mingw"
+            toolchain: "mingw"  # unused, other than for display in the UI
             luaVersion: "luajit"
 
     runs-on: ${{ matrix.os }}
@@ -66,7 +64,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
 
       # - name: install Dependencies analyzer
-      #   # action step used for troubleshooting if dll's build incorrectly
+      #   # action step used for troubleshooting if Windows dll's build incorrectly
       #   run: |
       #     $version = "1.11.1"
       #     echo "Installing Dependencies version: $version"
@@ -109,10 +107,3 @@ jobs:
       - name: test
         run: |
           busted --Xoutput "--color"
-
-      # - name: Report test coverage
-      #   if: success()
-      #   continue-on-error: true
-      #   run: luacov-coveralls
-      #   env:
-      #     COVERALLS_REPO_TOKEN: ${{ github.token }}
