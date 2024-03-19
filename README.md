@@ -1,4 +1,4 @@
-[![Build](https://img.shields.io/github/actions/workflow/status/lunarmodules/luasystem/build.yml?branch=master&label=Unix%20build&logo=linux)](https://github.com/lunarmodules/luasystem/actions/workflows/build.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/lunarmodules/luasystem/build.yml?branch=master&label=Unix/Win/Mac%20Build)](https://github.com/lunarmodules/luasystem/actions/workflows/build.yml)
 [![Lint](https://github.com/lunarmodules/luasystem/workflows/Lint/badge.svg)](https://github.com/lunarmodules/luasystem/actions/workflows/lint.yml)
 [![SemVer](https://img.shields.io/github/v/tag/lunarmodules/luasystem?color=brightgreen&label=SemVer&logo=semver&sort=semver)](CHANGELOG.md)
 
