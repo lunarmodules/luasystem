@@ -38,8 +38,6 @@ jobs:
           - os: "macos-latest"
             luaVersion: "5.4"
           - os: "windows-latest"
-            luaVersion: "luajit"
-          - os: "windows-latest"
             toolchain: "msvc"
             luaVersion: "5.1"
           - os: "windows-latest"
@@ -51,6 +49,9 @@ jobs:
           - os: "windows-latest"
             toolchain: "msvc"
             luaVersion: "5.4"
+          - os: "windows-latest"
+            toolchain: "mingw"
+            luaVersion: "luajit"
 
     runs-on: ${{ matrix.os }}
 
