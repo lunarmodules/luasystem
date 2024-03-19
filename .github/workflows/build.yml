@@ -16,6 +16,11 @@ on:
     - master
 
 
+# On Windows builds:
+# 'hishamhm/gh-actions-lua' will build the PuC Rio Lua versions using MSVC, and
+# the LuaJIT version using MinGW/gcc. By running against LuaJIT and Lua 5.4 below,
+# we test both toolchains.
+
 jobs:
   test:
     strategy:
@@ -34,13 +39,18 @@ jobs:
             luaVersion: "5.4"
           - os: "windows-latest"
             luaVersion: "luajit"
-          # for Windows we build 1 Lua version on msvc and 1 on mingw
+          - os: "windows-latest"
+            toolchain: "msvc"
+            luaVersion: "5.1"
+          - os: "windows-latest"
+            toolchain: "msvc"
+            luaVersion: "5.2"
+          - os: "windows-latest"
+            toolchain: "msvc"
+            luaVersion: "5.3"
           - os: "windows-latest"
             toolchain: "msvc"
             luaVersion: "5.4"
-          - os: "windows-latest"
-            toolchain: "mingw"
-            luaVersion: "5.3"
 
     runs-on: ${{ matrix.os }}
 
@@ -49,32 +59,34 @@ jobs:
         uses: actions/checkout@master
 
       - name: Setup MSVC
+        # the 'hishamhm/gh-actions-lua' step requires msvc to build PuC Rio Lua
+        # versions on Windows (LuaJIT will be build using MinGW/gcc).
         if: ${{ matrix.toolchain == 'msvc' }}
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: install Dependencies analyzer
-        if: ${{ matrix.toolchain == 'msvc' }}
-        run: |
-          $version = "1.11.1"
-          echo "Installing Dependencies version: $version"
-          $url = 'https://github.com/lucasg/Dependencies/releases/download/v' + $version + '/Dependencies_x64_Release.zip'
-          $dest = Join-Path -Path $PWD -ChildPath ".dependencies"
+      # - name: install Dependencies analyzer
+      #   # action step used for troubleshooting if dll's build incorrectly
+      #   run: |
+      #     $version = "1.11.1"
+      #     echo "Installing Dependencies version: $version"
+      #     $url = 'https://github.com/lucasg/Dependencies/releases/download/v' + $version + '/Dependencies_x64_Release.zip'
+      #     $dest = Join-Path -Path $PWD -ChildPath ".dependencies"
 
-          # Download and extract Dependencies
-          New-Item -ItemType Directory -Path "$dest"
-          Invoke-WebRequest -Uri $url -OutFile "$dest\dependencies.zip"
-          Expand-Archive -Path "$dest\dependencies.zip" -DestinationPath "$dest"
-          Remove-Item -Path "$dest\dependencies.zip"
-          # dir "$dest"
+      #     # Download and extract Dependencies
+      #     New-Item -ItemType Directory -Path "$dest"
+      #     Invoke-WebRequest -Uri $url -OutFile "$dest\dependencies.zip"
+      #     Expand-Archive -Path "$dest\dependencies.zip" -DestinationPath "$dest"
+      #     Remove-Item -Path "$dest\dependencies.zip"
+      #     # dir "$dest"
 
-          # Add Dependencies to PATH
-          $env:PATH += ";$dest"
-          echo $env:PATH
+      #     # Add Dependencies to PATH
+      #     $env:PATH += ";$dest"
+      #     echo $env:PATH
 
-          # Verify Dependencies Installation
-          dir "$dest\*.exe"
-          dir ".\.dependencies\Dependencies.exe"
-          .\.dependencies\Dependencies.exe -help
+      #     # Verify Dependencies Installation
+      #     dir "$dest\*.exe"
+      #     dir ".\.dependencies\Dependencies.exe"
+      #     .\.dependencies\Dependencies.exe -help
 
       - uses: hishamhm/gh-actions-lua@master
         with:
@@ -87,16 +99,10 @@ jobs:
       - name: dependencies
         run: |
           luarocks install busted
-          luarocks config
-          luarocks show luafilesystem
 
-      - name: check dependencies
-        if: ${{ matrix.toolchain == 'msvc' }}
+      - name: install
         run: |
-          dir C:\Users\runneradmin\AppData\Roaming\luarocks\lib\lua\5.4\lfs.dll
-          lua -e "print(require'system.core')"
-          lua -e "print(require'lfs')"
-          .\.dependencies\Dependencies.exe -json -exports C:\Users\runneradmin\AppData\Roaming\luarocks\lib\lua\5.4\lfs.dll
+          luarocks remove --force luasystem
           luarocks make
 
       - name: test
