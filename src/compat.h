@@ -14,8 +14,10 @@ void luaL_setfuncs(lua_State *L, const luaL_Reg *l, int nup);
 #endif
 
 // Windows compatibility; define DWORD on non-Windows
+#ifndef _WIN32
 #ifndef DWORD
-  #define DWORD unsigned long
+#define DWORD unsigned long
+#endif
 #endif
 
 #ifdef _MSC_VER
