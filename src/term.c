@@ -179,7 +179,7 @@ Enables console flags (Windows).
 
 @function enableconsoleflags
 @tparam file file the file-handle to set the flags on
-@tparam integer action the flags to set
+@tparam integer bitmask the flags to set
 @treturn[1] boolean success (always `true` on non-Windows platforms)
 @treturn[2] nil
 @treturn[2] string error message
@@ -195,8 +195,8 @@ static int lua_enableconsoleflags(lua_State *L)
 Disables console flags (Windows).
 
 @function disableconsoleflags
-@tparam file file the file-handle to set the flags on
-@tparam integer action the flags to disable
+@tparam file file the file-handle to unset the flags on
+@tparam integer bitmask the flags to disable
 @treturn[1] boolean success (always `true` on non-Windows platforms)
 @treturn[2] nil
 @treturn[2] string error message
@@ -211,10 +211,10 @@ static int lua_disableconsoleflags(lua_State *L)
 Checks console flags (Windows).
 
 @function getconsoleflags
-@tparam file file the file-handle to set the flags on
-@tparam[opt] integer action the flags to check. If not provided, returns the combined current console flags.
+@tparam file file the file-handle to check the flags on
+@tparam[opt] integer bitmask the flags to check. If not provided, returns the combined current console flags.
 @treturn[1] integer the current console flags (if no parameters are passed), always 0 on non-Windows platforms.
-@treturn[2] boolean true if all the requested flags are set, or false if at least one is not set. Always false on non-Windows platforms.
+@treturn[2] boolean true if all the requested flags are currently set, or false if at least one is not set. Always false on non-Windows platforms.
 @treturn[3] nil
 @treturn[3] string error message
 */
