@@ -258,60 +258,11 @@ static int lua_getconsoleflags(lua_State *L)
 
 
 
-/***
-(Un)sets the virtual console mode on Windows enabling color.
-Doesn't do anything on other platforms.
-
-@function setvt
-@tparam boolean set to `true` to enable virtual console mode, `false` to disable
-@treturn[1] boolean success (always `true` on non-Windows platforms)
-@treturn[2] nil
-@treturn[2] string error message
-*/
-static int lua_setvt(lua_State *L)
-{
-#ifdef _WIN32
-    int on_off = lua_toboolean(L, 1);
-
-    HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    if(console_handle == INVALID_HANDLE_VALUE) {
-        console_handle = GetStdHandle(STD_ERROR_HANDLE);
-        if(console_handle == INVALID_HANDLE_VALUE) {
-            lua_pushnil(L);
-            lua_pushliteral(L, "failed to get console handle");
-            return 2;
-        }
-    }
-
-    DWORD prev_console_mode;
-    if(GetConsoleMode(console_handle, &prev_console_mode) == 0) {
-        lua_pushnil(L);
-        lua_pushliteral(L, "failed to get console mode");
-        return 2;
-    }
-
-    DWORD new_console_mode = (prev_console_mode & ~ENABLE_VIRTUAL_TERMINAL_PROCESSING) | (on_off ? ENABLE_VIRTUAL_TERMINAL_PROCESSING : 0);
-
-    int success = SetConsoleMode(console_handle, new_console_mode) != 0;
-    if(!success) {
-        lua_pushnil(L);
-        lua_pushliteral(L, "failed to set console mode");
-        return 2;
-    }
-#endif
-
-    lua_pushboolean(L, 1);
-    return 1;
-}
-
-
-
 static luaL_Reg func[] = {
     { "isatty", lua_isatty },
     { "enableconsoleflags", lua_enableconsoleflags },
     { "disableconsoleflags", lua_disableconsoleflags },
     { "getconsoleflags", lua_getconsoleflags },
-    { "setvt", lua_setvt },
     { NULL, NULL }
 };
 
