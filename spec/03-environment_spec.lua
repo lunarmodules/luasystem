@@ -1,5 +1,6 @@
 -- Import the library that contains the environment-related functions
 local system = require("system")
+require("spec.helpers")
 
 describe("Environment Variables:", function()
 
@@ -11,9 +12,8 @@ describe("Environment Variables:", function()
     end)
 
 
-    local func = system.windows and pending or it --pending on Windows
     -- Windows will unset a variable if set as an empty string
-    func("should set an empty environment variable value", function()
+    nix_it("should set an empty environment variable value", function()
       assert.is_true(system.setenv("TEST_VAR", ""))
       assert.is_equal("", system.getenv("TEST_VAR"))
     end)
