@@ -3,7 +3,8 @@ redefined       = false
 max_line_length = false
 
 globals = {
---    "ngx",
+    "win_it",
+    "nix_it",
 }
 
 not_globals = {
