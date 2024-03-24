@@ -42,7 +42,7 @@ describe("Terminal:", function()
 
 
 
-    it("returns true for all if a terminal", function()
+    it("returns true for all if a terminal #manual", function()
       assert.are.same(
         {
           stdin = true,
@@ -54,7 +54,7 @@ describe("Terminal:", function()
     end)
 
 
-    it("returns false for stdin if not a terminal", function()
+    it("returns false for stdin if not a terminal #manual", function()
       assert.are.same(
         {
           stdin = false,
@@ -66,7 +66,7 @@ describe("Terminal:", function()
     end)
 
 
-    it("returns false for stdout if not a terminal", function()
+    it("returns false for stdout if not a terminal #manual", function()
       assert.are.same(
         {
           stdin = true,
@@ -78,7 +78,7 @@ describe("Terminal:", function()
     end)
 
 
-    it("returns false for stderr if not a terminal", function()
+    it("returns false for stderr if not a terminal #manual", function()
       assert.are.same(
         {
           stdin = true,
