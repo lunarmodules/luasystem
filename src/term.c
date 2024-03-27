@@ -13,6 +13,27 @@
 #endif
 
 
+// after an error is returned, GetLastError() result can be passed to this function to get a string
+// representation of the error on the stack.
+// result will be nil+error on the stack, always 2 results.
+static void termFormatError(lua_State *L, DWORD errorCode, const char* prefix) {
+//static void FormatErrorAndReturn(lua_State *L, DWORD errorCode, const char* prefix) {
+    LPSTR messageBuffer = NULL;
+    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                   NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+
+    lua_pushnil(L);
+    if (messageBuffer) {
+        if (prefix) {
+            lua_pushfstring(L, "%s: %s", prefix, messageBuffer);
+        } else {
+            lua_pushstring(L, messageBuffer);
+        }
+        LocalFree(messageBuffer);
+    } else {
+        lua_pushfstring(L, "%sError code %lu", prefix ? prefix : "", errorCode);
+    }
+}
 
 /***
 Checks if a file-handle is a TTY.
@@ -117,13 +138,18 @@ static HANDLE get_console_handle(lua_State *L, int flags_optional)
         luaL_argerror(L, 1, "invalid file handle"); // does not return
     }
 
-    if (handle == INVALID_HANDLE_VALUE || handle == NULL) {
+    if (handle == INVALID_HANDLE_VALUE) {
+        termFormatError(L, GetLastError(), "failed to retrieve std handle");
+        return 2;
+    }
+
+    if (handle == NULL) {
         lua_pushnil(L);
         lua_pushliteral(L, "failed to get console handle");
         return NULL;
     }
 
-    if (!flags_optional && lua_gettop(L) < 2) {
+    if (flags_optional && lua_gettop(L) < 2) {
         return handle;
     }
 
@@ -140,41 +166,69 @@ static HANDLE get_console_handle(lua_State *L, int flags_optional)
 }
 #endif
 
+#define SETFLAGS_AS_GIVEN 0
+#define SETFLAGS_ENABLE 1
+#define SETFLAGS_DISABLE 2
 
-static int lua_setconsoleflags(lua_State *L, int unsetting)
+static int lualib_setconsoleflags(lua_State *L, int setting)
 {
 #ifdef _WIN32
     HANDLE console_handle = get_console_handle(L, 0);
     if (console_handle == NULL) {
         return 2; // error message is already on the stack
     }
-    DWORD flags = (DWORD)luaL_checkinteger(L, 2); // flags are already validated
-
-    if (unsetting) {
-        flags = ~flags;
-    }
+    DWORD flags = (DWORD)lua_tointeger(L, 2); // flags are already validated
 
     DWORD prev_console_mode;
     if (GetConsoleMode(console_handle, &prev_console_mode) == 0)
     {
-        lua_pushnil(L);
-        lua_pushliteral(L, "failed to get console mode");
+        termFormatError(L, GetLastError(), "failed to get console mode");
         return 2;
     }
 
-    DWORD new_console_mode = (prev_console_mode & ~flags) | flags;
+    DWORD new_console_mode = flags;
+    if (setting == SETFLAGS_DISABLE) {
+        new_console_mode = prev_console_mode & ~flags;
+    } else if (setting == SETFLAGS_ENABLE) {
+        new_console_mode = prev_console_mode | flags;
+    }
 
     int success = SetConsoleMode(console_handle, new_console_mode) != 0;
     if (!success)
     {
-        lua_pushnil(L);
-        lua_pushliteral(L, "failed to set console mode");
+        termFormatError(L, GetLastError(), "failed to set console mode");
         return 2;
     }
-#endif
 
-    lua_pushboolean(L, 1);
-    return 1;
+    lua_pushinteger(L, prev_console_mode);
+    lua_pushinteger(L, new_console_mode);
+    return 2;
+
+#else
+    lua_pushinteger(L, 0);
+    lua_pushinteger(L, 0);
+    return 2;
+
+#endif
+}
+
+
+
+/***
+Sets the full set of console flags (Windows).
+
+@function setconsoleflags
+@tparam file file the file-handle to set the flags on
+@tparam integer bitmask the flags to set/unset
+@treturn[1] the old console flags (always 0 on non-Windows platforms)
+@treturn[1] the new console flags (always 0 on non-Windows platforms)
+@treturn[2] nil
+@treturn[2] string error message
+@see https://learn.microsoft.com/en-us/windows/console/setconsolemode
+*/
+static int lua_setconsoleflags(lua_State *L)
+{
+    return lualib_setconsoleflags(L, SETFLAGS_AS_GIVEN);
 }
 
 
@@ -185,13 +239,15 @@ Enables console flags (Windows).
 @function enableconsoleflags
 @tparam file file the file-handle to set the flags on
 @tparam integer bitmask the flags to set
-@treturn[1] boolean success (always `true` on non-Windows platforms)
+@treturn[1] the old console flags (always 0 on non-Windows platforms)
+@treturn[1] the new console flags (always 0 on non-Windows platforms)
 @treturn[2] nil
 @treturn[2] string error message
+@see https://learn.microsoft.com/en-us/windows/console/setconsolemode
 */
 static int lua_enableconsoleflags(lua_State *L)
 {
-    return lua_setconsoleflags(L, 0);
+    return lualib_setconsoleflags(L, SETFLAGS_ENABLE);
 }
 
 
@@ -202,13 +258,15 @@ Disables console flags (Windows).
 @function disableconsoleflags
 @tparam file file the file-handle to unset the flags on
 @tparam integer bitmask the flags to disable
-@treturn[1] boolean success (always `true` on non-Windows platforms)
+@treturn[1] the old console flags (always 0 on non-Windows platforms)
+@treturn[1] the new console flags (always 0 on non-Windows platforms)
 @treturn[2] nil
 @treturn[2] string error message
+@see https://learn.microsoft.com/en-us/windows/console/setconsolemode
 */
 static int lua_disableconsoleflags(lua_State *L)
 {
-    return lua_setconsoleflags(L, 1);
+    return lualib_setconsoleflags(L, SETFLAGS_DISABLE);
 }
 
 
@@ -222,6 +280,7 @@ Checks console flags (Windows).
 @treturn[2] boolean true if all the requested flags are currently set, or false if at least one is not set. Always false on non-Windows platforms.
 @treturn[3] nil
 @treturn[3] string error message
+@see https://learn.microsoft.com/en-us/windows/console/getconsolemode
 */
 static int lua_getconsoleflags(lua_State *L)
 {
@@ -247,10 +306,11 @@ static int lua_getconsoleflags(lua_State *L)
     }
 
     // If parameters are passed, check if the provided flags are currently set
-    DWORD flags = (DWORD)luaL_checkinteger(L, 2); // flags are already validated
+    DWORD flags = (DWORD)luaL_checkinteger(L, 2); // flags were already validated
     int all_set = (console_mode & flags) == flags;
     lua_pushboolean(L, all_set);
     return 1;
+
 #else
     if (lua_gettop(L) < 2)
     {
@@ -258,22 +318,134 @@ static int lua_getconsoleflags(lua_State *L)
         return 1;
     }
     lua_pushboolean(L, 0);
+
 #endif
 }
 
 
+
+/*-------------------------------------------------------------------------
+ * backup/restore terminal state
+ *-------------------------------------------------------------------------*/
+
+static const char *backup_key = "LuaSystem.TermBackup";
+static const char *backup_key_mt = "LuaSystem.TermBackup.mt";
+
+typedef struct TermBackup {
+    int stdin_value;
+    int stdout_value;
+    int stderr_value;
+} TermBackup;
+
+
+
+/***
+Stores the current console flags (Windows).
+
+Creates a backup of the console settings. This backup can be restored using `termrestore`.
+Upon exiting the Lua state, the backup will be automatically restored.
+@function termbackup
+@treturn[1] boolean true if the backup was successful
+@treturn[2] nil
+@treturn[2] string error message, if the backup already existed
+*/
+static int lua_termbackup(lua_State *L) {
+    // Check if the backup already exists in the registry
+    lua_getfield(L, LUA_REGISTRYINDEX, backup_key);
+    if (!lua_isnil(L, -1)) {
+        lua_pushnil(L);
+        lua_pushliteral(L, "backup already exists");
+        return 2;
+    }
+
+    lua_pop(L, 1); // Pop the nil value off the stack
+
+    TermBackup *backup = (TermBackup *)lua_newuserdata(L, sizeof(TermBackup));
+
+    // Get current state of the console flags
+    if (!GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), &backup->stdin_value)) {
+        backup->stdin_value = -1;
+    };
+    if (!GetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), &backup->stdout_value)) {
+        backup->stdout_value = -1;
+    };
+    if (!GetConsoleMode(GetStdHandle(STD_ERROR_HANDLE), &backup->stderr_value)) {
+        backup->stderr_value = -1;
+    };
+    luaL_getmetatable(L, backup_key_mt);
+    lua_setmetatable(L, -2);
+
+    // Store the backup in the registry
+    lua_setfield(L, LUA_REGISTRYINDEX, backup_key);
+
+    lua_pushboolean(L, TRUE);
+    return 1;
+}
+
+
+/***
+Restores the console flags backup (Windows).
+
+Restores the console settings from a backup created with `termbackup`.
+It will automatically be restored when the Lua state is closed, if not done already.
+@function termrestore
+@treturn[1] boolean true if the restore was successful
+@treturn[2] nil
+@treturn[2] string error message, if the backup didn't exist (anymore)
+*/
+static int lua_termrestore(lua_State *L) {
+    lua_getfield(L, LUA_REGISTRYINDEX, backup_key);
+    if (lua_isnil(L, -1)) {
+        lua_pushnil(L);
+        lua_pushliteral(L, "backup does not exist");
+        return 2;
+    }
+    TermBackup *backup = (TermBackup *)lua_touserdata(L, -1);
+
+    // Restore the backup values
+    if (backup->stdin_value != -1) {
+        SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), backup->stdin_value);
+        backup->stdin_value = -1;
+    }
+    if (backup->stdout_value != -1) {
+        SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), backup->stdout_value);
+        backup->stdout_value = -1;
+    }
+    if (backup->stderr_value != -1) {
+        SetConsoleMode(GetStdHandle(STD_ERROR_HANDLE), backup->stderr_value);
+        backup->stderr_value = -1;
+    }
+
+    lua_pushboolean(L, TRUE);
+    return 1;
+}
+
+
+
+static int termbackup_gc(lua_State *L) {
+    lua_termrestore(L);
+    // printf("termbackup_gc\n");
+    return 0;
+}
+
+
+/*-------------------------------------------------------------------------
+ * Initializes module
+ *-------------------------------------------------------------------------*/
 
 static luaL_Reg func[] = {
     { "isatty", lua_isatty },
     { "enableconsoleflags", lua_enableconsoleflags },
     { "disableconsoleflags", lua_disableconsoleflags },
     { "getconsoleflags", lua_getconsoleflags },
+    { "setconsoleflags", lua_setconsoleflags },
+    { "termbackup", lua_termbackup },
+    { "termrestore", lua_termrestore },
     { NULL, NULL }
 };
 
-/*-------------------------------------------------------------------------
- * Initializes module
- *-------------------------------------------------------------------------*/
+
+
 void term_open(lua_State *L) {
     // set up constants and export the constants in module table
     initialize_valid_flags();
@@ -287,6 +459,13 @@ void term_open(lua_State *L) {
         lua_pushinteger(L, console_out_flags[i].value);
         lua_setfield(L, -2, console_out_flags[i].name);
     }
+
+    // set up backup/restore meta-table
+    luaL_newmetatable(L, backup_key_mt);
+    lua_pushcfunction(L, termbackup_gc);
+    lua_setfield(L, -2, "__gc");
+    lua_pop(L, 1); // pop the metatable from the stack
+
     // export functions
     luaL_setfuncs(L, func, 0);
 }
