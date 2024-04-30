@@ -77,13 +77,16 @@ print(flags3:value())           -- 0
 -- comparing flags
 local flags4 = sys.bitflag(7)   -- b0111
 local flags5 = sys.bitflag(255) -- b11111111
-print(flags5 >= flags4)         -- true, all bits in flags4 are set in flags5
+print(flags5 ~= flags4)         -- true, not the same flags
+local flags6 = sys.bitflag(7)   -- b0111
+print(flags6 == flags4)         -- true, same flags
 
--- comparing with 0 flags: comparison and `has` behave differently
-local flags6 = sys.bitflag(0)   -- b0000
-local flags7 = sys.bitflag(1)   -- b0001
-print(flags6 < flags7)          -- true, flags6 is a subset of flags7
-print(flags7:has(flags6))       -- false, flags6 is not set in flags7
+-- comparison of subsets
+local flags7 = sys.bitflag(0)   -- b0000
+local flags8 = sys.bitflag(3)   -- b0011
+local flags9 = sys.bitflag(7)   -- b0111
+print(flags9:has(flags8))       -- true, flags8 bits are all set in flags9
+print(flags8:has(flags7))       -- false, flags7 (== 0) is not set in flags8
 */
 static int lsbf_new(lua_State *L) {
     LSBF_BITFLAG flags = 0;
@@ -130,14 +133,6 @@ static int lsbf_eq(lua_State *L) {
     return 1;
 }
 
-static int lsbf_le(lua_State *L) {
-    LSBF_BITFLAG a = lsbf_checkbitflags(L, 1);
-    LSBF_BITFLAG b = lsbf_checkbitflags(L, 2);
-    // Check if all bits in b are also set in a
-    lua_pushboolean(L, (a & b) == a);
-    return 1;
-}
-
 /***
 Checks if the given flags are set.
 This is different from the `>=` and `<=` operators because if the flag to check
@@ -159,14 +154,6 @@ static int lsbf_has(lua_State *L) {
     LSBF_BITFLAG b = lsbf_checkbitflags(L, 2);
     // Check if all bits in b are also set in a, and b is not 0
     lua_pushboolean(L, (a | b) == a && b != 0);
-    return 1;
-}
-
-static int lsbf_lt(lua_State *L) {
-    LSBF_BITFLAG a = lsbf_checkbitflags(L, 1);
-    LSBF_BITFLAG b = lsbf_checkbitflags(L, 2);
-    // Check if a is strictly less than b, meaning a != b and a is a subset of b
-    lua_pushboolean(L, (a != b) && ((a & b) == a));
     return 1;
 }
 
@@ -219,8 +206,6 @@ static const struct luaL_Reg lsbf_methods[] = {
     {"__add", lsbf_add},
     {"__sub", lsbf_sub},
     {"__eq", lsbf_eq},
-    {"__le", lsbf_le},
-    {"__lt", lsbf_lt},
     {"__index", lsbf_index},
     {"__newindex", lsbf_newindex},
     {NULL, NULL}

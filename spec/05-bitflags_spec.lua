@@ -71,11 +71,13 @@ describe("BitFlags library", function()
   end)
 
   it("sets and clears bits correctly", function()
-    local bf = sys.bitflag(0)
+    local bf = sys.bitflag(8)   -- b1000
     bf[1] = true
-    assert.is_true(bf[1])
+    assert.is_true(bf[1])       -- b1010
+    assert.equals(10, bf:value())
     bf[1] = false
-    assert.is_false(bf[1])
+    assert.is_false(bf[1])      -- b1000
+    assert.equals(8, bf:value())
   end)
 
   it("errors on setting invalid bit indexes", function()
@@ -83,15 +85,6 @@ describe("BitFlags library", function()
     assert.has_error(function() bf[-10] = true end, "index out of range")
     assert.has_error(function() bf[10000] = true end, "index out of range")
     assert.has_error(function() bf.not_a_number = true end, "index must be a number")
-  end)
-
-  it("handles <= and >= operations", function()
-    local bf1 = sys.bitflag(3)    -- b0011
-    local bf2 = sys.bitflag(15)   -- b1111
-    assert.is_true(bf2 >= bf1)    -- all bits in bf1 are set in bf2
-    assert.is_true(bf2 > bf1)     -- all bits in bf1 are set in bf2 and some more
-    assert.is_false(bf2 <= bf1)   -- not all bits in bf2 are set in bf1
-    assert.is_false(bf2 < bf1)    -- not all bits in bf2 are set in bf1
   end)
 
   it("checks for a subset using 'has'", function()
