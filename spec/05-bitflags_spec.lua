@@ -87,15 +87,28 @@ describe("BitFlags library", function()
     assert.has_error(function() bf.not_a_number = true end, "index must be a number")
   end)
 
-  it("checks for a subset using 'has'", function()
+  it("checks for a subset using 'has_all_of'", function()
     local bf1 = sys.bitflag(3)    -- b0011
     local bf2 = sys.bitflag(3)    -- b0011
     local bf3 = sys.bitflag(15)   -- b1111
     local bf0 = sys.bitflag(0)    -- b0000
-    assert.is_true(bf1:has(bf2))  -- equal
-    assert.is_true(bf3:has(bf1))  -- is a subset, and has more flags
-    assert.is_false(bf1:has(bf3)) -- not a subset, bf3 has more flags
-    assert.is_false(bf1:has(bf0)) -- bf0 is unset, always returns false
+    assert.is_true(bf1:has_all_of(bf2))  -- equal
+    assert.is_true(bf3:has_all_of(bf1))  -- is a subset, and has more flags
+    assert.is_false(bf1:has_all_of(bf3)) -- not a subset, bf3 has more flags
+    assert.is_false(bf1:has_all_of(bf0)) -- bf0 is unset, always returns false
+  end)
+
+  it("checks for a subset using 'has_any_of'", function()
+    local bf1 = sys.bitflag(3)    -- b0011
+    local bf2 = sys.bitflag(3)    -- b0011
+    local bf3 = sys.bitflag(7)    -- b0111
+    local bf4 = sys.bitflag(8)    -- b1000
+    local bf0 = sys.bitflag(0)    -- b0000
+    assert.is_true(bf1:has_any_of(bf2))  -- equal
+    assert.is_true(bf3:has_any_of(bf1))  -- is a subset, and has more flags
+    assert.is_false(bf3:has_any_of(bf4)) -- no overlap in flags
+    assert.is_true(bf1:has_any_of(bf3))  -- not a subset, bf3 has more flags but still some overlap
+    assert.is_false(bf1:has_all_of(bf0)) -- bf0 is unset, always returns false
   end)
 
 end)

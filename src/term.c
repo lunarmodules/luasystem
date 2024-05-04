@@ -386,7 +386,7 @@ local system = require('system')
 local flags = system.getconsoleflags(io.stdout)
 print("Current stdout flags:", tostring(flags))
 
-if flags:has(system.COF_VIRTUAL_TERMINAL_PROCESSING + system.COF_PROCESSED_OUTPUT) then
+if flags:has_all_of(system.COF_VIRTUAL_TERMINAL_PROCESSING + system.COF_PROCESSED_OUTPUT) then
     print("Both flags are set")
 else
     print("At least one flag is not set")
@@ -445,7 +445,7 @@ The terminal attributes is a table with the following fields:
 local system = require('system')
 
 local status = assert(tcgetattr(io.stdin))
-if status.iflag:has(system.I_IGNBRK) then
+if status.iflag:has_all_of(system.I_IGNBRK) then
     print("Ignoring break condition")
 end
 */
@@ -539,7 +539,7 @@ _Note_: only `iflag`, `oflag`, and `lflag` are supported at the moment. The othe
 local system = require('system')
 
 local status = assert(tcgetattr(io.stdin))
-if not status.lflag:has(system.L_ECHO) then
+if not status.lflag:has_all_of(system.L_ECHO) then
     -- if echo is off, turn echoing newlines on
     tcsetattr(io.stdin, system.TCSANOW, { lflag = status.lflag + system.L_ECHONL }))
 end

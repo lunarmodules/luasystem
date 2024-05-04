@@ -82,11 +82,12 @@ local flags6 = sys.bitflag(7)   -- b0111
 print(flags6 == flags4)         -- true, same flags
 
 -- comparison of subsets
-local flags7 = sys.bitflag(0)   -- b0000
-local flags8 = sys.bitflag(3)   -- b0011
-local flags9 = sys.bitflag(7)   -- b0111
-print(flags9:has(flags8))       -- true, flags8 bits are all set in flags9
-print(flags8:has(flags7))       -- false, flags7 (== 0) is not set in flags8
+local flags7 = sys.bitflag(0)    -- b0000
+local flags8 = sys.bitflag(3)    -- b0011
+local flags9 = sys.bitflag(7)    -- b0111
+print(flags9:has_all_of(flags8)) -- true, flags8 bits are all set in flags9
+print(flags8:has_any_of(flags9)) -- true, some of flags9 bits are set in flags8
+print(flags8:has_all_of(flags7)) -- false, flags7 (== 0) is not set in flags8
 */
 static int lsbf_new(lua_State *L) {
     LSBF_BITFLAG flags = 0;
@@ -134,26 +135,48 @@ static int lsbf_eq(lua_State *L) {
 }
 
 /***
-Checks if the given flags are set.
-This is different from the `>=` and `<=` operators because if the flag to check
-has a value `0`, it will always return `false`. So if there are flags that are
-unsupported on a platform, they can be set to 0 and the `has` function will
+Checks if all the flags in the given subset are set.
+If the flags to check has a value `0`, it will always return `false`. So if there are flags that are
+unsupported on a platform, they can be set to 0 and the `has_all_of` function will
 return `false` if the flags are checked.
-@function bitflag:has
+@function bitflag:has_all_of
 @tparam bitflag subset the flags to check for.
 @treturn boolean true if all the flags are set, false otherwise.
 @usage
 local sys = require 'system'
-local flags = sys.bitflag(12)   -- b1100
-local myflags = sys.bitflag(15) -- b1111
-print(flags:has(myflags))       -- false, not all bits in myflags are set in flags
-print(myflags:has(flags))       -- true, all bits in flags are set in myflags
+local flags = sys.bitflag(12)     -- b1100
+local myflags = sys.bitflag(15)   -- b1111
+print(flags:has_all_of(myflags))  -- false, not all bits in myflags are set in flags
+print(myflags:has_all_of(flags))  -- true, all bits in flags are set in myflags
 */
-static int lsbf_has(lua_State *L) {
+static int lsbf_has_all_of(lua_State *L) {
     LSBF_BITFLAG a = lsbf_checkbitflags(L, 1);
     LSBF_BITFLAG b = lsbf_checkbitflags(L, 2);
     // Check if all bits in b are also set in a, and b is not 0
-    lua_pushboolean(L, (a | b) == a && b != 0);
+    lua_pushboolean(L, (a & b) == b && b != 0);
+    return 1;
+}
+
+/***
+Checks if any of the flags in the given subset are set.
+If the flags to check has a value `0`, it will always return `false`. So if there are flags that are
+unsupported on a platform, they can be set to 0 and the `has_any_of` function will
+return `false` if the flags are checked.
+@function bitflag:has_any_of
+@tparam bitflag subset the flags to check for.
+@treturn boolean true if any of the flags are set, false otherwise.
+@usage
+local sys = require 'system'
+local flags = sys.bitflag(12)     -- b1100
+local myflags = sys.bitflag(7)    -- b0111
+print(flags:has_any_of(myflags))  -- true, some bits in myflags are set in flags
+print(myflags:has_any_of(flags))  -- true, some bits in flags are set in myflags
+*/
+static int lsbf_has_any_of(lua_State *L) {
+    LSBF_BITFLAG a = lsbf_checkbitflags(L, 1);
+    LSBF_BITFLAG b = lsbf_checkbitflags(L, 2);
+    // Check if any bits in b are set in a
+    lua_pushboolean(L, (a & b) != 0);
     return 1;
 }
 
@@ -201,7 +224,8 @@ static const struct luaL_Reg lsbf_funcs[] = {
 
 static const struct luaL_Reg lsbf_methods[] = {
     {"value", lsbf_value},
-    {"has", lsbf_has},
+    {"has_all_of", lsbf_has_all_of},
+    {"has_any_of", lsbf_has_any_of},
     {"__tostring", lsbf_tostring},
     {"__add", lsbf_add},
     {"__sub", lsbf_sub},

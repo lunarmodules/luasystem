@@ -154,7 +154,7 @@ function sys.listconsoleflags(fh)
   local out = {}
   for k,v in pairs(sys) do
     if type(k) == "string" and k:sub(1,4) == flagtype then
-      if flags:has(v) then
+      if flags:has_all_of(v) then
         out[#out+1] = string.format("%10d [x] %s",v:value(),k)
       else
         out[#out+1] = string.format("%10d [ ] %s",v:value(),k)
@@ -191,7 +191,7 @@ function sys.listtermflags(fh)
     local out = {}
     for k,v in pairs(sys) do
       if type(k) == "string" and k:sub(1,2) == prefix then
-        if flags[flagtype]:has(v) then
+        if flags[flagtype]:has_all_of(v) then
           out[#out+1] = string.format("%10d [x] %s",v:value(),k)
         else
           out[#out+1] = string.format("%10d [ ] %s",v:value(),k)
