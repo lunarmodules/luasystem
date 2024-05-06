@@ -4,6 +4,19 @@ require("spec.helpers")
 
 describe("Terminal:", function()
 
+  local wincodepage
+
+  setup(function()
+    wincodepage = system.getconsoleoutputcp()
+    assert(system.setconsoleoutputcp(65001))
+  end)
+
+  teardown(function()
+    assert(system.setconsoleoutputcp(wincodepage))
+  end)
+
+
+
   describe("isatty()", function()
 
     local newtmpfile = require("pl.path").tmpname
@@ -93,7 +106,7 @@ describe("Terminal:", function()
 
 
 
-  describe("getconsoleflags()", function()
+  pending("getconsoleflags()", function()
 
     pending("returns the consoleflags, if called without flags", function()
 print"1"
@@ -111,4 +124,181 @@ for k,v in pairs(debug.getinfo(system.isatty)) do print(k,v) end
     end)
 
   end)
+
+
+
+  pending("setconsoleflags()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  pending("tcgetattr()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  pending("tcsetattr()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  pending("getconsolecp()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  pending("setconsolecp()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  pending("getconsoleoutputcp()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  pending("setconsoleoutputcp()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  pending("getnonblock()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  pending("setnonblock()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  pending("termsize()", function()
+
+    pending("sets the consoleflags, if called with flags", function()
+    end)
+
+  end)
+
+
+
+  describe("utf8cwidth()", function()
+
+    local ch1 = string.char(226, 130, 172)       -- "€"   single
+    local ch2 = string.char(240, 159, 154, 128)  -- "🚀"  double
+    local ch3 = string.char(228, 189, 160)       -- "你"  double
+    local ch4 = string.char(229, 165, 189)       -- "好"  double
+
+    it("handles zero width characters", function()
+      assert.same({0}, {system.utf8cwidth("")}) -- empty string returns 0-size
+      assert.same({nil, 'Character width determination failed'}, {system.utf8cwidth("\a")})  -- bell character
+      assert.same({nil, 'Character width determination failed'}, {system.utf8cwidth("\27")}) -- escape character
+    end)
+
+    it("handles single width characters", function()
+      assert.same({1}, {system.utf8cwidth("a")})
+      assert.same({1}, {system.utf8cwidth(ch1)})
+    end)
+
+    it("handles double width characters", function()
+      assert.same({2}, {system.utf8cwidth(ch2)})
+      assert.same({2}, {system.utf8cwidth(ch3)})
+      assert.same({2}, {system.utf8cwidth(ch4)})
+    end)
+
+    it("returns the width of the first character in the string", function()
+      assert.same({nil, 'Character width determination failed'}, {system.utf8cwidth("\a" .. ch1)})  -- bell character + EURO
+      assert.same({1}, {system.utf8cwidth(ch1 .. ch2)})
+      assert.same({2}, {system.utf8cwidth(ch2 .. ch3 .. ch4)})
+    end)
+
+  end)
+
+
+
+  describe("utf8swidth()", function()
+
+    local ch1 = string.char(226, 130, 172)       -- "€"   single
+    local ch2 = string.char(240, 159, 154, 128)  -- "🚀"  double
+    local ch3 = string.char(228, 189, 160)       -- "你"  double
+    local ch4 = string.char(229, 165, 189)       -- "好"  double
+
+    it("handles zero width characters", function()
+      assert.same({0}, {system.utf8swidth("")}) -- empty string returns 0-size
+      assert.same({nil, 'Character width determination failed'}, {system.utf8swidth("\a")})  -- bell character
+      assert.same({nil, 'Character width determination failed'}, {system.utf8swidth("\27")}) -- escape character
+    end)
+
+    it("handles multi-character UTF8 strings", function()
+      assert.same({15}, {system.utf8swidth("hello " .. ch1 .. ch2 .. " world")})
+      assert.same({16}, {system.utf8swidth("hello " .. ch3 .. ch4 .. " world")})
+    end)
+
+  end)
+
+
+
+  pending("termbackup()", function()
+
+  end)
+
+
+
+  pending("termrestore()", function()
+
+  end)
+
+
+
+  pending("termwrap()", function()
+
+  end)
+
+
+
+  pending("readkey()", function()
+
+  end)
+
+
+
+  pending("readansi()", function()
+
+  end)
+
 end)

@@ -5,11 +5,14 @@ local sys = require "system"
 
 
 
-if sys.is_windows then
+if sys.windows then
   -- Windows holds multiple copies of environment variables, to ensure `getenv`
   -- returns what `setenv` sets we need to use the `system.getenv` instead of
   -- `os.getenv`.
   os.getenv = sys.getenv  -- luacheck: ignore
+
+  -- Set console output to UTF-8 encoding.
+  sys.setconsoleoutputcp(65001)
 
   -- Set up the terminal to handle ANSI escape sequences on Windows.
   if sys.isatty(io.stdout) then
