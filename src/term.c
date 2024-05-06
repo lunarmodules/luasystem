@@ -15,6 +15,7 @@
 
 #ifdef _WIN32
 # include <windows.h>
+# include <locale.h>
 #else
 # include <termios.h>
 # include <string.h>
@@ -22,7 +23,15 @@
 # include <fcntl.h>
 # include <sys/ioctl.h>
 # include <unistd.h>
+# include <wchar.h>
+# include <locale.h>
 #endif
+
+
+// Windows does not have a wcwidth function, so we use compatibilty code from
+// http://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c by Markus Kuhn
+#include "wcwidth.h"
+
 
 #ifdef _WIN32
 // after an error is returned, GetLastError() result can be passed to this function to get a string
@@ -423,7 +432,7 @@ static int lst_getconsoleflags(lua_State *L)
 // see https://github.com/luaposix/luaposix
 
 /***
-Get termios state.
+Get termios state (Posix).
 The terminal attributes is a table with the following fields:
 
 - `iflag` input flags
@@ -511,7 +520,7 @@ static int lst_tcgetattr(lua_State *L)
 
 
 /***
-Set termios state.
+Set termios state (Posix).
 This function will set the flags as given.
 
 The `I_`, `O_`, and `L_` constants are available on the module table. They are the respective
@@ -689,13 +698,28 @@ static int lst_getnonblock(lua_State *L)
  * Reading keyboard input
  *-------------------------------------------------------------------------*/
 
-/***
-Reads a key from the console non-blocking.
-On Posix, `io.stdin` must be set to non-blocking mode using `setnonblock`
-before calling this function. Otherwise it will block.
+#ifdef _WIN32
+// Define a static buffer for UTF-8 characters
+static char utf8_buffer[4];
+static int utf8_buffer_len = 0;
+static int utf8_buffer_index = 0;
+#endif
 
-@function readkey
-@treturn[1] integer the key code of the key that was pressed
+
+/***
+Reads a key from the console non-blocking. This function should not be called
+directly, but through the `system.readkey` or `system.readansi` functions. It
+will return the next byte from the input stream, or `nil` if no key was pressed.
+
+On Posix, `io.stdin` must be set to non-blocking mode using `setnonblock`
+before calling this function. Otherwise it will block. No conversions are
+done on Posix, so the byte read is returned as-is.
+
+On Windows this reads a wide character and converts it to UTF-8. Multi-byte
+sequences will be buffered internally and returned one byte at a time.
+
+@function _readkey
+@treturn[1] integer the byte read from the input stream
 @treturn[2] nil if no key was pressed
 @treturn[3] nil on error
 @treturn[3] string error message
@@ -703,20 +727,87 @@ before calling this function. Otherwise it will block.
 */
 static int lst_readkey(lua_State *L) {
 #ifdef _WIN32
-    if (_kbhit()) {
-        int ch = _getch();
-        if (ch == EOF) {
-            // Error handling for end-of-file or read error
-            lua_pushnil(L);
-            lua_pushliteral(L, "_getch error");
-            return 2;
+    if (utf8_buffer_len > 0) {
+        // Buffer not empty, return the next byte
+        lua_pushinteger(L, (unsigned char)utf8_buffer[utf8_buffer_index]);
+        utf8_buffer_index++;
+        utf8_buffer_len--;
+        // printf("returning from buffer: %d\n", luaL_checkinteger(L, -1));
+        if (utf8_buffer_len == 0) {
+            utf8_buffer_index = 0;
         }
-        lua_pushinteger(L, (unsigned char)ch);
         return 1;
     }
-    return 0;
+
+    if (!_kbhit()) {
+        return 0;
+    }
+
+    wchar_t wc = _getwch();
+    // printf("----\nread wchar_t: %x\n", wc);
+    if (wc == WEOF) {
+        lua_pushnil(L);
+        lua_pushliteral(L, "read error");
+        return 2;
+    }
+
+    if (sizeof(wchar_t) == 2) {
+        // printf("2-byte wchar_t\n");
+        // only 2 bytes wide, not 4
+        if (wc >= 0xD800 && wc <= 0xDBFF) {
+            // printf("2-byte wchar_t, received high, getting low...\n");
+
+            // we got a high surrogate, so we need to read the next one as the low surrogate
+            if (!_kbhit()) {
+                lua_pushnil(L);
+                lua_pushliteral(L, "incomplete surrogate pair");
+                return 2;
+            }
+
+            wchar_t wc2 = _getwch();
+            // printf("read wchar_t 2: %x\n", wc2);
+            if (wc2 == WEOF) {
+                lua_pushnil(L);
+                lua_pushliteral(L, "read error");
+                return 2;
+            }
+
+            if (wc2 < 0xDC00 || wc2 > 0xDFFF) {
+                lua_pushnil(L);
+                lua_pushliteral(L, "invalid surrogate pair");
+                return 2;
+            }
+            // printf("2-byte pair complete now\n");
+            wchar_t wch_pair[2] = { wc, wc2 };
+            utf8_buffer_len = WideCharToMultiByte(CP_UTF8, 0, wch_pair, 2, utf8_buffer, sizeof(utf8_buffer), NULL, NULL);
+
+        } else {
+            // printf("2-byte wchar_t, no surrogate pair\n");
+            // not a high surrogate, so we can handle just the 2 bytes directly
+            utf8_buffer_len = WideCharToMultiByte(CP_UTF8, 0, &wc, 1, utf8_buffer, sizeof(utf8_buffer), NULL, NULL);
+        }
+
+    } else {
+        // printf("4-byte wchar_t\n");
+        // 4 bytes wide, so handle as UTF-32 directly
+        utf8_buffer_len = WideCharToMultiByte(CP_UTF8, 0, &wc, 1, utf8_buffer, sizeof(utf8_buffer), NULL, NULL);
+    }
+    // printf("utf8_buffer_len: %d\n", utf8_buffer_len);
+    utf8_buffer_index = 0;
+    if (utf8_buffer_len <= 0) {
+        lua_pushnil(L);
+        lua_pushliteral(L, "UTF-8 conversion error");
+        return 2;
+    }
+
+    lua_pushinteger(L, (unsigned char)utf8_buffer[utf8_buffer_index]);
+    utf8_buffer_index++;
+    utf8_buffer_len--;
+    // printf("returning from buffer: %x\n", luaL_checkinteger(L, -1));
+    return 1;
 
 #else
+    // Posix implementation
     char ch;
     ssize_t bytes_read = read(STDIN_FILENO, &ch, 1);
     if (bytes_read > 0) {
@@ -782,6 +873,205 @@ static int lst_termsize(lua_State *L) {
 
 
 /*-------------------------------------------------------------------------
+ * utf8 conversion and support
+ *-------------------------------------------------------------------------*/
+
+// Function to convert a single UTF-8 character to a Unicode code point (uint32_t)
+// To prevent having to do codepage/locale changes, we use a custom implementation
+int utf8_to_wchar(const char *utf8, size_t len, mk_wchar_t *codepoint) {
+    if (len == 0) {
+        return -1; // No input provided
+    }
+
+    unsigned char c = (unsigned char)utf8[0];
+    if (c <= 0x7F) {
+        *codepoint = c;
+        return 1;
+    } else if ((c & 0xE0) == 0xC0) {
+        if (len < 2) return -1; // Not enough bytes
+        *codepoint = ((utf8[0] & 0x1F) << 6) | (utf8[1] & 0x3F);
+        return 2;
+    } else if ((c & 0xF0) == 0xE0) {
+        if (len < 3) return -1; // Not enough bytes
+        *codepoint = ((utf8[0] & 0x0F) << 12) | ((utf8[1] & 0x3F) << 6) | (utf8[2] & 0x3F);
+        return 3;
+    } else if ((c & 0xF8) == 0xF0) {
+        if (len < 4) return -1; // Not enough bytes
+        *codepoint = ((utf8[0] & 0x07) << 18) | ((utf8[1] & 0x3F) << 12) | ((utf8[2] & 0x3F) << 6) | (utf8[3] & 0x3F);
+        return 4;
+    } else {
+        // Invalid UTF-8 character
+        return -1;
+    }
+}
+
+
+/***
+Get the width of a utf8 character for terminal display.
+@function utf8cwidth
+@tparam string utf8_char the utf8 character to check, only the width of the first character will be returned
+@treturn[1] int the display width in columns of the first character in the string (0 for an empty string)
+@treturn[2] nil
+@treturn[2] string error message
+*/
+int lst_utf8cwidth(lua_State *L) {
+    const char *utf8_char;
+    size_t utf8_len;
+    utf8_char = luaL_checklstring(L, 1, &utf8_len);
+    int width = 0;
+
+    mk_wchar_t wc;
+
+    if (utf8_len == 0) {
+        lua_pushinteger(L, 0);
+        return 1;
+    }
+
+    // Convert the UTF-8 string to a wide character
+    int bytes_processed = utf8_to_wchar(utf8_char, utf8_len, &wc);
+    if (bytes_processed == -1) {
+        lua_pushnil(L);
+        lua_pushstring(L, "Invalid UTF-8 character");
+        return 2;
+    }
+
+    // Get the width of the wide character
+    width = mk_wcwidth(wc);
+    if (width == -1) {
+        lua_pushnil(L);
+        lua_pushstring(L, "Character width determination failed");
+        return 2;
+    }
+
+    lua_pushinteger(L, width);
+    return 1;
+}
+
+
+
+
+/***
+Get the width of a utf8 string for terminal display.
+@function utf8swidth
+@tparam string utf8_string the utf8 string to check
+@treturn[1] int the display width of the string in columns (0 for an empty string)
+@treturn[2] nil
+@treturn[2] string error message
+*/
+int lst_utf8swidth(lua_State *L) {
+    const char *utf8_str;
+    size_t utf8_len;
+    utf8_str = luaL_checklstring(L, 1, &utf8_len);
+    int total_width = 0;
+
+    if (utf8_len == 0) {
+        lua_pushinteger(L, 0);
+        return 1;
+    }
+
+    int bytes_processed = 0;
+    size_t i = 0;
+    mk_wchar_t wc;
+
+    while (i < utf8_len) {
+        bytes_processed = utf8_to_wchar(utf8_str + i, utf8_len - i, &wc);
+        if (bytes_processed == -1) {
+            lua_pushnil(L);
+            lua_pushstring(L, "Invalid UTF-8 character");
+            return 2;
+        }
+
+        int width = mk_wcwidth(wc);
+        if (width == -1) {
+            lua_pushnil(L);
+            lua_pushstring(L, "Character width determination failed");
+            return 2;
+        }
+
+        total_width += width;
+        i += bytes_processed;
+    }
+
+    lua_pushinteger(L, total_width);
+    return 1;
+}
+
+
+
+/*-------------------------------------------------------------------------
+ * Windows codepage functions
+ *-------------------------------------------------------------------------*/
+
+
+/***
+Gets the current console code page (Windows).
+@function getconsolecp
+@treturn[1] int the current code page (always 65001 on Posix systems)
+*/
+static int lst_getconsolecp(lua_State *L) {
+    unsigned int cp = 65001;
+#ifdef _WIN32
+    cp = GetConsoleCP();
+#endif
+    lua_pushinteger(L, cp);
+    return 1;
+}
+
+
+
+/***
+Sets the current console code page (Windows).
+@function setconsolecp
+@tparam int cp the code page to set, use 65001 for UTF-8
+@treturn[1] bool `true` on success (always `true` on Posix systems)
+*/
+static int lst_setconsolecp(lua_State *L) {
+    unsigned int cp = (unsigned int)luaL_checkinteger(L, 1);
+    int success = TRUE;
+#ifdef _WIN32
+    SetConsoleCP(cp);
+#endif
+    lua_pushboolean(L, success);
+    return 1;
+}
+
+
+
+/***
+Gets the current console output code page (Windows).
+@function getconsoleoutputcp
+@treturn[1] int the current code page (always 65001 on Posix systems)
+*/
+static int lst_getconsoleoutputcp(lua_State *L) {
+    unsigned int cp = 65001;
+#ifdef _WIN32
+    cp = GetConsoleOutputCP();
+#endif
+    lua_pushinteger(L, cp);
+    return 1;
+}
+
+
+
+/***
+Sets the current console output code page (Windows).
+@function setconsoleoutputcp
+@tparam int cp the code page to set, use 65001 for UTF-8
+@treturn[1] bool `true` on success (always `true` on Posix systems)
+*/
+static int lst_setconsoleoutputcp(lua_State *L) {
+    unsigned int cp = (unsigned int)luaL_checkinteger(L, 1);
+    int success = TRUE;
+#ifdef _WIN32
+    SetConsoleOutputCP(cp);
+#endif
+    lua_pushboolean(L, success);
+    return 1;
+}
+
+
+
+/*-------------------------------------------------------------------------
  * Initializes module
  *-------------------------------------------------------------------------*/
 
@@ -791,10 +1081,16 @@ static luaL_Reg func[] = {
     { "setconsoleflags", lst_setconsoleflags },
     { "tcgetattr", lst_tcgetattr },
     { "tcsetattr", lst_tcsetattr },
-    { "getnonblock", lst_setnonblock },
+    { "getnonblock", lst_getnonblock },
     { "setnonblock", lst_setnonblock },
-    { "readkey", lst_readkey },
+    { "_readkey", lst_readkey },
     { "termsize", lst_termsize },
+    { "utf8cwidth", lst_utf8cwidth },
+    { "utf8swidth", lst_utf8swidth },
+    { "getconsolecp", lst_getconsolecp },
+    { "setconsolecp", lst_setconsolecp },
+    { "getconsoleoutputcp", lst_getconsoleoutputcp },
+    { "setconsoleoutputcp", lst_setconsoleoutputcp },
     { NULL, NULL }
 };
 

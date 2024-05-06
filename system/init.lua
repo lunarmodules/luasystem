@@ -2,45 +2,11 @@
 -- @module init
 
 local sys = require 'system.core'
-local global_backup -- global backup for terminal settings
-
-
-
-local add_gc_method do
-  -- feature detection; __GC meta-method, not available in all Lua versions
-  local has_gc = false
-  local tt = setmetatable({}, {  -- luacheck: ignore
-    __gc = function() has_gc = true end
-  })
-
-  -- clear table and run GC to trigger
-  tt = nil
-  collectgarbage()
-  collectgarbage()
-
-
-  if has_gc then
-    -- use default GC mechanism since it is available
-    function add_gc_method(t, f)
-      setmetatable(t, { __gc = f })
-    end
-  else
-    -- create workaround using a proxy userdata, typical for Lua 5.1
-    function add_gc_method(t, f)
-      local proxy = newproxy(true)
-      getmetatable(proxy).__gc = function()
-        t["__gc_proxy"] = nil
-        f(t)
-      end
-      t["__gc_proxy"] = proxy
-    end
-  end
-end
 
 
 
 --- Returns a backup of terminal setting for stdin/out/err.
--- Handles terminal/console flags and non-block flags on the streams.
+-- Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
 -- Backs up terminal/console flags only if a stream is a tty.
 -- @return table with backup of terminal settings
 function sys.termbackup()
@@ -63,6 +29,9 @@ function sys.termbackup()
   backup.block_out = sys.getnonblock(io.stdout)
   backup.block_err = sys.getnonblock(io.stderr)
 
+  backup.consoleoutcodepage = sys.getconsoleoutputcp()
+  backup.consolecp = sys.getconsolecp()
+
   return backup
 end
 
@@ -82,25 +51,65 @@ function sys.termrestore(backup)
   if backup.block_in  ~= nil then sys.setnonblock(io.stdin,  backup.block_in) end
   if backup.block_out ~= nil then sys.setnonblock(io.stdout, backup.block_out) end
   if backup.block_err ~= nil then sys.setnonblock(io.stderr, backup.block_err) end
+
+  if backup.consoleoutcodepage then sys.setconsoleoutputcp(backup.consoleoutcodepage) end
+  if backup.consolecp          then sys.setconsolecp(backup.consolecp) end
   return true
 end
 
 
 
---- Backs up terminal settings and restores them on application exit.
--- Calls `termbackup` to back up terminal settings and sets up a GC method to
--- automatically restore them on application exit (also works on Lua 5.1).
--- @treturn[1] boolean true
--- @treturn[2] nil if the backup was already created
--- @treturn[2] string error message
-function sys.autotermrestore()
-  if global_backup then
-    return nil, "global terminal backup was already set up"
+do -- autotermrestore
+  local global_backup -- global backup for terminal settings
+
+
+  local add_gc_method do
+    -- feature detection; __GC meta-method, not available in all Lua versions
+    local has_gc = false
+    local tt = setmetatable({}, {  -- luacheck: ignore
+      __gc = function() has_gc = true end
+    })
+
+    -- clear table and run GC to trigger
+    tt = nil
+    collectgarbage()
+    collectgarbage()
+
+
+    if has_gc then
+      -- use default GC mechanism since it is available
+      function add_gc_method(t, f)
+        setmetatable(t, { __gc = f })
+      end
+    else
+      -- create workaround using a proxy userdata, typical for Lua 5.1
+      function add_gc_method(t, f)
+        local proxy = newproxy(true)
+        getmetatable(proxy).__gc = function()
+          t["__gc_proxy"] = nil
+          f(t)
+        end
+        t["__gc_proxy"] = proxy
+      end
+    end
   end
-  global_backup = sys.termbackup()
-  add_gc_method(global_backup, function(self)
-    sys.termrestore(self) end)
-  return true
+
+
+  --- Backs up terminal settings and restores them on application exit.
+  -- Calls `termbackup` to back up terminal settings and sets up a GC method to
+  -- automatically restore them on application exit (also works on Lua 5.1).
+  -- @treturn[1] boolean true
+  -- @treturn[2] nil if the backup was already created
+  -- @treturn[2] string error message
+  function sys.autotermrestore()
+    if global_backup then
+      return nil, "global terminal backup was already set up"
+    end
+    global_backup = sys.termbackup()
+    add_gc_method(global_backup, function(self)
+      sys.termrestore(self) end)
+    return true
+  end
 end
 
 
@@ -208,12 +217,9 @@ end
 
 
 do
-  local _readkey = sys.readkey
-  local interval = 0.1
-
   --- Reads a single byte from the console, with a timeout.
-  -- This function uses `system.sleep` to wait in increments of 0.1 seconds until either a byte is
-  -- available or the timeout is reached.
+  -- This function uses `system.sleep` to wait until either a byte is available or the timeout is reached.
+  -- The sleep period is exponentially backing off, starting at 0.0125 seconds, with a maximum of 0.2 seconds.
   -- It returns immediately if a byte is available or if `timeout` is less than or equal to `0`.
   -- @tparam number timeout the timeout in seconds.
   -- @treturn[1] integer the key code of the key that was received
@@ -224,11 +230,13 @@ do
       error("arg #1 to readkey, expected timeout in seconds, got " .. type(timeout), 2)
     end
 
-    local key = _readkey()
+    local interval = 0.0125
+    local key = sys._readkey()
     while key == nil and timeout > 0 do
-      sys.sleep(interval)
+      sys.sleep(math.min(interval, timeout))
       timeout = timeout - interval
-      key = _readkey()
+      interval = math.min(0.2, interval * 2)
+      key = sys._readkey()
     end
 
     if key then
@@ -246,14 +254,14 @@ do
   local utf8_length -- length of utf8 sequence currently being processed
   local unpack = unpack or table.unpack
 
-  -- Reads a single key, if it is the start of ansi escape sequence then it reads
-  -- the full sequence.
+  --- Reads a single key, if it is the start of ansi escape sequence then it reads
+  -- the full sequence. The key can be a multi-byte string in case of multibyte UTF-8 character.
   -- This function uses `system.readkey`, and hence `system.sleep` to wait until either a key is
   -- available or the timeout is reached.
   -- It returns immediately if a key is available or if `timeout` is less than or equal to `0`.
   -- In case of an ANSI sequence, it will return the full sequence as a string.
   -- @tparam number timeout the timeout in seconds.
-  -- @treturn[1] string the character that was received, or a complete ANSI sequence
+  -- @treturn[1] string the character that was received (can be multi-byte), or a complete ANSI sequence
   -- @treturn[1] string the type of input: `"char"` for a single key, `"ansi"` for an ANSI sequence
   -- @treturn[2] nil in case of an error
   -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
