@@ -207,4 +207,151 @@ end
 
 
 
+do
+  local _readkey = sys.readkey
+  local interval = 0.1
+
+  --- Reads a single byte from the console, with a timeout.
+  -- This function uses `system.sleep` to wait in increments of 0.1 seconds until either a byte is
+  -- available or the timeout is reached.
+  -- It returns immediately if a byte is available or if `timeout` is less than or equal to `0`.
+  -- @tparam number timeout the timeout in seconds.
+  -- @treturn[1] integer the key code of the key that was received
+  -- @treturn[2] nil if no key was read
+  -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
+  function sys.readkey(timeout)
+    if type(timeout) ~= "number" then
+      error("arg #1 to readkey, expected timeout in seconds, got " .. type(timeout), 2)
+    end
+
+    local key = _readkey()
+    while key == nil and timeout > 0 do
+      sys.sleep(interval)
+      timeout = timeout - interval
+      key = _readkey()
+    end
+
+    if key then
+      return key
+    end
+    return nil, "timeout"
+  end
+end
+
+
+
+do
+  local left_over_key
+  local sequence -- table to store the sequence in progress
+  local utf8_length -- length of utf8 sequence currently being processed
+
+  -- Reads a single key, if it is the start of ansi escape sequence then it reads
+  -- the full sequence.
+  -- This function uses `system.readkey`, and hence `system.sleep` to wait until either a key is
+  -- available or the timeout is reached.
+  -- It returns immediately if a key is available or if `timeout` is less than or equal to `0`.
+  -- In case of an ANSI sequence, it will return the full sequence as a string.
+  -- @tparam number timeout the timeout in seconds.
+  -- @treturn[1] string the character that was received, or a complete ANSI sequence
+  -- @treturn[1] string the type of input: `"char"` for a single key, `"ansi"` for an ANSI sequence
+  -- @treturn[2] nil in case of an error
+  -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
+  -- @treturn[2] string partial result in case of an error while reading a sequence, the sequence so far.
+  function sys.readansi(timeout)
+    if type(timeout) ~= "number" then
+      error("arg #1 to readansi, expected timeout in seconds, got " .. type(timeout), 2)
+    end
+
+    local key
+
+    if not sequence then
+      -- no sequence in progress, read a key
+
+      if left_over_key then
+        -- we still have a cached key from the last call
+        key = left_over_key
+        left_over_key = nil
+      else
+        -- read a new key
+        local err
+        key, err = sys.readkey(timeout)
+        if key == nil then -- timeout or error
+          return nil, err
+        end
+      end
+
+      if key == 27 then
+        -- looks like an ansi escape sequence, immediately read next char
+        -- as an heuristic against manually typing escape sequences
+        local key2 = sys.readkey(0)
+        if key2 ~= 91 and key2 ~= 79 then -- we expect either "[" or "O" for an ANSI sequence
+          -- not the expected [ or O character, so we return the key as is
+          -- and store the extra key read for the next call
+          left_over_key = key2
+          return string.char(key), "char"
+        end
+
+        -- escape sequence detected
+        sequence = { key, key2 }
+      else
+        -- check UTF8 length
+        utf8_length = key < 128 and 1 or key < 224 and 2 or key < 240 and 3 or key < 248 and 4
+        if utf8_length  == 1 then
+          -- single byte character
+          utf8_length = nil
+          return string.char(key), "char"
+        else
+          -- UTF8 sequence detected
+          sequence = { key }
+        end
+      end
+    end
+
+    local err
+    if utf8_length then
+      -- read remainder of UTF8 sequence
+      local timeout_end = sys.gettime() + timeout
+      while true do
+        key, err = sys.readkey(timeout_end - sys.gettime())
+        if err then
+          break
+        end
+        table.insert(sequence, key)
+
+        if #sequence == utf8_length then
+          -- end of sequence, return the full sequence
+          local result = string.char((unpack or table.unpack)(sequence))
+          sequence = nil
+          utf8_length = nil
+          return result, "char"
+        end
+      end
+
+    else
+      -- read remainder of ANSI sequence
+      local timeout_end = sys.gettime() + timeout
+      while true do
+        key, err = sys.readkey(timeout_end - sys.gettime())
+        if err then
+          break
+        end
+        table.insert(sequence, key)
+
+        if (key >= 65 and key <= 90) or (key >= 97 and key <= 126) then
+          -- end of sequence, return the full sequence
+          local result = string.char((unpack or table.unpack)(sequence))
+          sequence = nil
+          return result, "ansi"
+        end
+      end
+    end
+
+    -- error, or timeout reached, return the sequence so far
+    local partial = string.char((unpack or table.unpack)(sequence))
+    return nil, err, partial
+  end
+end
+
+
+
 return sys

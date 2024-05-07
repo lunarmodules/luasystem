@@ -44,8 +44,8 @@ local spinner do
     i = i + 1
     if i > #spin then i = 1 end
 
-    if sys.keypressed() then
-      sys.readkey() -- consume key pressed
+    if sys.readkey(0) ~= nil then
+      while sys.readkey(0) ~= nil do end -- consume keys pressed
       io.write(" ");
       left()
       showCursor()
