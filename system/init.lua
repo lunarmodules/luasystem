@@ -244,6 +244,7 @@ do
   local left_over_key
   local sequence -- table to store the sequence in progress
   local utf8_length -- length of utf8 sequence currently being processed
+  local unpack = unpack or table.unpack
 
   -- Reads a single key, if it is the start of ansi escape sequence then it reads
   -- the full sequence.
@@ -320,7 +321,7 @@ do
 
         if #sequence == utf8_length then
           -- end of sequence, return the full sequence
-          local result = string.char((unpack or table.unpack)(sequence))
+          local result = string.char(unpack(sequence))
           sequence = nil
           utf8_length = nil
           return result, "char"
@@ -339,7 +340,7 @@ do
 
         if (key >= 65 and key <= 90) or (key >= 97 and key <= 126) then
           -- end of sequence, return the full sequence
-          local result = string.char((unpack or table.unpack)(sequence))
+          local result = string.char(unpack(sequence))
           sequence = nil
           return result, "ansi"
         end
@@ -347,7 +348,7 @@ do
     end
 
     -- error, or timeout reached, return the sequence so far
-    local partial = string.char((unpack or table.unpack)(sequence))
+    local partial = string.char(unpack(sequence))
     return nil, err, partial
   end
 end
