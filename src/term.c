@@ -738,34 +738,7 @@ static int lst_readkey(lua_State *L) {
 #endif
 }
 
-/***
-Checks if a key has been pressed without reading it.
-On Posix, `io.stdin` must be set to non-blocking mode using `setnonblock`
-before calling this function. Otherwise it will block.
 
-@function keypressed
-@treturn boolean true if a key has been pressed, nil if not.
-*/
-static int lst_keypressed(lua_State *L) {
-#ifdef _WIN32
-    if (kbhit()) {
-        lua_pushboolean(L, 1);
-        return 1;
-    }
-    return 0;
-
-#else
-    char ch;
-    if (read(STDIN_FILENO, &ch, 1) > 0) {
-        // key was read, push back to stdin
-        ungetc(ch, stdin);
-        lua_pushboolean(L, 1);
-        return 1;
-    }
-    return 0;
-
-#endif
-}
 
 /*-------------------------------------------------------------------------
  * Retrieve terminal size
@@ -821,7 +794,6 @@ static luaL_Reg func[] = {
     { "getnonblock", lst_setnonblock },
     { "setnonblock", lst_setnonblock },
     { "readkey", lst_readkey },
-    { "keypressed", lst_keypressed },
     { "termsize", lst_termsize },
     { NULL, NULL }
 };
