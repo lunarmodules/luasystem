@@ -697,22 +697,43 @@ before calling this function. Otherwise it will block.
 @function readkey
 @treturn[1] integer the key code of the key that was pressed
 @treturn[2] nil if no key was pressed
+@treturn[3] nil on error
+@treturn[3] string error message
+@treturn[3] int errnum (on posix)
 */
 static int lst_readkey(lua_State *L) {
 #ifdef _WIN32
     if (_kbhit()) {
-        lua_pushinteger(L, _getch());
+        int ch = _getch();
+        if (ch == EOF) {
+            // Error handling for end-of-file or read error
+            lua_pushnil(L);
+            lua_pushliteral(L, "_getch error");
+            return 2;
+        }
+        lua_pushinteger(L, (unsigned char)ch);
         return 1;
     }
     return 0;
 
 #else
     char ch;
-    if (read(STDIN_FILENO, &ch, 1) > 0) {
-        lua_pushinteger(L, ch);
+    ssize_t bytes_read = read(STDIN_FILENO, &ch, 1);
+    if (bytes_read > 0) {
+        lua_pushinteger(L, (unsigned char)ch);
         return 1;
+
+    } else if (bytes_read == 0) {
+        return 0;  // End of file or stream closed
+
+    } else {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            // Resource temporarily unavailable, no data available to read
+            return 0;
+        } else {
+            return pusherror(L, "read error");
+        }
     }
-    return 0;
 
 #endif
 }
