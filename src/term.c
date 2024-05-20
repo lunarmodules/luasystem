@@ -309,6 +309,7 @@ static HANDLE get_console_handle(lua_State *L, int flags_optional)
 // Lua error if the file is not one of these.
 static int get_console_handle(lua_State *L)
 {
+printf("get_console_handle\n");
     FILE **file = (FILE **)luaL_checkudata(L, 1, LUA_FILEHANDLE);
     if (file == NULL || *file == NULL) {
         return luaL_argerror(L, 1, "expected file handle"); // call doesn't return
@@ -375,9 +376,12 @@ static int lst_setconsoleflags(lua_State *L)
         return 2;
     }
 
-#endif
-    lua_pushboolean(L, 1);
+#else
+    get_console_handle(L); // to validate args
+    lua_pushboolean(L, 1); // always return true on Posix
     return 1;
+
+#endif
 }
 
 
@@ -417,6 +421,8 @@ static int lst_getconsoleflags(lua_State *L)
         lua_pushliteral(L, "failed to get console mode");
         return 2;
     }
+#else
+    get_console_handle(L); // to validate args
 
 #endif
     lsbf_pushbitflags(L, console_mode);

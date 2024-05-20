@@ -106,21 +106,29 @@ describe("Terminal:", function()
 
 
 
-  pending("getconsoleflags()", function()
+  describe("getconsoleflags()", function()
 
-    pending("returns the consoleflags, if called without flags", function()
-print"1"
-package.loaded["system"] = nil
-package.loaded["system.core"] = nil
-print"2"
-local system = require "system"
-print"3"
-for k,v in pairs(system) do print(k,v) end
-for k,v in pairs(debug.getinfo(system.isatty)) do print(k,v) end
-
+    win_it("returns the consoleflags #manual", function()
       local flags, err = system.getconsoleflags(io.stdin)
       assert.is_nil(err)
-      assert.is_integer(flags)
+      assert.is_userdata(flags)
+      assert.equals("bitflags:", tostring(flags):sub(1,9))
+    end)
+
+
+    nix_it("returns the consoleflags, as value 0", function()
+      local flags, err = system.getconsoleflags(io.stdin)
+      assert.is_nil(err)
+      assert.is_userdata(flags)
+      assert.equals("bitflags:", tostring(flags):sub(1,9))
+      assert.equals(0, flags:value())
+    end)
+
+
+    it("returns an error if called with an invalid argument", function()
+      assert.has.error(function()
+        system.getconsoleflags("invalid")
+      end, "bad argument #1 to 'getconsoleflags' (FILE* expected, got string)")
     end)
 
   end)
