@@ -109,15 +109,15 @@ describe("Terminal:", function()
   describe("getconsoleflags()", function()
 
     win_it("returns the consoleflags #manual", function()
-      local flags, err = system.getconsoleflags(io.stdin)
+      local flags, err = system.getconsoleflags(io.stdout)
       assert.is_nil(err)
       assert.is_userdata(flags)
       assert.equals("bitflags:", tostring(flags):sub(1,9))
     end)
 
 
-    nix_it("returns the consoleflags, as value 0", function()
-      local flags, err = system.getconsoleflags(io.stdin)
+    nix_it("returns the consoleflags, always value 0", function()
+      local flags, err = system.getconsoleflags(io.stdout)
       assert.is_nil(err)
       assert.is_userdata(flags)
       assert.equals("bitflags:", tostring(flags):sub(1,9))
@@ -135,9 +135,39 @@ describe("Terminal:", function()
 
 
 
-  pending("setconsoleflags()", function()
+  describe("setconsoleflags()", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    win_it("sets the consoleflags #manual", function()
+      local old_flags = assert(system.getconsoleflags(io.stdout))
+      finally(function()
+        system.setconsoleflags(io.stdout, old_flags)
+      end)
+
+      local new_flags
+      if old_flags:has_all_of(system.COF_VIRTUAL_TERMINAL_PROCESSING) then
+        new_flags = old_flags - system.COF_VIRTUAL_TERMINAL_PROCESSING
+      else
+        new_flags = old_flags + system.COF_VIRTUAL_TERMINAL_PROCESSING
+      end
+
+      local success, err = system.setconsoleflags(io.stdout, new_flags)
+      assert.is_nil(err)
+      assert.is_true(success)
+
+      local updated_flags = assert(system.getconsoleflags(io.stdout))
+      assert.equals(new_flags:value(), updated_flags:value())
+    end)
+
+
+    nix_it("sets the consoleflags, always succeeds", function()
+      assert(system.setconsoleflags(io.stdout, system.getconsoleflags(io.stdout)))
+    end)
+
+
+    it("returns an error if called with an invalid argument", function()
+      assert.has.error(function()
+        system.setconsoleflags("invalid")
+      end, "bad argument #1 to 'setconsoleflags' (FILE* expected, got string)")
     end)
 
   end)
