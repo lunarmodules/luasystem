@@ -324,9 +324,12 @@ describe("Terminal:", function()
 
 
 
-  pending("termsize()", function()
+  describe("termsize() #manual", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    it("gets the terminal size", function()
+      local w, h = system.termsize()
+      assert.is_number(w)
+      assert.is_number(h)
     end)
 
   end)
@@ -407,13 +410,147 @@ describe("Terminal:", function()
 
 
 
-  pending("readkey()", function()
+  describe("keyboard input", function()
 
-  end)
+    local old_readkey = system._readkey
+    local current_buffer
+    local function setbuffer(str)
+      assert(type(str) == "string", "setbuffer() expects a string")
+      if str == "" then
+        current_buffer = nil
+      else
+        current_buffer = str
+      end
+    end
+
+
+    setup(function()
+      system._readkey = function()
+        if not current_buffer then
+          return nil
+        end
+        local ch = current_buffer:byte(1, 1)
+        if #current_buffer == 1 then
+          current_buffer = nil
+        else
+          current_buffer = current_buffer:sub(2, -1)
+        end
+        return ch
+      end
+    end)
+
+
+    teardown(function()
+      system._readkey = old_readkey
+    end)
 
 
 
-  pending("readansi()", function()
+    describe("readkey()", function()
+
+      it("fails without a timeout", function()
+        assert.has.error(function()
+          system.readkey()
+        end, "arg #1 to readkey, expected timeout in seconds, got nil")
+      end)
+
+
+      it("reads a single byte for single-byte characters", function()
+        setbuffer("abc")
+        assert.equals(string.byte("a"), system.readkey(0))
+        assert.equals(string.byte("b"), system.readkey(0))
+        assert.equals(string.byte("c"), system.readkey(0))
+      end)
+
+
+      it("reads a single byte for multi-byte chars", function()
+        setbuffer(string.char(226, 130, 172) ..        -- "€"   single
+                  string.char(240, 159, 154, 128))     -- "🚀"  double
+        assert.equals(226, system.readkey(0))
+        assert.equals(130, system.readkey(0))
+        assert.equals(172, system.readkey(0))
+        assert.equals(240, system.readkey(0))
+        assert.equals(159, system.readkey(0))
+        assert.equals(154, system.readkey(0))
+        assert.equals(128, system.readkey(0))
+      end)
+
+
+      it("times out", function()
+        setbuffer("")
+        local timing = system.gettime()
+        assert.same({ nil, "timeout" }, { system.readkey(0.5) })
+
+        timing = system.gettime() - timing
+        -- assert.is.near(0.5, timing, 0.1)  -- this works in CI for Unix and Windows, but not MacOS (locally it passes)
+        assert.is.near(1, timing, 0.5)       -- this also works for MacOS in CI
+      end)
+
+    end)
+
+
+
+    describe("readansi()", function()
+
+      it("fails without a timeout", function()
+        assert.has.error(function()
+          system.readansi()
+        end, "arg #1 to readansi, expected timeout in seconds, got nil")
+      end)
+
+
+      it("reads a single byte for single-byte characters", function()
+        setbuffer("abc")
+        assert.are.same({"a", "char"}, {system.readansi(0)})
+        assert.are.same({"b", "char"}, {system.readansi(0)})
+        assert.are.same({"c", "char"}, {system.readansi(0)})
+      end)
+
+
+      it("reads a multi-byte characters one at a time", function()
+        setbuffer(string.char(226, 130, 172) ..        -- "€"   single
+                  string.char(240, 159, 154, 128))     -- "🚀"  double
+        assert.are.same({"€", "char"}, {system.readansi(0)})
+        assert.are.same({"🚀", "char"}, {system.readansi(0)})
+      end)
+
+
+      it("reads ANSI escape sequences, marked by '<esc>['", function()
+        setbuffer("\27[A\27[B\27[C\27[D")
+        assert.are.same({"\27[A", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27[B", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27[C", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27[D", "ansi"}, {system.readansi(0)})
+      end)
+
+
+      it("reads ANSI escape sequences, marked by '<esc>O'", function()
+        setbuffer("\27OA\27OB\27OC\27OD")
+        assert.are.same({"\27OA", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27OB", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27OC", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27OD", "ansi"}, {system.readansi(0)})
+      end)
+
+
+      it("returns a single <esc> character if no sequence is found", function()
+        setbuffer("\27\27[A")
+        assert.are.same({"\27", "char"}, {system.readansi(0)})
+        assert.are.same({"\27[A", "ansi"}, {system.readansi(0)})
+      end)
+
+
+      it("times out", function()
+        setbuffer("")
+        local timing = system.gettime()
+        assert.same({ nil, "timeout" }, { system.readansi(0.5) })
+
+        timing = system.gettime() - timing
+        -- assert.is.near(0.5, timing, 0.1)  -- this works in CI for Unix and Windows, but not MacOS (locally it passes)
+        assert.is.near(1, timing, 0.5)       -- this also works for MacOS in CI
+      end)
+
+    end)
 
   end)
 
