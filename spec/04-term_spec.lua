@@ -140,7 +140,7 @@ describe("Terminal:", function()
     win_it("sets the consoleflags #manual", function()
       local old_flags = assert(system.getconsoleflags(io.stdout))
       finally(function()
-        system.setconsoleflags(io.stdout, old_flags)
+        system.setconsoleflags(io.stdout, old_flags)   -- ensure we restore the original ones
       end)
 
       local new_flags
@@ -192,36 +192,114 @@ describe("Terminal:", function()
 
 
 
-  pending("getconsolecp()", function()
+  describe("getconsolecp()", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    win_it("gets the console codepage", function()
+      local cp, err = system.getconsolecp()
+      assert.is_nil(err)
+      assert.is_number(cp)
+    end)
+
+    nix_it("gets the console codepage, always 65001 (utf8)", function()
+      local cp, err = system.getconsolecp()
+      assert.is_nil(err)
+      assert.equals(65001, cp)
     end)
 
   end)
 
 
 
-  pending("setconsolecp()", function()
+  describe("setconsolecp()", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    win_it("sets the console codepage", function()
+      local old_cp = assert(system.getconsolecp())
+      finally(function()
+        system.setconsolecp(old_cp)  -- ensure we restore the original one
+      end)
+
+      local new_cp
+      if old_cp ~= 65001 then
+        new_cp = 65001  -- set to UTF8
+      else
+        new_cp = 850    -- another common one
+      end
+
+      local success, err = system.setconsolecp(new_cp)
+      assert.is_nil(err)
+      assert.is_true(success)
+
+      local updated_cp = assert(system.getconsolecp())
+      assert.equals(new_cp, updated_cp)
+    end)
+
+
+    nix_it("sets the console codepage, always succeeds", function()
+      assert(system.setconsolecp(850))
+    end)
+
+
+    it("returns an error if called with an invalid argument", function()
+      assert.has.error(function()
+        system.setconsolecp("invalid")
+      end, "bad argument #1 to 'setconsolecp' (number expected, got string)")
     end)
 
   end)
 
 
 
-  pending("getconsoleoutputcp()", function()
+  describe("getconsoleoutputcp()", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    win_it("gets the console output codepage", function()
+      local cp, err = system.getconsoleoutputcp()
+      assert.is_nil(err)
+      assert.is_number(cp)
+    end)
+
+    nix_it("gets the console output codepage, always 65001 (utf8)", function()
+      local cp, err = system.getconsoleoutputcp()
+      assert.is_nil(err)
+      assert.equals(65001, cp)
     end)
 
   end)
 
 
 
-  pending("setconsoleoutputcp()", function()
+  describe("setconsoleoutputcp()", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    win_it("sets the console output codepage", function()
+      local old_cp = assert(system.getconsoleoutputcp())
+      finally(function()
+        system.setconsoleoutputcp(old_cp)  -- ensure we restore the original one
+      end)
+
+      local new_cp
+      if old_cp ~= 65001 then
+        new_cp = 65001  -- set to UTF8
+      else
+        new_cp = 850    -- another common one
+      end
+
+      local success, err = system.setconsoleoutputcp(new_cp)
+      assert.is_nil(err)
+      assert.is_true(success)
+
+      local updated_cp = assert(system.getconsoleoutputcp())
+      assert.equals(new_cp, updated_cp)
+    end)
+
+
+    nix_it("sets the console output codepage, always succeeds", function()
+      assert(system.setconsoleoutputcp(850))
+    end)
+
+
+    it("returns an error if called with an invalid argument", function()
+      assert.has.error(function()
+        system.setconsoleoutputcp("invalid")
+      end, "bad argument #1 to 'setconsoleoutputcp' (number expected, got string)")
     end)
 
   end)
