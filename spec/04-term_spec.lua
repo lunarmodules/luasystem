@@ -306,18 +306,56 @@ describe("Terminal:", function()
 
 
 
-  pending("getnonblock()", function()
+  describe("getnonblock()", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    nix_it("gets the non-blocking flag", function()
+      local nb, err = system.getnonblock(io.stdin)
+      assert.is_nil(err)
+      assert.is_boolean(nb)
+    end)
+
+    win_it("gets the non-blocking flag, always false", function()
+      local nb, err = system.getnonblock(io.stdin)
+      assert.is_nil(err)
+      assert.is_false(nb)
     end)
 
   end)
 
 
 
-  pending("setnonblock()", function()
+  describe("setnonblock()", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    nix_it("sets the non-blocking flag", function()
+      local old_nb = system.getnonblock(io.stdin)
+      assert.is.boolean(old_nb)
+
+      finally(function()
+        system.setnonblock(io.stdin, old_nb)  -- ensure we restore the original one
+      end)
+
+      local new_nb = not old_nb
+
+      local success, err = system.setnonblock(io.stdin, new_nb)
+      assert.is_nil(err)
+      assert.is_true(success)
+
+      local updated_nb = assert(system.getnonblock(io.stdin))
+      assert.equals(new_nb, updated_nb)
+    end)
+
+
+    win_it("sets the non-blocking flag, always succeeds", function()
+      local success, err = system.setnonblock(io.stdin, true)
+      assert.is_nil(err)
+      assert.is_true(success)
+    end)
+
+
+    it("returns an error if called with an invalid argument", function()
+      assert.has.error(function()
+        system.setnonblock("invalid")
+      end, "bad argument #1 to 'setnonblock' (FILE* expected, got string)")
     end)
 
   end)
