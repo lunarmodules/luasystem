@@ -656,6 +656,12 @@ static int lst_setnonblock(lua_State *L)
         return pusherror(L, "Error changing O_NONBLOCK: ");
     }
 
+#else
+    HANDLE console_handle = get_console_handle(L, 1);
+    if (console_handle == NULL) {
+        return 2; // error message is already on the stack
+    }
+
 #endif
 
     lua_pushboolean(L, 1);
@@ -691,6 +697,11 @@ static int lst_getnonblock(lua_State *L)
     }
 
 #else
+    HANDLE console_handle = get_console_handle(L, 1);
+    if (console_handle == NULL) {
+        return 2; // error message is already on the stack
+    }
+
     lua_pushboolean(L, 0);
 
 #endif
