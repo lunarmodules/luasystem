@@ -174,18 +174,97 @@ describe("Terminal:", function()
 
 
 
-  pending("tcgetattr()", function()
+  describe("tcgetattr()", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    pending("gets the terminal flags", function()
+    end)
+
+
+    win_it("gets the terminal flags, always 0", function()
+      local flags, err = system.tcgetattr(io.stdin)
+      assert.is_nil(err)
+      assert.is_table(flags)
+      assert.equals("bitflags:", tostring(flags.iflag):sub(1,9))
+      assert.equals("bitflags:", tostring(flags.oflag):sub(1,9))
+      assert.equals("bitflags:", tostring(flags.lflag):sub(1,9))
+      assert.equals("bitflags:", tostring(flags.cflag):sub(1,9))
+      assert.equals(0, flags.iflag:value())
+      assert.equals(0, flags.oflag:value())
+      assert.equals(0, flags.lflag:value())
+      assert.equals(0, flags.cflag:value())
+      assert.same({}, flags.cc)
+    end)
+
+
+    it("returns an error if called with an invalid argument", function()
+      assert.has.error(function()
+        system.tcgetattr("invalid")
+      end, "bad argument #1 to 'tcgetattr' (FILE* expected, got string)")
     end)
 
   end)
 
 
 
-  pending("tcsetattr()", function()
+  describe("tcsetattr()", function()
 
-    pending("sets the consoleflags, if called with flags", function()
+    nix_it("sets the terminal flags, if called with flags", function()
+      assert.equal(true, false)
+    end)
+
+
+    win_it("sets the terminal flags, if called with flags, always succeeds", function()
+      local success, err = system.tcsetattr(io.stdin, system.TCSANOW, system.tcgetattr(io.stdin))
+      assert.is_nil(err)
+      assert.is_true(success)
+    end)
+
+
+    it("returns an error if called with an invalid first argument", function()
+      assert.has.error(function()
+        system.tcsetattr("invalid")
+      end, "bad argument #1 to 'tcsetattr' (FILE* expected, got string)")
+    end)
+
+
+    it("returns an error if called with an invalid second argument", function()
+      assert.has.error(function()
+        system.tcsetattr(io.stdin, "invalid")
+      end, "bad argument #2 to 'tcsetattr' (number expected, got string)")
+    end)
+
+
+    it("returns an error if called with an invalid third argument", function()
+      assert.has.error(function()
+        system.tcsetattr(io.stdin, system.TCSANOW, "invalid")
+      end, "bad argument #3 to 'tcsetattr' (table expected, got string)")
+    end)
+
+
+    it("returns an error if iflag is not a bitflags object", function()
+      local flags = assert(system.tcgetattr(io.stdin))
+      flags.iflag = 0
+      assert.has.error(function()
+        system.tcsetattr(io.stdin, system.TCSANOW, flags)
+      end, "bad argument #3 to 'tcsetattr' (table expected, got number)")
+    end)
+
+
+    it("returns an error if oflag is not a bitflags object", function()
+      local flags = assert(system.tcgetattr(io.stdin))
+      flags.oflag = 0
+      assert.has.error(function()
+        system.tcsetattr(io.stdin, system.TCSANOW, flags)
+      end, "bad argument #3 to 'tcsetattr' (table expected, got number)")
+    end)
+
+
+    it("returns an error if lflag is not a bitflags object", function()
+      local flags = assert(system.tcgetattr(io.stdin))
+      flags.lflag = 0
+      assert.has.error(function()
+        system.tcsetattr(io.stdin, system.TCSANOW, flags)
+      end, "bad argument #3 to 'tcsetattr' (table expected, got number)")
     end)
 
   end)
@@ -314,10 +393,18 @@ describe("Terminal:", function()
       assert.is_boolean(nb)
     end)
 
+
     win_it("gets the non-blocking flag, always false", function()
       local nb, err = system.getnonblock(io.stdin)
       assert.is_nil(err)
       assert.is_false(nb)
+    end)
+
+
+    it("returns an error if called with an invalid argument", function()
+      assert.has.error(function()
+        system.getnonblock("invalid")
+      end, "bad argument #1 to 'getnonblock' (FILE* expected, got string)")
     end)
 
   end)
