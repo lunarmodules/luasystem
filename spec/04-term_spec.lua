@@ -8,7 +8,7 @@ describe("Terminal:", function()
 
   setup(function()
     wincodepage = system.getconsoleoutputcp()
-    assert(system.setconsoleoutputcp(65001))
+    assert(system.setconsoleoutputcp(65001))  -- set to UTF8
   end)
 
   teardown(function()

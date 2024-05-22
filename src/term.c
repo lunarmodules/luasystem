@@ -361,26 +361,17 @@ static int lst_setconsoleflags(lua_State *L)
     }
     LSBF_BITFLAG new_console_mode = lsbf_checkbitflags(L, 2);
 
-    DWORD prev_console_mode;
-    if (GetConsoleMode(console_handle, &prev_console_mode) == 0)
-    {
-        termFormatError(L, GetLastError(), "failed to get console mode");
-        return 2;
-    }
-
-    int success = SetConsoleMode(console_handle, new_console_mode) != 0;
-    if (!success)
-    {
+    if (!SetConsoleMode(console_handle, new_console_mode)) {
         termFormatError(L, GetLastError(), "failed to set console mode");
         return 2;
     }
 
 #else
     get_console_handle(L); // to validate args
-    lua_pushboolean(L, 1); // always return true on Posix
-    return 1;
-
 #endif
+
+    lua_pushboolean(L, 1);
+    return 1;
 }
 
 
@@ -657,6 +648,9 @@ static int lst_setnonblock(lua_State *L)
     }
 
 #else
+    if (lua_gettop(L) > 1) {
+        lua_settop(L, 1); // use one argument, because the second boolean will fail as get_console_flags expects bitflags
+    }
     HANDLE console_handle = get_console_handle(L, 1);
     if (console_handle == NULL) {
         return 2; // error message is already on the stack
@@ -697,6 +691,9 @@ static int lst_getnonblock(lua_State *L)
     }
 
 #else
+    if (lua_gettop(L) > 1) {
+        lua_settop(L, 1); // use one argument, because the second boolean will fail as get_console_flags expects bitflags
+    }
     HANDLE console_handle = get_console_handle(L, 1);
     if (console_handle == NULL) {
         return 2; // error message is already on the stack
