@@ -309,7 +309,6 @@ static HANDLE get_console_handle(lua_State *L, int flags_optional)
 // Lua error if the file is not one of these.
 static int get_console_handle(lua_State *L)
 {
-printf("get_console_handle\n");
     FILE **file = (FILE **)luaL_checkudata(L, 1, LUA_FILEHANDLE);
     if (file == NULL || *file == NULL) {
         return luaL_argerror(L, 1, "expected file handle"); // call doesn't return
