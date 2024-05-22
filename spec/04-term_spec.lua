@@ -404,7 +404,65 @@ describe("Terminal:", function()
 
 
 
-  pending("termwrap()", function()
+  describe("termwrap()", function()
+
+    local old_backup
+    local old_restore
+    local result
+
+    setup(function()
+      old_backup = system.termbackup
+      old_restore = system.termrestore
+      system.termbackup = function()
+        table.insert(result,"backup")
+      end
+
+      system.termrestore = function()
+        table.insert(result,"restore")
+      end
+    end)
+
+
+    before_each(function()
+      result = {}
+    end)
+
+
+    teardown(function()
+      system.termbackup = old_backup
+      system.termrestore = old_restore
+    end)
+
+
+
+    it("calls both backup and restore", function()
+      system.termwrap(function()
+        table.insert(result,"wrapped")
+      end)()
+
+      assert.are.same({"backup", "wrapped", "restore"}, result)
+    end)
+
+
+    it("passes all args", function()
+      system.termwrap(function(...)
+        table.insert(result,{...})
+      end)(1, 2, 3)
+
+      assert.are.same({"backup", {1,2,3}, "restore"}, result)
+    end)
+
+
+    it("returns all results", function()
+      local a, b, c = system.termwrap(function(...)
+        return 1, nil, 3 -- ensure nil is passed as well
+      end)()
+
+      assert.are.same({"backup", "restore"}, result)
+      assert.equals(1, a)
+      assert.is_nil(b)
+      assert.equals(3, c)
+    end)
 
   end)
 
