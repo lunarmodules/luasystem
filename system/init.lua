@@ -4,59 +4,65 @@
 local sys = require 'system.core'
 
 
+do
+  local backup_mt = {}
 
---- Returns a backup of terminal setting for stdin/out/err.
--- Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
--- Backs up terminal/console flags only if a stream is a tty.
--- @return table with backup of terminal settings
-function sys.termbackup()
-  local backup = {}
+  --- Returns a backup of terminal setting for stdin/out/err.
+  -- Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
+  -- Backs up terminal/console flags only if a stream is a tty.
+  -- @return table with backup of terminal settings
+  function sys.termbackup()
+    local backup = setmetatable({}, backup_mt)
 
-  if sys.isatty(io.stdin) then
-    backup.console_in = sys.getconsoleflags(io.stdin)
-    backup.term_in = sys.tcgetattr(io.stdin)
+    if sys.isatty(io.stdin) then
+      backup.console_in = sys.getconsoleflags(io.stdin)
+      backup.term_in = sys.tcgetattr(io.stdin)
+    end
+    if sys.isatty(io.stdout) then
+      backup.console_out = sys.getconsoleflags(io.stdout)
+      backup.term_out = sys.tcgetattr(io.stdout)
+    end
+    if sys.isatty(io.stderr) then
+      backup.console_err = sys.getconsoleflags(io.stderr)
+      backup.term_err = sys.tcgetattr(io.stderr)
+    end
+
+    backup.block_in = sys.getnonblock(io.stdin)
+    backup.block_out = sys.getnonblock(io.stdout)
+    backup.block_err = sys.getnonblock(io.stderr)
+
+    backup.consoleoutcodepage = sys.getconsoleoutputcp()
+    backup.consolecp = sys.getconsolecp()
+
+    return backup
   end
-  if sys.isatty(io.stdout) then
-    backup.console_out = sys.getconsoleflags(io.stdout)
-    backup.term_out = sys.tcgetattr(io.stdout)
+
+
+
+  --- Restores terminal settings from a backup
+  -- @tparam table backup the backup of terminal settings, see `termbackup`.
+  -- @treturn boolean true
+  function sys.termrestore(backup)
+    if getmetatable(backup) ~= backup_mt then
+      error("arg #1 to termrestore, expected backup table, got " .. type(backup), 2)
+    end
+
+    if backup.console_in  then sys.setconsoleflags(io.stdin, backup.console_in) end
+    if backup.term_in     then sys.tcsetattr(io.stdin, sys.TCSANOW, backup.term_in) end
+    if backup.console_out then sys.setconsoleflags(io.stdout, backup.console_out) end
+    if backup.term_out    then sys.tcsetattr(io.stdout, sys.TCSANOW, backup.term_out) end
+    if backup.console_err then sys.setconsoleflags(io.stderr, backup.console_err) end
+    if backup.term_err    then sys.tcsetattr(io.stderr, sys.TCSANOW, backup.term_err) end
+
+    if backup.block_in  ~= nil then sys.setnonblock(io.stdin,  backup.block_in) end
+    if backup.block_out ~= nil then sys.setnonblock(io.stdout, backup.block_out) end
+    if backup.block_err ~= nil then sys.setnonblock(io.stderr, backup.block_err) end
+
+    if backup.consoleoutcodepage then sys.setconsoleoutputcp(backup.consoleoutcodepage) end
+    if backup.consolecp          then sys.setconsolecp(backup.consolecp) end
+    return true
   end
-  if sys.isatty(io.stderr) then
-    backup.console_err = sys.getconsoleflags(io.stderr)
-    backup.term_err = sys.tcgetattr(io.stderr)
-  end
-
-  backup.block_in = sys.getnonblock(io.stdin)
-  backup.block_out = sys.getnonblock(io.stdout)
-  backup.block_err = sys.getnonblock(io.stderr)
-
-  backup.consoleoutcodepage = sys.getconsoleoutputcp()
-  backup.consolecp = sys.getconsolecp()
-
-  return backup
 end
-
-
-
---- Restores terminal settings from a backup
--- @tparam table backup the backup of terminal settings, see `termbackup`.
--- @treturn boolean true
-function sys.termrestore(backup)
-  if backup.console_in  then sys.setconsoleflags(io.stdin, backup.console_in) end
-  if backup.term_in     then sys.tcsetattr(io.stdin, sys.TCSANOW, backup.term_in) end
-  if backup.console_out then sys.setconsoleflags(io.stdout, backup.console_out) end
-  if backup.term_out    then sys.tcsetattr(io.stdout, sys.TCSANOW, backup.term_out) end
-  if backup.console_err then sys.setconsoleflags(io.stderr, backup.console_err) end
-  if backup.term_err    then sys.tcsetattr(io.stderr, sys.TCSANOW, backup.term_err) end
-
-  if backup.block_in  ~= nil then sys.setnonblock(io.stdin,  backup.block_in) end
-  if backup.block_out ~= nil then sys.setnonblock(io.stdout, backup.block_out) end
-  if backup.block_err ~= nil then sys.setnonblock(io.stderr, backup.block_err) end
-
-  if backup.consoleoutcodepage then sys.setconsoleoutputcp(backup.consoleoutcodepage) end
-  if backup.consolecp          then sys.setconsolecp(backup.consolecp) end
-  return true
-end
-
 
 
 do -- autotermrestore

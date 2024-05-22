@@ -392,13 +392,45 @@ describe("Terminal:", function()
 
 
 
-  pending("termbackup()", function()
+  describe("termbackup() & termrestore()", function()
 
-  end)
+    -- this is all Lua code, so testing one platform should be good enough
+    win_it("creates and restores a backup", function()
+      local backup = system.termbackup()
+
+      local old_cp = assert(system.getconsoleoutputcp())
+      finally(function()
+        system.setconsoleoutputcp(old_cp)  -- ensure we restore the original one
+      end)
+
+      -- get the console page...
+      local new_cp
+      if old_cp ~= 65001 then
+        new_cp = 65001  -- set to UTF8
+      else
+        new_cp = 850    -- another common one
+      end
+
+      -- change the console page...
+      local success, err = system.setconsoleoutputcp(new_cp)
+      assert.is_nil(err)
+      assert.is_true(success)
+      -- ... and check it
+      local updated_cp = assert(system.getconsoleoutputcp())
+      assert.equals(new_cp, updated_cp)
+
+      -- restore the console page
+      system.termrestore(backup)
+      local restored_cp = assert(system.getconsoleoutputcp())
+      assert.equals(old_cp, restored_cp)
+    end)
 
 
-
-  pending("termrestore()", function()
+    it("termrestore() fails on bad input", function()
+      assert.has.error(function()
+        system.termrestore("invalid")
+      end, "arg #1 to termrestore, expected backup table, got string")
+    end)
 
   end)
 
