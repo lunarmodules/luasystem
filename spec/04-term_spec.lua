@@ -208,7 +208,7 @@ describe("Terminal:", function()
 
   describe("tcsetattr()", function()
 
-    nix_it("sets the terminal flags, if called with flags", function()
+    pending("sets the terminal flags, if called with flags", function()
       assert.equal(true, false)
     end)
 
@@ -222,14 +222,14 @@ describe("Terminal:", function()
 
     it("returns an error if called with an invalid first argument", function()
       assert.has.error(function()
-        system.tcsetattr("invalid")
+        system.tcsetattr("invalid", system.TCSANOW, {})
       end, "bad argument #1 to 'tcsetattr' (FILE* expected, got string)")
     end)
 
 
     it("returns an error if called with an invalid second argument", function()
       assert.has.error(function()
-        system.tcsetattr(io.stdin, "invalid")
+        system.tcsetattr(io.stdin, "invalid", {})
       end, "bad argument #2 to 'tcsetattr' (number expected, got string)")
     end)
 
@@ -241,7 +241,7 @@ describe("Terminal:", function()
     end)
 
 
-    it("returns an error if iflag is not a bitflags object", function()
+    it("returns an error if iflag is not a bitflags object #manual", function()
       local flags = assert(system.tcgetattr(io.stdin))
       flags.iflag = 0
       assert.has.error(function()
@@ -250,7 +250,7 @@ describe("Terminal:", function()
     end)
 
 
-    it("returns an error if oflag is not a bitflags object", function()
+    it("returns an error if oflag is not a bitflags object #manual", function()
       local flags = assert(system.tcgetattr(io.stdin))
       flags.oflag = 0
       assert.has.error(function()
@@ -259,7 +259,7 @@ describe("Terminal:", function()
     end)
 
 
-    it("returns an error if lflag is not a bitflags object", function()
+    it("returns an error if lflag is not a bitflags object #manual", function()
       local flags = assert(system.tcgetattr(io.stdin))
       flags.lflag = 0
       assert.has.error(function()

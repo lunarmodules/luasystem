@@ -493,6 +493,9 @@ static int lst_tcgetattr(lua_State *L)
     lua_setfield(L, -2, "cc");
 
 #else
+    lua_settop(L, 1); // remove all but file handle
+    get_console_handle(L, 1); //check args
+
     lua_newtable(L);
     lsbf_pushbitflags(L, 0);
     lua_setfield(L, -2, "iflag");
@@ -584,11 +587,12 @@ static int lst_tcsetattr(lua_State *L)
 
 #else
     // Windows does not have a tcsetattr function, but we check arguments anyway
-    get_console_handle(L, 1); // to validate args
     luaL_checkinteger(L, 2);
-    lsbf_checkbitflagsfield(L, 3, "iflag", t.c_iflag);
-    lsbf_checkbitflagsfield(L, 3, "oflag", t.c_iflag);
-    lsbf_checkbitflagsfield(L, 3, "lflag", t.c_iflag);
+    lsbf_checkbitflagsfield(L, 3, "iflag", 0);
+    lsbf_checkbitflagsfield(L, 3, "oflag", 0);
+    lsbf_checkbitflagsfield(L, 3, "lflag", 0);
+    lua_settop(L, 1); // remove all but file handle
+    get_console_handle(L, 1);
 #endif
 
     lua_pushboolean(L, 1);
