@@ -177,7 +177,18 @@ describe("Terminal:", function()
   describe("tcgetattr()", function()
 
     nix_it("gets the terminal flags #manual", function()
-      assert.equal(true, false) -- implement this test still
+      local flags, err = system.tcgetattr(io.stdin)
+      assert.is_nil(err)
+      assert.is_table(flags)
+      assert.equals("bitflags:", tostring(flags.iflag):sub(1,9))
+      assert.equals("bitflags:", tostring(flags.oflag):sub(1,9))
+      assert.equals("bitflags:", tostring(flags.lflag):sub(1,9))
+      assert.equals("bitflags:", tostring(flags.cflag):sub(1,9))
+      assert.not_equal(0, flags.iflag:value())
+      assert.not_equal(0, flags.oflag:value())
+      assert.not_equal(0, flags.lflag:value())
+      assert.not_equal(0, flags.cflag:value())
+      assert.is.table(flags.cc)
     end)
 
 
@@ -210,7 +221,43 @@ describe("Terminal:", function()
   describe("tcsetattr()", function()
 
     nix_it("sets the terminal flags, if called with flags #manual", function()
-      assert.equal(true, false) -- implement this test still
+      system.listtermflags(io.stdin)
+      local old_flags = assert(system.tcgetattr(io.stdin))
+      finally(function()
+        system.tcsetattr(io.stdin, system.TCSANOW, old_flags)  -- ensure we restore the original ones
+      end)
+
+      local new_flags = assert(system.tcgetattr(io.stdin)) -- just get them again, and then update
+      -- change iflags
+      local flag_to_change = system.I_IGNCR
+      if new_flags.iflag:has_all_of(flag_to_change) then
+        new_flags.iflag = new_flags.iflag - flag_to_change
+      else
+        new_flags.iflag = new_flags.iflag + flag_to_change
+      end
+
+      -- change oflags
+      flag_to_change = system.O_OPOST
+      if new_flags.oflag:has_all_of(flag_to_change) then
+        new_flags.oflag = new_flags.oflag - flag_to_change
+      else
+        new_flags.oflag = new_flags.oflag + flag_to_change
+      end
+
+      -- change lflags
+      flag_to_change = system.L_ECHO
+      if new_flags.lflag:has_all_of(flag_to_change) then
+        new_flags.lflag = new_flags.lflag - flag_to_change
+      else
+        new_flags.lflag = new_flags.lflag + flag_to_change
+      end
+
+      assert(system.tcsetattr(io.stdin, system.TCSANOW, new_flags))
+
+      local updated_flags = assert(system.tcgetattr(io.stdin))
+      assert.equals(new_flags.iflag:value(), updated_flags.iflag:value())
+      assert.equals(new_flags.oflag:value(), updated_flags.oflag:value())
+      assert.equals(new_flags.lflag:value(), updated_flags.lflag:value())
     end)
 
 
