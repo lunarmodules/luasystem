@@ -246,7 +246,7 @@ describe("Terminal:", function()
       flags.iflag = 0
       assert.has.error(function()
         system.tcsetattr(io.stdin, system.TCSANOW, flags)
-      end, "bad argument #3 to 'tcsetattr' (table expected, got number)")
+      end, "bad argument #3, field 'iflag' must be a bitflag object")
     end)
 
 
@@ -255,7 +255,7 @@ describe("Terminal:", function()
       flags.oflag = 0
       assert.has.error(function()
         system.tcsetattr(io.stdin, system.TCSANOW, flags)
-      end, "bad argument #3 to 'tcsetattr' (table expected, got number)")
+      end, "bad argument #3, field 'oflag' must be a bitflag object")
     end)
 
 
@@ -264,7 +264,7 @@ describe("Terminal:", function()
       flags.lflag = 0
       assert.has.error(function()
         system.tcsetattr(io.stdin, system.TCSANOW, flags)
-      end, "bad argument #3 to 'tcsetattr' (table expected, got number)")
+      end, "bad argument #3, field 'lflag' must be a bitflag object")
     end)
 
   end)

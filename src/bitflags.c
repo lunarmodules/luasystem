@@ -46,6 +46,32 @@ LSBF_BITFLAG lsbf_checkbitflags(lua_State *L, int index) {
     return obj->flags;
 }
 
+// Validates that the given index is a table containing a field 'fieldname'
+// which is a bitflag object and returns its value.
+// If the index is not a table or the field is not a bitflag object, a Lua
+// error is raised. If the bitflag is not present, the default value is returned.
+// The stack remains unchanged.
+LSBF_BITFLAG lsbf_checkbitflagsfield(lua_State *L, int index, const char *fieldname, LSBF_BITFLAG default_value) {
+    luaL_checktype(L, index, LUA_TTABLE);
+    lua_getfield(L, index, fieldname);
+
+    // if null, return default value
+    if (lua_isnil(L, -1)) {
+        lua_pop(L, 1);
+        return default_value;
+    }
+
+    // check to bitflags
+    LS_BitFlags *obj = luaL_testudata(L, -1, BITFLAGS_MT_NAME);
+    if (obj == NULL) {
+        lua_pop(L, 1);
+        return luaL_error(L, "bad argument #%d, field '%s' must be a bitflag object", index, fieldname);
+    }
+    LSBF_BITFLAG value = obj->flags;
+    lua_pop(L, 1);
+    return value;
+}
+
 /***
 Creates a new bitflag object from the given value.
 @function system.bitflag

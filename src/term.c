@@ -556,28 +556,13 @@ static int lst_tcsetattr(lua_State *L)
     int r, i;
     int fd = get_console_handle(L);     // first is the console handle
     int act = luaL_checkinteger(L, 2);  // second is the action to take
-    luaL_checktype(L, 3, LUA_TTABLE);   // third is the termios table with fields
 
     r = tcgetattr(fd, &t);
     if (r == -1) return pusherror(L, NULL);
 
-    lua_getfield(L, 3, "iflag");
-    if (!lua_isnil(L, -1)) {
-        t.c_iflag = lsbf_checkbitflags(L, -1);
-    }
-    lua_pop(L, 1);
-
-    lua_getfield(L, 3, "oflag");
-    if (!lua_isnil(L, -1)) {
-        t.c_oflag = lsbf_checkbitflags(L, -1);
-    }
-    lua_pop(L, 1);
-
-    lua_getfield(L, 3, "lflag");
-    if (!lua_isnil(L, -1)) {
-        t.c_lflag = lsbf_checkbitflags(L, -1);
-    }
-    lua_pop(L, 1);
+    t.c_iflag = lsbf_checkbitflagsfield(L, 3, "iflag", t.c_iflag);
+    t.c_oflag = lsbf_checkbitflagsfield(L, 3, "oflag", t.c_oflag);
+    t.c_lflag = lsbf_checkbitflagsfield(L, 3, "lflag", t.c_lflag);
 
     // Skipping the others for now
 
@@ -596,6 +581,14 @@ static int lst_tcsetattr(lua_State *L)
 
     r = tcsetattr(fd, act, &t);
     if (r == -1) return pusherror(L, NULL);
+
+#else
+    // Windows does not have a tcsetattr function, but we check arguments anyway
+    get_console_handle(L, 1); // to validate args
+    luaL_checkinteger(L, 2);
+    lsbf_checkbitflagsfield(L, 3, "iflag", t.c_iflag);
+    lsbf_checkbitflagsfield(L, 3, "oflag", t.c_iflag);
+    lsbf_checkbitflagsfield(L, 3, "lflag", t.c_iflag);
 #endif
 
     lua_pushboolean(L, 1);
