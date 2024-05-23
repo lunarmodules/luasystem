@@ -176,7 +176,8 @@ describe("Terminal:", function()
 
   describe("tcgetattr()", function()
 
-    pending("gets the terminal flags", function()
+    nix_it("gets the terminal flags #manual", function()
+      assert.equal(true, false) -- implement this test still
     end)
 
 
@@ -208,8 +209,8 @@ describe("Terminal:", function()
 
   describe("tcsetattr()", function()
 
-    pending("sets the terminal flags, if called with flags", function()
-      assert.equal(true, false)
+    nix_it("sets the terminal flags, if called with flags #manual", function()
+      assert.equal(true, false) -- implement this test still
     end)
 
 
@@ -234,7 +235,7 @@ describe("Terminal:", function()
     end)
 
 
-    it("returns an error if called with an invalid third argument", function()
+    it("returns an error if called with an invalid third argument #manual", function()
       assert.has.error(function()
         system.tcsetattr(io.stdin, system.TCSANOW, "invalid")
       end, "bad argument #3 to 'tcsetattr' (table expected, got string)")
