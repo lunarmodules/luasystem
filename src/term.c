@@ -337,7 +337,7 @@ To see flag status and constant names check `listconsoleflags`.
 Note: not all combinations of flags are allowed, as some are mutually exclusive or mutually required.
 See [setconsolemode documentation](https://learn.microsoft.com/en-us/windows/console/setconsolemode)
 @function setconsoleflags
-@tparam file file the file-handle to set the flags on
+@tparam file file file handle to operate on, one of `io.stdin`, `io.stdout`, `io.stderr`
 @tparam bitflags bitflags the flags to set/unset
 @treturn[1] boolean `true` on success
 @treturn[2] nil
@@ -378,8 +378,17 @@ static int lst_setconsoleflags(lua_State *L)
 
 /***
 Gets console flags (Windows).
+The `CIF_` and `COF_` constants are available on the module table. Where `CIF` are the
+input flags (for use with `io.stdin`) and `COF` are the output flags (for use with
+`io.stdout`/`io.stderr`).
+
+_Note_: See [setconsolemode documentation](https://learn.microsoft.com/en-us/windows/console/setconsolemode)
+for more information on the flags.
+
+
+
 @function getconsoleflags
-@tparam file file the file-handle to get the flags from.
+@tparam file file file handle to operate on, one of `io.stdin`, `io.stdout`, `io.stderr`
 @treturn[1] bitflags the current console flags.
 @treturn[2] nil
 @treturn[2] string error message
@@ -433,8 +442,8 @@ The terminal attributes is a table with the following fields:
 
 - `iflag` input flags
 - `oflag` output flags
-- `cflag` control flags
 - `lflag` local flags
+- `cflag` control flags
 - `ispeed` input speed
 - `ospeed` output speed
 - `cc` control characters
@@ -527,9 +536,6 @@ flags for the `iflags`, `oflags`, and `lflags` bitmasks.
 
 To see flag status and constant names check `listtermflags`. For their meaning check
 [the manpage](https://www.man7.org/linux/man-pages/man3/termios.3.html).
-
-_Note_: not all combinations of flags are allowed, as some are mutually exclusive or mutually required.
-See [setconsolemode documentation](https://learn.microsoft.com/en-us/windows/console/setconsolemode)
 
 _Note_: only `iflag`, `oflag`, and `lflag` are supported at the moment. The other fields are ignored.
 @function tcsetattr
@@ -722,6 +728,7 @@ directly, but through the `system.readkey` or `system.readansi` functions. It
 will return the next byte from the input stream, or `nil` if no key was pressed.
 
 On Posix, `io.stdin` must be set to non-blocking mode using `setnonblock`
+and canonical mode must be turned off using `tcsetattr`,
 before calling this function. Otherwise it will block. No conversions are
 done on Posix, so the byte read is returned as-is.
 

@@ -26,11 +26,12 @@ end
 
 local w, h
 print("Change the terminal window size, press any key to exit")
-while not sys.readkey(0.2) do
+while not sys.readansi(0.2) do  -- use readansi to not leave stray bytes in the input buffer
   local nw, nh = sys.termsize()
   if w ~= nw or h ~= nh then
     w, h = nw, nh
     local text = "Terminal size: " .. w .. "x" .. h .. "     "
     io.write(text .. cursor_move_horiz(-#text))
+    io.flush()
   end
 end

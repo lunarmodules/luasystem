@@ -1,3 +1,9 @@
+--- An example class for reading a line of input from the user in a non-blocking way.
+-- It uses ANSI escape sequences to move the cursor and handle input.
+-- It can be used to read a line of input from the user, with a prompt.
+-- It can handle double-width UTF-8 characters.
+-- It can be used asynchroneously if `system.sleep` is patched to yield to a coroutine scheduler.
+
 local sys = require("system")
 
 
@@ -134,7 +140,7 @@ readline.__index = readline
 --- Create a new readline object.
 -- @tparam table opts the options for the readline object
 -- @tparam[opt=""] string opts.prompt the prompt to display
--- @tparam[opt=80] number opts.max_length the maximum length of the input
+-- @tparam[opt=80] number opts.max_length the maximum length of the input (in characters, not bytes)
 -- @tparam[opt=""] string opts.value the default value
 -- @tparam[opt=`#value`] number opts.position of the cursor in the input
 -- @tparam[opt={"\10"/"\13"}] table opts.exit_keys an array of keys that will cause the readline to exit
@@ -425,29 +431,25 @@ end
 
 
 
--- return readline
+-- return readline  -- normally we'd return here, but for the example we continue
 
 
 
+
+local backup = sys.termbackup()
 
 -- setup Windows console to handle ANSI processing
-local of_in = sys.getconsoleflags(io.stdin)
-local cp_in = sys.getconsolecp()
--- sys.setconsolecp(65001)
-sys.setconsolecp(850)
-local of_out = sys.getconsoleflags(io.stdout)
-local cp_out = sys.getconsoleoutputcp()
-sys.setconsoleoutputcp(65001)
 sys.setconsoleflags(io.stdout, sys.getconsoleflags(io.stdout) + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
 sys.setconsoleflags(io.stdin, sys.getconsoleflags(io.stdin) + sys.CIF_VIRTUAL_TERMINAL_INPUT)
+-- set output to UTF-8
+sys.setconsoleoutputcp(65001)
 
--- setup Posix terminal to use non-blocking mode, and disable line-mode
-local of_attr = sys.tcgetattr(io.stdin)
-local of_block = sys.getnonblock(io.stdin)
-sys.setnonblock(io.stdin, true)
+-- setup Posix terminal to disable canonical mode and echo
 sys.tcsetattr(io.stdin, sys.TCSANOW, {
-  lflag = of_attr.lflag - sys.L_ICANON - sys.L_ECHO, -- disable canonical mode and echo
+  lflag = sys.tcgetattr(io.stdin).lflag - sys.L_ICANON - sys.L_ECHO,
 })
+-- setup stdin to non-blocking mode
+sys.setnonblock(io.stdin, true)
 
 
 local rl = readline.new{
@@ -467,10 +469,4 @@ print("Exit-Key (bytes):", key:byte(1,-1))
 
 
 -- Clean up afterwards
-sys.setnonblock(io.stdin, false)
-sys.setconsoleflags(io.stdout, of_out)
-sys.setconsoleflags(io.stdin, of_in)
-sys.tcsetattr(io.stdin, sys.TCSANOW, of_attr)
-sys.setnonblock(io.stdin, of_block)
-sys.setconsolecp(cp_in)
-sys.setconsoleoutputcp(cp_out)
+sys.termrestore(backup)

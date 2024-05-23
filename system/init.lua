@@ -7,7 +7,7 @@ local sys = require 'system.core'
 do
   local backup_mt = {}
 
-  --- Returns a backup of terminal setting for stdin/out/err.
+  --- Returns a backup of terminal settings for stdin/out/err.
   -- Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
   -- Backs up terminal/console flags only if a stream is a tty.
   -- @return table with backup of terminal settings
@@ -227,8 +227,11 @@ do
   -- This function uses `system.sleep` to wait until either a byte is available or the timeout is reached.
   -- The sleep period is exponentially backing off, starting at 0.0125 seconds, with a maximum of 0.2 seconds.
   -- It returns immediately if a byte is available or if `timeout` is less than or equal to `0`.
+  --
+  -- Using `system.readansi` is preferred over this function. Since this function can leave stray/invalid
+  -- byte-sequences in the input buffer, while `system.readansi` reads full ANSI and UTF8 sequences.
   -- @tparam number timeout the timeout in seconds.
-  -- @treturn[1] integer the key code of the key that was received
+  -- @treturn[1] byte the byte value that was read.
   -- @treturn[2] nil if no key was read
   -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
   function sys.readkey(timeout)
