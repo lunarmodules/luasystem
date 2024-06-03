@@ -1,7 +1,10 @@
-/// @submodule system
+/// @module system
 
+/// Terminal.
 // Unix: see https://blog.nelhage.com/2009/12/a-brief-introduction-to-termios-termios3-and-stty/
+//
 // Windows: see https://learn.microsoft.com/en-us/windows/console/console-reference
+// @section terminal
 
 #include <lua.h>
 #include <lauxlib.h>

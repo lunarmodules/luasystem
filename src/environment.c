@@ -1,4 +1,8 @@
-/// @submodule system
+/// @module system
+
+/// Environment.
+// @section environment
+
 #include <lua.h>
 #include <lauxlib.h>
 #include "compat.h"

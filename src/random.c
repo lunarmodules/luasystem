@@ -1,4 +1,9 @@
-/// @submodule system
+/// @module system
+
+/// Random.
+// @section random
+
+
 #include <lua.h>
 #include <lauxlib.h>
 #include "compat.h"

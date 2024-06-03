@@ -14,3 +14,4 @@ dir='docs'
 sort=true
 sort_modules=true
 all=false
+merge=true

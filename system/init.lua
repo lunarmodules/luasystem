@@ -1,7 +1,10 @@
 --- Lua System Library.
--- @module init
+-- @module system
 
-local sys = require 'system.core'
+--- Terminal
+-- @section terminal
+
+local system = require 'system.core'
 
 
 do
@@ -11,28 +14,28 @@ do
   -- Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
   -- Backs up terminal/console flags only if a stream is a tty.
   -- @return table with backup of terminal settings
-  function sys.termbackup()
+  function system.termbackup()
     local backup = setmetatable({}, backup_mt)
 
-    if sys.isatty(io.stdin) then
-      backup.console_in = sys.getconsoleflags(io.stdin)
-      backup.term_in = sys.tcgetattr(io.stdin)
+    if system.isatty(io.stdin) then
+      backup.console_in = system.getconsoleflags(io.stdin)
+      backup.term_in = system.tcgetattr(io.stdin)
     end
-    if sys.isatty(io.stdout) then
-      backup.console_out = sys.getconsoleflags(io.stdout)
-      backup.term_out = sys.tcgetattr(io.stdout)
+    if system.isatty(io.stdout) then
+      backup.console_out = system.getconsoleflags(io.stdout)
+      backup.term_out = system.tcgetattr(io.stdout)
     end
-    if sys.isatty(io.stderr) then
-      backup.console_err = sys.getconsoleflags(io.stderr)
-      backup.term_err = sys.tcgetattr(io.stderr)
+    if system.isatty(io.stderr) then
+      backup.console_err = system.getconsoleflags(io.stderr)
+      backup.term_err = system.tcgetattr(io.stderr)
     end
 
-    backup.block_in = sys.getnonblock(io.stdin)
-    backup.block_out = sys.getnonblock(io.stdout)
-    backup.block_err = sys.getnonblock(io.stderr)
+    backup.block_in = system.getnonblock(io.stdin)
+    backup.block_out = system.getnonblock(io.stdout)
+    backup.block_err = system.getnonblock(io.stderr)
 
-    backup.consoleoutcodepage = sys.getconsoleoutputcp()
-    backup.consolecp = sys.getconsolecp()
+    backup.consoleoutcodepage = system.getconsoleoutputcp()
+    backup.consolecp = system.getconsolecp()
 
     return backup
   end
@@ -42,24 +45,24 @@ do
   --- Restores terminal settings from a backup
   -- @tparam table backup the backup of terminal settings, see `termbackup`.
   -- @treturn boolean true
-  function sys.termrestore(backup)
+  function system.termrestore(backup)
     if getmetatable(backup) ~= backup_mt then
       error("arg #1 to termrestore, expected backup table, got " .. type(backup), 2)
     end
 
-    if backup.console_in  then sys.setconsoleflags(io.stdin, backup.console_in) end
-    if backup.term_in     then sys.tcsetattr(io.stdin, sys.TCSANOW, backup.term_in) end
-    if backup.console_out then sys.setconsoleflags(io.stdout, backup.console_out) end
-    if backup.term_out    then sys.tcsetattr(io.stdout, sys.TCSANOW, backup.term_out) end
-    if backup.console_err then sys.setconsoleflags(io.stderr, backup.console_err) end
-    if backup.term_err    then sys.tcsetattr(io.stderr, sys.TCSANOW, backup.term_err) end
+    if backup.console_in  then system.setconsoleflags(io.stdin, backup.console_in) end
+    if backup.term_in     then system.tcsetattr(io.stdin, system.TCSANOW, backup.term_in) end
+    if backup.console_out then system.setconsoleflags(io.stdout, backup.console_out) end
+    if backup.term_out    then system.tcsetattr(io.stdout, system.TCSANOW, backup.term_out) end
+    if backup.console_err then system.setconsoleflags(io.stderr, backup.console_err) end
+    if backup.term_err    then system.tcsetattr(io.stderr, system.TCSANOW, backup.term_err) end
 
-    if backup.block_in  ~= nil then sys.setnonblock(io.stdin,  backup.block_in) end
-    if backup.block_out ~= nil then sys.setnonblock(io.stdout, backup.block_out) end
-    if backup.block_err ~= nil then sys.setnonblock(io.stderr, backup.block_err) end
+    if backup.block_in  ~= nil then system.setnonblock(io.stdin,  backup.block_in) end
+    if backup.block_out ~= nil then system.setnonblock(io.stdout, backup.block_out) end
+    if backup.block_err ~= nil then system.setnonblock(io.stderr, backup.block_err) end
 
-    if backup.consoleoutcodepage then sys.setconsoleoutputcp(backup.consoleoutcodepage) end
-    if backup.consolecp          then sys.setconsolecp(backup.consolecp) end
+    if backup.consoleoutcodepage then system.setconsoleoutputcp(backup.consoleoutcodepage) end
+    if backup.consolecp          then system.setconsolecp(backup.consolecp) end
     return true
   end
 end
@@ -107,13 +110,13 @@ do -- autotermrestore
   -- @treturn[1] boolean true
   -- @treturn[2] nil if the backup was already created
   -- @treturn[2] string error message
-  function sys.autotermrestore()
+  function system.autotermrestore()
     if global_backup then
       return nil, "global terminal backup was already set up"
     end
-    global_backup = sys.termbackup()
+    global_backup = system.termbackup()
     add_gc_method(global_backup, function(self)
-      sys.termrestore(self) end)
+      system.termrestore(self) end)
     return true
   end
 end
@@ -129,15 +132,15 @@ do
   -- Calls `termbackup` before calling the function and `termrestore` after.
   -- @tparam function f function to wrap
   -- @treturn function wrapped function
-  function sys.termwrap(f)
+  function system.termwrap(f)
     if type(f) ~= "function" then
       error("arg #1 to wrap, expected function, got " .. type(f), 2)
     end
 
     return function(...)
-      local bu = sys.termbackup()
+      local bu = system.termbackup()
       local results = pack(f(...))
-      sys.termrestore(bu)
+      system.termrestore(bu)
       return unpack(results)
     end
   end
@@ -152,7 +155,7 @@ end
 -- system.listconsoleflags(io.stdin)
 -- system.listconsoleflags(io.stdout)
 -- system.listconsoleflags(io.stderr)
-function sys.listconsoleflags(fh)
+function system.listconsoleflags(fh)
   local flagtype
   if fh == io.stdin then
     print "------ STDIN FLAGS WINDOWS ------"
@@ -165,7 +168,7 @@ function sys.listconsoleflags(fh)
     flagtype = "COF_"
   end
 
-  local flags = assert(sys.getconsoleflags(fh))
+  local flags = assert(system.getconsoleflags(fh))
   local out = {}
   for k,v in pairs(sys) do
     if type(k) == "string" and k:sub(1,4) == flagtype then
@@ -191,7 +194,7 @@ end
 -- system.listconsoleflags(io.stdin)
 -- system.listconsoleflags(io.stdout)
 -- system.listconsoleflags(io.stderr)
-function sys.listtermflags(fh)
+function system.listtermflags(fh)
   if fh == io.stdin then
     print "------ STDIN FLAGS POSIX ------"
   elseif fh == io.stdout then
@@ -200,7 +203,7 @@ function sys.listtermflags(fh)
     print "------ STDERR FLAGS POSIX ------"
   end
 
-  local flags = assert(sys.tcgetattr(fh))
+  local flags = assert(system.tcgetattr(fh))
   for _, flagtype in ipairs { "iflag", "oflag", "lflag" } do
     local prefix = flagtype:sub(1,1):upper() .. "_"  -- I_, O_, or L_, the constant prefixes
     local out = {}
@@ -234,18 +237,18 @@ do
   -- @treturn[1] byte the byte value that was read.
   -- @treturn[2] nil if no key was read
   -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
-  function sys.readkey(timeout)
+  function system.readkey(timeout)
     if type(timeout) ~= "number" then
       error("arg #1 to readkey, expected timeout in seconds, got " .. type(timeout), 2)
     end
 
     local interval = 0.0125
-    local key = sys._readkey()
+    local key = system._readkey()
     while key == nil and timeout > 0 do
-      sys.sleep(math.min(interval, timeout))
+      system.sleep(math.min(interval, timeout))
       timeout = timeout - interval
       interval = math.min(0.2, interval * 2)
-      key = sys._readkey()
+      key = system._readkey()
     end
 
     if key then
@@ -275,7 +278,7 @@ do
   -- @treturn[2] nil in case of an error
   -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
   -- @treturn[2] string partial result in case of an error while reading a sequence, the sequence so far.
-  function sys.readansi(timeout)
+  function system.readansi(timeout)
     if type(timeout) ~= "number" then
       error("arg #1 to readansi, expected timeout in seconds, got " .. type(timeout), 2)
     end
@@ -292,7 +295,7 @@ do
       else
         -- read a new key
         local err
-        key, err = sys.readkey(timeout)
+        key, err = system.readkey(timeout)
         if key == nil then -- timeout or error
           return nil, err
         end
@@ -301,7 +304,7 @@ do
       if key == 27 then
         -- looks like an ansi escape sequence, immediately read next char
         -- as an heuristic against manually typing escape sequences
-        local key2 = sys.readkey(0)
+        local key2 = system.readkey(0)
         if key2 ~= 91 and key2 ~= 79 then -- we expect either "[" or "O" for an ANSI sequence
           -- not the expected [ or O character, so we return the key as is
           -- and store the extra key read for the next call
@@ -328,9 +331,9 @@ do
     local err
     if utf8_length then
       -- read remainder of UTF8 sequence
-      local timeout_end = sys.gettime() + timeout
+      local timeout_end = system.gettime() + timeout
       while true do
-        key, err = sys.readkey(timeout_end - sys.gettime())
+        key, err = system.readkey(timeout_end - system.gettime())
         if err then
           break
         end
@@ -347,9 +350,9 @@ do
 
     else
       -- read remainder of ANSI sequence
-      local timeout_end = sys.gettime() + timeout
+      local timeout_end = system.gettime() + timeout
       while true do
-        key, err = sys.readkey(timeout_end - sys.gettime())
+        key, err = system.readkey(timeout_end - system.gettime())
         if err then
           break
         end

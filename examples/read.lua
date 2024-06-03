@@ -37,7 +37,7 @@ while true do
   if key == "A" then io.write(get_cursor_pos); io.flush() end
 
   -- check if we got a key or ANSI sequence
-  if keytype == "key" then
+  if keytype == "char" then
     -- just a key
     local b = key:byte()
     if b < 32 then
