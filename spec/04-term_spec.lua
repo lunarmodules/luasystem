@@ -500,9 +500,9 @@ describe("Terminal:", function()
   describe("termsize() #manual", function()
 
     it("gets the terminal size", function()
-      local w, h = system.termsize()
-      assert.is_number(w)
-      assert.is_number(h)
+      local rows, columns = system.termsize()
+      assert.is_number(rows)
+      assert.is_number(columns)
     end)
 
   end)

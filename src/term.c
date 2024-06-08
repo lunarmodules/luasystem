@@ -857,10 +857,10 @@ static int lst_readkey(lua_State *L) {
 
 
 /***
-Get the size of the terminal in columns and rows.
+Get the size of the terminal in rows and columns.
 @function termsize
-@treturn[1] int the number of columns
 @treturn[1] int the number of rows
+@treturn[1] int the number of columns
 @treturn[2] nil
 @treturn[2] string error message
 */
@@ -885,8 +885,8 @@ static int lst_termsize(lua_State *L) {
     rows = ws.ws_row;
 
 #endif
-    lua_pushinteger(L, columns);
     lua_pushinteger(L, rows);
+    lua_pushinteger(L, columns);
     return 2;
 }
 
