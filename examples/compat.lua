@@ -12,7 +12,7 @@ if sys.windows then
   os.getenv = sys.getenv  -- luacheck: ignore
 
   -- Set console output to UTF-8 encoding.
-  sys.setconsoleoutputcp(65001)
+  sys.setconsoleoutputcp(sys.CODEPAGE_UTF8)
 
   -- Set up the terminal to handle ANSI escape sequences on Windows.
   if sys.isatty(io.stdout) then

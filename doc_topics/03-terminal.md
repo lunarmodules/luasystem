@@ -51,8 +51,8 @@ recent versions of Lua also have UTF-8 support. So `luasystem` also focusses on 
 
 On Windows UTF-8 output can be enabled by setting the output codepage like this:
 
-    -- setup Windows output codepage to UTF-8; 65001
-    sys.setconsoleoutputcp(65001)
+    -- setup Windows output codepage to UTF-8
+    sys.setconsoleoutputcp(sys.CODEPAGE_UTF8)
 
 Terminal input is handled by the [`_getwchar()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/getchar-getwchar) function on Windows which returns
 UTF-16 surrogate pairs. `luasystem` will automatically convert those to UTF-8.

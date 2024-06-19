@@ -442,7 +442,7 @@ local backup = sys.termbackup()
 sys.setconsoleflags(io.stdout, sys.getconsoleflags(io.stdout) + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
 sys.setconsoleflags(io.stdin, sys.getconsoleflags(io.stdin) + sys.CIF_VIRTUAL_TERMINAL_INPUT)
 -- set output to UTF-8
-sys.setconsoleoutputcp(65001)
+sys.setconsoleoutputcp(sys.CODEPAGE_UTF8)
 
 -- setup Posix terminal to disable canonical mode and echo
 sys.tcsetattr(io.stdin, sys.TCSANOW, {

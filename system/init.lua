@@ -7,6 +7,11 @@
 local system = require 'system.core'
 
 
+--- UTF8 codepage.
+-- To be used with `system.setconsoleoutputcp` and `system.setconsolecp`.
+-- @field CODEPAGE_UTF8 The Windows CodePage for UTF8.
+system.CODEPAGE_UTF8 = 65001
+
 do
   local backup_mt = {}
 

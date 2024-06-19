@@ -1042,7 +1042,7 @@ static int lst_getconsolecp(lua_State *L) {
 /***
 Sets the current console code page (Windows).
 @function setconsolecp
-@tparam int cp the code page to set, use 65001 for UTF-8
+@tparam int cp the code page to set, use `system.CODEPAGE_UTF8` (65001) for UTF-8
 @treturn[1] bool `true` on success (always `true` on Posix systems)
 */
 static int lst_setconsolecp(lua_State *L) {
@@ -1076,7 +1076,7 @@ static int lst_getconsoleoutputcp(lua_State *L) {
 /***
 Sets the current console output code page (Windows).
 @function setconsoleoutputcp
-@tparam int cp the code page to set, use 65001 for UTF-8
+@tparam int cp the code page to set, use `system.CODEPAGE_UTF8` (65001) for UTF-8
 @treturn[1] bool `true` on success (always `true` on Posix systems)
 */
 static int lst_setconsoleoutputcp(lua_State *L) {

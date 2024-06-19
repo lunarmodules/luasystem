@@ -8,7 +8,7 @@ describe("Terminal:", function()
 
   setup(function()
     wincodepage = system.getconsoleoutputcp()
-    assert(system.setconsoleoutputcp(65001))  -- set to UTF8
+    assert(system.setconsoleoutputcp(system.CODEPAGE_UTF8))  -- set to UTF8
   end)
 
   teardown(function()
@@ -346,8 +346,8 @@ describe("Terminal:", function()
       end)
 
       local new_cp
-      if old_cp ~= 65001 then
-        new_cp = 65001  -- set to UTF8
+      if old_cp ~= system.CODEPAGE_UTF8 then
+        new_cp = system.CODEPAGE_UTF8  -- set to UTF8
       else
         new_cp = 850    -- another common one
       end
@@ -403,8 +403,8 @@ describe("Terminal:", function()
       end)
 
       local new_cp
-      if old_cp ~= 65001 then
-        new_cp = 65001  -- set to UTF8
+      if old_cp ~= system.CODEPAGE_UTF8 then
+        new_cp = system.CODEPAGE_UTF8  -- set to UTF8
       else
         new_cp = 850    -- another common one
       end
@@ -578,8 +578,8 @@ describe("Terminal:", function()
 
       -- get the console page...
       local new_cp
-      if old_cp ~= 65001 then
-        new_cp = 65001  -- set to UTF8
+      if old_cp ~= system.CODEPAGE_UTF8 then
+        new_cp = system.CODEPAGE_UTF8  -- set to UTF8
       else
         new_cp = 850    -- another common one
       end
