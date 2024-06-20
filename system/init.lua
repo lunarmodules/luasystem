@@ -78,17 +78,8 @@ do -- autotermrestore
 
 
   local add_gc_method do
-    -- feature detection; __GC meta-method, not available in all Lua versions
-    local has_gc = false
-    local tt = setmetatable({}, {  -- luacheck: ignore
-      __gc = function() has_gc = true end
-    })
-
-    -- clear table and run GC to trigger
-    tt = nil
-    collectgarbage()
-    collectgarbage()
-
+    -- __gc meta-method is not available in all Lua versions
+    local has_gc = not newproxy or false -- `__gc` was added when `newproxy` was removed
 
     if has_gc then
       -- use default GC mechanism since it is available
@@ -120,8 +111,7 @@ do -- autotermrestore
       return nil, "global terminal backup was already set up"
     end
     global_backup = system.termbackup()
-    add_gc_method(global_backup, function(self)
-      system.termrestore(self) end)
+    add_gc_method(global_backup, function(self) pcall(system.termrestore, self) end)
     return true
   end
 
