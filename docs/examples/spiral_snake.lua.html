@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Lua-System docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Lua-System</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/compat.lua.html">compat.lua</a></li>
+  <li><a href="../examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
+  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="../examples/read.lua.html">read.lua</a></li>
+  <li><a href="../examples/readline.lua.html">readline.lua</a></li>
+  <li><a href="../examples/spinner.lua.html">spinner.lua</a></li>
+  <li><strong>spiral_snake.lua</strong></li>
+  <li><a href="../examples/terminalsize.lua.html">terminalsize.lua</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/system.html">system</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/bitflags.html">bitflags</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>spiral_snake.lua</h2>
+<pre>
+<span class="keyword">local</span> sys = <span class="global">require</span> <span class="string">"system"</span>
+
+<span class="global">print</span> <span class="string">[[
+
+This example will draw a snake like spiral on the screen. Showing ANSI escape
+codes for moving the cursor around.
+
+]]</span>
+
+<span class="comment">-- backup term settings with auto-restore on exit
+</span>sys.<span class="function-name">autotermrestore</span>()
+
+<span class="comment">-- setup Windows console to handle ANSI processing
+</span>sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdout, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout) + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
+
+<span class="comment">-- start drawing the spiral.
+</span><span class="comment">-- start from current pos, then right, then up, then left, then down, and again.
+</span><span class="keyword">local</span> x, y = <span class="number">1</span>, <span class="number">1</span>     <span class="comment">-- current position
+</span><span class="keyword">local</span> dx, dy = <span class="number">1</span>, <span class="number">0</span>   <span class="comment">-- direction after each step
+</span><span class="keyword">local</span> wx, wy = <span class="number">30</span>, <span class="number">30</span> <span class="comment">-- width and height of the room
+</span><span class="keyword">local</span> mx, my = <span class="number">1</span>, <span class="number">1</span>   <span class="comment">-- margin
+</span>
+<span class="comment">-- commands to move the cursor
+</span><span class="keyword">local</span> move_left = <span class="string">"\27[1D"</span>
+<span class="keyword">local</span> move_right = <span class="string">"\27[1C"</span>
+<span class="keyword">local</span> move_up = <span class="string">"\27[1A"</span>
+<span class="keyword">local</span> move_down = <span class="string">"\27[1B"</span>
+
+<span class="comment">-- create room: 30 empty lines
+</span><span class="global">print</span>((<span class="string">"\n"</span>):<span class="function-name">rep</span>(wy))
+<span class="keyword">local</span> move = move_right
+
+<span class="keyword">while</span> wx &gt; <span class="number">0</span> <span class="keyword">and</span> wy &gt; <span class="number">0</span> <span class="keyword">do</span>
+  sys.<span class="function-name">sleep</span>(<span class="number">0.01</span>) <span class="comment">-- slow down the drawing a little
+</span>  <span class="global">io</span>.<span class="function-name">write</span>(<span class="string">"*"</span> .. move_left .. move )
+  <span class="global">io</span>.<span class="function-name">flush</span>()
+  x = x + dx
+  y = y + dy
+
+  <span class="keyword">if</span> x &gt; wx <span class="keyword">and</span> move == move_right <span class="keyword">then</span>
+    <span class="comment">-- end of move right
+</span>    dx = <span class="number">0</span>
+    dy = <span class="number">1</span>
+    move = move_up
+    wy = wy - <span class="number">1</span>
+    my = my + <span class="number">1</span>
+  <span class="keyword">elseif</span> y &gt; wy <span class="keyword">and</span> move == move_up <span class="keyword">then</span>
+    <span class="comment">-- end of move up
+</span>    dx = -<span class="number">1</span>
+    dy = <span class="number">0</span>
+    move = move_left
+    wx = wx - <span class="number">1</span>
+    mx = mx + <span class="number">1</span>
+  <span class="keyword">elseif</span> x &lt; mx <span class="keyword">and</span> move == move_left <span class="keyword">then</span>
+    <span class="comment">-- end of move left
+</span>    dx = <span class="number">0</span>
+    dy = -<span class="number">1</span>
+    move = move_down
+    wy = wy - <span class="number">1</span>
+    my = my + <span class="number">1</span>
+  <span class="keyword">elseif</span> y &lt; my <span class="keyword">and</span> move == move_down <span class="keyword">then</span>
+    <span class="comment">-- end of move down
+</span>    dx = <span class="number">1</span>
+    dy = <span class="number">0</span>
+    move = move_right
+    wx = wx - <span class="number">1</span>
+    mx = mx + <span class="number">1</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="global">io</span>.<span class="function-name">write</span>(move_down:<span class="function-name">rep</span>(<span class="number">15</span>))
+<span class="global">print</span>(<span class="string">"\nDone!"</span>)</pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-06-20 23:11:37 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

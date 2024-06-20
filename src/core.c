@@ -4,7 +4,7 @@
 #include <lua.h>
 #include <lauxlib.h>
 
-#define LUASYSTEM_VERSION   "LuaSystem 0.3.0"
+#define LUASYSTEM_VERSION   "LuaSystem 0.4.0"
 
 #ifdef _WIN32
 #define LUAEXPORT __declspec(dllexport)
@@ -26,6 +26,9 @@ LUAEXPORT int luaopen_system_core(lua_State *L) {
     lua_pushstring(L, "_VERSION");
     lua_pushstring(L, LUASYSTEM_VERSION);
     lua_rawset(L, -3);
+
+/// Flag to identify Windows.
+// @field windows `true` if on Windows, `false` otherwise.
     lua_pushstring(L, "windows");
 #ifdef _WIN32
     lua_pushboolean(L, 1);

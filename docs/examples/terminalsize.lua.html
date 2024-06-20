@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Lua-System docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Lua-System</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/compat.lua.html">compat.lua</a></li>
+  <li><a href="../examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
+  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="../examples/read.lua.html">read.lua</a></li>
+  <li><a href="../examples/readline.lua.html">readline.lua</a></li>
+  <li><a href="../examples/spinner.lua.html">spinner.lua</a></li>
+  <li><a href="../examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
+  <li><strong>terminalsize.lua</strong></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/system.html">system</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/bitflags.html">bitflags</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>terminalsize.lua</h2>
+<pre>
+<span class="keyword">local</span> sys = <span class="global">require</span>(<span class="string">"system"</span>)
+
+sys.<span class="function-name">autotermrestore</span>()  <span class="comment">-- set up auto restore of terminal settings on exit
+</span>
+<span class="comment">-- setup Windows console to handle ANSI processing
+</span>sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdout, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout) + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
+sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdin, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdin) + sys.CIF_VIRTUAL_TERMINAL_INPUT)
+
+<span class="comment">-- setup Posix to disable canonical mode and echo
+</span><span class="keyword">local</span> of_attr = sys.<span class="function-name">tcgetattr</span>(<span class="global">io</span>.stdin)
+sys.<span class="function-name">setnonblock</span>(<span class="global">io</span>.stdin, <span class="keyword">true</span>)
+sys.<span class="function-name">tcsetattr</span>(<span class="global">io</span>.stdin, sys.TCSANOW, {
+  lflag = of_attr.lflag - sys.L_ICANON - sys.L_ECHO, <span class="comment">-- disable canonical mode and echo
+</span>})
+
+
+<span class="comment">-- generate string to move cursor horizontally
+</span><span class="comment">-- positive goes right, negative goes left
+</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">cursor_move_horiz</span>(n)
+  <span class="keyword">if</span> n == <span class="number">0</span> <span class="keyword">then</span>
+    <span class="keyword">return</span> <span class="string">""</span>
+  <span class="keyword">end</span>
+  <span class="keyword">return</span> <span class="string">"\27["</span> .. (n &gt; <span class="number">0</span> <span class="keyword">and</span> n <span class="keyword">or</span> -n) .. (n &gt; <span class="number">0</span> <span class="keyword">and</span> <span class="string">"C"</span> <span class="keyword">or</span> <span class="string">"D"</span>)
+<span class="keyword">end</span>
+
+
+<span class="keyword">local</span> rows, cols
+<span class="global">print</span>(<span class="string">"Change the terminal window size, press any key to exit"</span>)
+<span class="keyword">while</span> <span class="keyword">not</span> sys.<span class="function-name">readansi</span>(<span class="number">0.2</span>) <span class="keyword">do</span>  <span class="comment">-- use readansi to not leave stray bytes in the input buffer
+</span>  <span class="keyword">local</span> nrows, ncols = sys.<span class="function-name">termsize</span>()
+  <span class="keyword">if</span> rows ~= nrows <span class="keyword">or</span> cols ~= ncols <span class="keyword">then</span>
+    rows, cols = nrows, ncols
+    <span class="keyword">local</span> text = <span class="string">"Terminal size: "</span> .. rows .. <span class="string">"x"</span> .. cols .. <span class="string">"     "</span>
+    <span class="global">io</span>.<span class="function-name">write</span>(text .. <span class="function-name">cursor_move_horiz</span>(-#text))
+    <span class="global">io</span>.<span class="function-name">flush</span>()
+  <span class="keyword">end</span>
+<span class="keyword">end</span></pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-06-20 23:11:37 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

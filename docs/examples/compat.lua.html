@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Lua-System docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Lua-System</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><strong>compat.lua</strong></li>
+  <li><a href="../examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
+  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="../examples/read.lua.html">read.lua</a></li>
+  <li><a href="../examples/readline.lua.html">readline.lua</a></li>
+  <li><a href="../examples/spinner.lua.html">spinner.lua</a></li>
+  <li><a href="../examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
+  <li><a href="../examples/terminalsize.lua.html">terminalsize.lua</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/system.html">system</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/bitflags.html">bitflags</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>compat.lua</h2>
+<pre>
+<span class="comment">-- This example shows how to remove platform differences to create a
+</span><span class="comment">-- cross-platform level playing field.
+</span>
+<span class="keyword">local</span> sys = <span class="global">require</span> <span class="string">"system"</span>
+
+
+
+<span class="keyword">if</span> sys.windows <span class="keyword">then</span>
+  <span class="comment">-- Windows holds multiple copies of environment variables, to ensure <code>getenv</code>
+</span>  <span class="comment">-- returns what <code>setenv</code> sets we need to use the <a href="../modules/system.html#getenv">system.getenv</a> instead of
+</span>  <span class="comment">-- <a href="https://www.lua.org/manual/5.4/manual.html#pdf-os.getenv">os.getenv</a>.
+</span>  <span class="global">os</span>.getenv = sys.getenv  <span class="comment">-- luacheck: ignore
+</span>
+  <span class="comment">-- Set console output to UTF-8 encoding.
+</span>  sys.<span class="function-name">setconsoleoutputcp</span>(sys.CODEPAGE_UTF8)
+
+  <span class="comment">-- Set up the terminal to handle ANSI escape sequences on Windows.
+</span>  <span class="keyword">if</span> sys.<span class="function-name">isatty</span>(<span class="global">io</span>.stdout) <span class="keyword">then</span>
+    sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdout, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout) + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
+  <span class="keyword">end</span>
+  <span class="keyword">if</span> sys.<span class="function-name">isatty</span>(<span class="global">io</span>.stderr) <span class="keyword">then</span>
+    sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stderr, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stderr) + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
+  <span class="keyword">end</span>
+  <span class="keyword">if</span> sys.<span class="function-name">isatty</span>(<span class="global">io</span>.stdin) <span class="keyword">then</span>
+    sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdin, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout) + sys.ENABLE_VIRTUAL_TERMINAL_INPUT)
+  <span class="keyword">end</span>
+
+
+<span class="keyword">else</span>
+  <span class="comment">-- On Posix, one can set a variable to an empty string, but on Windows, this
+</span>  <span class="comment">-- will remove the variable from the environment. To make this consistent
+</span>  <span class="comment">-- across platforms, we will remove the variable from the environment if the
+</span>  <span class="comment">-- value is an empty string.
+</span>  <span class="keyword">local</span> old_setenv = sys.setenv
+  <span class="keyword">function</span> sys.<span class="function-name">setenv</span>(name, value)
+    <span class="keyword">if</span> value == <span class="string">""</span> <span class="keyword">then</span> value = <span class="keyword">nil</span> <span class="keyword">end</span>
+    <span class="keyword">return</span> <span class="function-name">old_setenv</span>(name, value)
+  <span class="keyword">end</span>
+<span class="keyword">end</span></pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-06-20 23:11:37 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

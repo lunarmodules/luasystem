@@ -28,6 +28,20 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### Version 0.4.0, released 20-Jun-2024
+
+- Feat: `getconsoleflags` and `setconsoleflags` for getting/setting the current console configuration flags on Windows
+- Feat: `getconsolecp` and `setconsolecp` for getting/setting the console codepage on Windows
+- Feat: `getconsoleoutputcp` and `setconsoleoutputcp` for getting/setting the console output codepage on Windows
+- Feat: `tcgetattr` and `tcsetattr` for getting/setting the current console configuration flags on Posix
+- Feat: `getnonblock` and `setnonblock` for getting/setting the non-blocking flag on Posix
+- Feat: `bitflags`: a support feature for the above flag type controls to facilitate bit manipulation without resorting to binary operations (to also support PuC Lua 5.1)
+- Feat: `readkey` reads a keyboard input from `stdin` in a non-blocking way (utf8, also on Windows)
+- Feat: `readansi` reads a keyboard input from `stdin` in a non-blocking way, parses ansi and utf8 sequences
+- Feat: `termsize` gets the current terminal size in rows and columns
+- Feat: `utf8cwidth` and `utf8swidth` for getting the display width (in columns) of respectively a single utf8 character, or a utf8 string
+- Feat: helpers; `termbackup`, `termrestore`, `autotermrestore`, and `termwrap` for managing the many terminal settings on all platforms.
+
 ### Version 0.3.0, released 15-Dec-2023
 
 - Feat: on Windows `sleep` now has a precision parameter

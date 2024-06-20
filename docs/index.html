@@ -27,339 +27,122 @@
 <h1>Lua-System</h1>
 
 
-<h2>Contents</h2>
-<ul>
-<li><a href="#environment_Functions">environment Functions</a></li>
-<li><a href="#random_Functions">random Functions</a></li>
-<li><a href="#term_Functions">term Functions</a></li>
-<li><a href="#time_Functions">time Functions</a></li>
-</ul>
+
 
 
 <h2>Modules</h2>
 <ul class="nowrap">
-  <li><strong>system</strong></li>
+  <li><a href="modules/system.html">system</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="classes/bitflags.html">bitflags</a></li>
 </ul>
 <h2>Topics</h2>
 <ul class="">
   <li><a href="topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="topics/02-development.md.html">2. Development</a></li>
+  <li><a href="topics/03-terminal.md.html">3. Terminal functionality</a></li>
   <li><a href="topics/CHANGELOG.md.html">CHANGELOG</a></li>
   <li><a href="topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="examples/compat.lua.html">compat.lua</a></li>
+  <li><a href="examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
+  <li><a href="examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="examples/read.lua.html">read.lua</a></li>
+  <li><a href="examples/readline.lua.html">readline.lua</a></li>
+  <li><a href="examples/spinner.lua.html">spinner.lua</a></li>
+  <li><a href="examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
+  <li><a href="examples/terminalsize.lua.html">terminalsize.lua</a></li>
 </ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>system</code></h1>
-<p>Platform independent system calls for Lua.</p>
-<p>
 
-</p>
+  <h2>Platform independent system calls for Lua</h2>
 
-
-<h2><a href="#environment_Functions">environment Functions</a></h2>
-<table class="function_list">
+<h2>Modules</h2>
+<table class="module_list">
 	<tr>
-	<td class="name" nowrap><a href="#getenv">getenv (name)</a></td>
-	<td class="summary">Gets the value of an environment variable.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#getenvs">getenvs ()</a></td>
-	<td class="summary">Returns a table with all environment variables.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#setenv">setenv (name[, value])</a></td>
-	<td class="summary">Sets an environment variable.</td>
+		<td class="name"  nowrap><a href="modules/system.html">system</a></td>
+		<td class="summary">Platform independent system calls for Lua.</td>
 	</tr>
 </table>
-<h2><a href="#random_Functions">random Functions</a></h2>
-<table class="function_list">
+<h2>Classes</h2>
+<table class="module_list">
 	<tr>
-	<td class="name" nowrap><a href="#random">random ([length=1])</a></td>
-	<td class="summary">Generate random bytes.</td>
+		<td class="name"  nowrap><a href="classes/bitflags.html">bitflags</a></td>
+		<td class="summary">Bitflags module.</td>
 	</tr>
 </table>
-<h2><a href="#term_Functions">term Functions</a></h2>
-<table class="function_list">
+<h2>Topics</h2>
+<table class="module_list">
 	<tr>
-	<td class="name" nowrap><a href="#isatty">isatty (file)</a></td>
-	<td class="summary">Checks if a file-handle is a TTY.</td>
+		<td class="name"  nowrap><a href="topics/01-introduction.md.html">01-introduction.md</a></td>
+		<td class="summary"></td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="topics/02-development.md.html">02-development.md</a></td>
+		<td class="summary"></td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="topics/03-terminal.md.html">03-terminal.md</a></td>
+		<td class="summary"></td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="topics/CHANGELOG.md.html">CHANGELOG.md</a></td>
+		<td class="summary"></td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="topics/LICENSE.md.html">LICENSE.md</a></td>
+		<td class="summary"></td>
 	</tr>
 </table>
-<h2><a href="#time_Functions">time Functions</a></h2>
-<table class="function_list">
+<h2>Examples</h2>
+<table class="module_list">
 	<tr>
-	<td class="name" nowrap><a href="#gettime">gettime ()</a></td>
-	<td class="summary">Get system time.</td>
+		<td class="name"  nowrap><a href="examples/compat.lua.html">compat.lua</a></td>
+		<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#monotime">monotime ()</a></td>
-	<td class="summary">Get monotonic time.</td>
+		<td class="name"  nowrap><a href="examples/flag_debugging.lua.html">flag_debugging.lua</a></td>
+		<td class="summary"></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#sleep">sleep (seconds[, precision=16])</a></td>
-	<td class="summary">Sleep without a busy loop.</td>
+		<td class="name"  nowrap><a href="examples/password_input.lua.html">password_input.lua</a></td>
+		<td class="summary"></td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="examples/read.lua.html">read.lua</a></td>
+		<td class="summary"></td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="examples/readline.lua.html">readline.lua</a></td>
+		<td class="summary"></td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="examples/spinner.lua.html">spinner.lua</a></td>
+		<td class="summary"></td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="examples/spiral_snake.lua.html">spiral_snake.lua</a></td>
+		<td class="summary"></td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="examples/terminalsize.lua.html">terminalsize.lua</a></td>
+		<td class="summary"></td>
 	</tr>
 </table>
-
-<br/>
-<br/>
-
-
-    <h2 class="section-header "><a name="environment_Functions"></a>environment Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "getenv"></a>
-    <strong>getenv (name)</strong>
-    </dt>
-    <dd>
-    Gets the value of an environment variable. </p>
-
-<p><strong>NOTE</strong>: Windows has multiple copies of environment variables. For this reason,
-the <a href="index.html#setenv">setenv</a> function will not work with Lua's <a href="https://www.lua.org/manual/5.1/manual.html#pdf-os.getenv">os.getenv</a> on Windows. If you want
-to use <a href="index.html#setenv">setenv</a> then consider patching <a href="https://www.lua.org/manual/5.1/manual.html#pdf-os.getenv">os.getenv</a> with this implementation of <a href="index.html#getenv">getenv</a>.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         name of the environment variable
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <span class="type">nil</span></span>
-        value of the environment variable, or nil if the variable is not set
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "getenvs"></a>
-    <strong>getenvs ()</strong>
-    </dt>
-    <dd>
-    Returns a table with all environment variables.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
-        table with all environment variables and their values
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "setenv"></a>
-    <strong>setenv (name[, value])</strong>
-    </dt>
-    <dd>
-    Sets an environment variable. </p>
-
-<p><strong>NOTE</strong>: Windows has multiple copies of environment variables. For this reason, the
-<a href="index.html#setenv">setenv</a> function will not work with Lua's <a href="https://www.lua.org/manual/5.1/manual.html#pdf-os.getenv">os.getenv</a> on Windows. If you want to use
-it then consider patching <a href="https://www.lua.org/manual/5.1/manual.html#pdf-os.getenv">os.getenv</a> with the implementation of <a href="index.html#getenv">system.getenv</a>.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         name of the environment variable
-        </li>
-        <li><span class="parameter">value</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-         value of the environment variable, if <code>nil</code> the variable will be deleted (on
-Windows, setting an empty string, will also delete the variable)
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">boolean</span></span>
-        success
-    </ol>
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="random_Functions"></a>random Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "random"></a>
-    <strong>random ([length=1])</strong>
-    </dt>
-    <dd>
-    Generate random bytes.
-This uses <code>CryptGenRandom()</code> on Windows, and <code>/dev/urandom</code> on other platforms. It will return the
-requested number of bytes, or an error, never a partial result.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">length</span>
-            <span class="types"><span class="type">int</span></span>
-         number of bytes to get
-         (<em>default</em> 1)
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-        string of random bytes
-    </ol>
-     <h3>Or</h3>
-    <ol>
-        <li>
-           <span class="types"><span class="type">nil</span></span>
-
-
-</li>
-        <li>
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
-        error message</li>
-    </ol>
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="term_Functions"></a>term Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "isatty"></a>
-    <strong>isatty (file)</strong>
-    </dt>
-    <dd>
-    Checks if a file-handle is a TTY.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">file</span>
-            <span class="types"><span class="type">file</span></span>
-         the file-handle to check
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">boolean</span></span>
-        true if the file is a tty
-    </ol>
-
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="time_Functions"></a>time Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "gettime"></a>
-    <strong>gettime ()</strong>
-    </dt>
-    <dd>
-    Get system time.
-The time is returned as the seconds since the epoch (1 January 1970 00:00:00).
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">number</span></span>
-        seconds (fractional)
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "monotime"></a>
-    <strong>monotime ()</strong>
-    </dt>
-    <dd>
-    Get monotonic time.
-The time is returned as the seconds since system start.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">number</span></span>
-        seconds (fractional)
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "sleep"></a>
-    <strong>sleep (seconds[, precision=16])</strong>
-    </dt>
-    <dd>
-    Sleep without a busy loop.
-This function will sleep, without doing a busy-loop and wasting CPU cycles.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">seconds</span>
-            <span class="types"><span class="type">number</span></span>
-         seconds to sleep (fractional).
-        </li>
-        <li><span class="parameter">precision</span>
-            <span class="types"><span class="type">integer</span></span>
-         minimum stepsize in milliseconds (Windows only, ignored elsewhere)
-         (<em>default</em> 16)
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-        <code>true</code> on success, or <code>nil+err</code> on failure
-    </ol>
-
-
-
-
-</dd>
-</dl>
-
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2023-12-15 13:15:09 </i>
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-06-20 23:11:37 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
