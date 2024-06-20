@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Lua-System docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Lua-System</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/compat.lua.html">compat.lua</a></li>
+  <li><a href="../examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
+  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="../examples/read.lua.html">read.lua</a></li>
+  <li><a href="../examples/readline.lua.html">readline.lua</a></li>
+  <li><strong>spinner.lua</strong></li>
+  <li><a href="../examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
+  <li><a href="../examples/terminalsize.lua.html">terminalsize.lua</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/system.html">system</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/bitflags.html">bitflags</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>spinner.lua</h2>
+<pre>
+<span class="keyword">local</span> sys = <span class="global">require</span>(<span class="string">"system"</span>)
+
+<span class="global">print</span> <span class="string">[[
+
+An example to display a spinner, whilst a long running task executes.
+
+]]</span>
+
+
+<span class="comment">-- start make backup, to auto-restore on exit
+</span>sys.<span class="function-name">autotermrestore</span>()
+<span class="comment">-- configure console
+</span>sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdin, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdin) - sys.CIF_ECHO_INPUT - sys.CIF_LINE_INPUT)
+<span class="keyword">local</span> of = sys.<span class="function-name">tcgetattr</span>(<span class="global">io</span>.stdin)
+sys.<span class="function-name">tcsetattr</span>(<span class="global">io</span>.stdin, sys.TCSANOW, { lflag = of.lflag - sys.L_ICANON - sys.L_ECHO })
+sys.<span class="function-name">setnonblock</span>(<span class="global">io</span>.stdin, <span class="keyword">true</span>)
+
+
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">hideCursor</span>()
+  <span class="global">io</span>.<span class="function-name">write</span>(<span class="string">"\27[?25l"</span>)
+  <span class="global">io</span>.<span class="function-name">flush</span>()
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">showCursor</span>()
+  <span class="global">io</span>.<span class="function-name">write</span>(<span class="string">"\27[?25h"</span>)
+  <span class="global">io</span>.<span class="function-name">flush</span>()
+<span class="keyword">end</span>
+
+<span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">left</span>(n)
+  <span class="global">io</span>.<span class="function-name">write</span>(<span class="string">"\27["</span>,n <span class="keyword">or</span> <span class="number">1</span>,<span class="string">"D"</span>)
+  <span class="global">io</span>.<span class="function-name">flush</span>()
+<span class="keyword">end</span>
+
+
+
+<span class="keyword">local</span> spinner <span class="keyword">do</span>
+  <span class="keyword">local</span> spin = <span class="string">[[|/-\]]</span>
+  <span class="keyword">local</span> i = <span class="number">1</span>
+  spinner = <span class="keyword">function</span>()
+    <span class="function-name">hideCursor</span>()
+    <span class="global">io</span>.<span class="function-name">write</span>(spin:<span class="function-name">sub</span>(i, i))
+    <span class="function-name">left</span>()
+    i = i + <span class="number">1</span>
+    <span class="keyword">if</span> i &gt; #spin <span class="keyword">then</span> i = <span class="number">1</span> <span class="keyword">end</span>
+
+    <span class="keyword">if</span> sys.<span class="function-name">readkey</span>(<span class="number">0</span>) ~= <span class="keyword">nil</span> <span class="keyword">then</span>
+      <span class="keyword">while</span> sys.<span class="function-name">readkey</span>(<span class="number">0</span>) ~= <span class="keyword">nil</span> <span class="keyword">do</span> <span class="keyword">end</span> <span class="comment">-- consume keys pressed
+</span>      <span class="global">io</span>.<span class="function-name">write</span>(<span class="string">" "</span>);
+      <span class="function-name">left</span>()
+      <span class="function-name">showCursor</span>()
+      <span class="keyword">return</span> <span class="keyword">true</span>
+    <span class="keyword">else</span>
+      <span class="keyword">return</span> <span class="keyword">false</span>
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="global">io</span>.stdout:<span class="function-name">write</span>(<span class="string">"press any key to stop the spinner... "</span>)
+<span class="keyword">while</span> <span class="keyword">not</span> <span class="function-name">spinner</span>() <span class="keyword">do</span>
+  sys.<span class="function-name">sleep</span>(<span class="number">0.1</span>)
+<span class="keyword">end</span>
+
+<span class="global">print</span>(<span class="string">"Done!"</span>)</pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-06-20 23:11:37 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

@@ -33,13 +33,16 @@
 
 
 
-<h2>Topics</h2>
-<ul class="">
-  <li><strong>1. Introduction</strong></li>
-  <li><a href="../topics/02-development.md.html">2. Development</a></li>
-  <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
-  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
-  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/compat.lua.html">compat.lua</a></li>
+  <li><strong>flag_debugging.lua</strong></li>
+  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="../examples/read.lua.html">read.lua</a></li>
+  <li><a href="../examples/readline.lua.html">readline.lua</a></li>
+  <li><a href="../examples/spinner.lua.html">spinner.lua</a></li>
+  <li><a href="../examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
+  <li><a href="../examples/terminalsize.lua.html">terminalsize.lua</a></li>
 </ul>
 <h2>Modules</h2>
 <ul class="nowrap">
@@ -49,35 +52,28 @@
 <ul class="nowrap">
   <li><a href="../classes/bitflags.html">bitflags</a></li>
 </ul>
-<h2>Examples</h2>
-<ul class="nowrap">
-  <li><a href="../examples/compat.lua.html">compat.lua</a></li>
-  <li><a href="../examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
-  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
-  <li><a href="../examples/read.lua.html">read.lua</a></li>
-  <li><a href="../examples/readline.lua.html">readline.lua</a></li>
-  <li><a href="../examples/spinner.lua.html">spinner.lua</a></li>
-  <li><a href="../examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
-  <li><a href="../examples/terminalsize.lua.html">terminalsize.lua</a></li>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
 </ul>
 
 </div>
 
 <div id="content">
 
+    <h2>flag_debugging.lua</h2>
+<pre>
+<span class="keyword">local</span> sys = <span class="global">require</span> <span class="string">"system"</span>
 
-<h1>1. Introduction</h1>
+<span class="comment">-- Print the Windows Console flags for stdin
+</span>sys.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdin)
 
-<p>luasystem is a platform independent system call library for Lua.
-Supports Unix, Windows, MacOS, <code>Lua &gt;= 5.1</code> and <code>luajit &gt;= 2.0.0</code>.</p>
-
-<p>Lua is typically platform independent, but it requires adhering to very old C
-standards. This in turn means that many common features (according to todays standards)
-are not available. This module attempts to overcome some of those hurdles by providing
-functions that cover those common needs.</p>
-
-<p>This is not a kitchen sink library, but a minimalistic one with a focus on platform
-independence.</p>
+<span class="comment">-- Print the Posix termios flags for stdin
+</span>sys.<span class="function-name">listtermflags</span>(<span class="global">io</span>.stdin)</pre>
 
 
 </div> <!-- id="content" -->

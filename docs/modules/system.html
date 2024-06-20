@@ -1,0 +1,1418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Lua-System docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Lua-System</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Fields">Fields</a></li>
+<li><a href="#Environment">Environment </a></li>
+<li><a href="#Random">Random </a></li>
+<li><a href="#Terminal">Terminal </a></li>
+<li><a href="#Time">Time </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>system</strong></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/bitflags.html">bitflags</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/compat.lua.html">compat.lua</a></li>
+  <li><a href="../examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
+  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="../examples/read.lua.html">read.lua</a></li>
+  <li><a href="../examples/readline.lua.html">readline.lua</a></li>
+  <li><a href="../examples/spinner.lua.html">spinner.lua</a></li>
+  <li><a href="../examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
+  <li><a href="../examples/terminalsize.lua.html">terminalsize.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>system</code></h1>
+<p>Platform independent system calls for Lua.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Fields">Fields</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#windows">windows</a></td>
+	<td class="summary">Flag to identify Windows.</td>
+	</tr>
+</table>
+<h2><a href="#Environment">Environment </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#getenv">getenv (name)</a></td>
+	<td class="summary">Gets the value of an environment variable.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getenvs">getenvs ()</a></td>
+	<td class="summary">Returns a table with all environment variables.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setenv">setenv (name[, value])</a></td>
+	<td class="summary">Sets an environment variable.</td>
+	</tr>
+</table>
+<h2><a href="#Random">Random </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#random">random ([length=1])</a></td>
+	<td class="summary">Generate random bytes.</td>
+	</tr>
+</table>
+<h2><a href="#Terminal">Terminal </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#CODEPAGE_UTF8">CODEPAGE_UTF8</a></td>
+	<td class="summary">UTF8 codepage.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#_readkey">_readkey ()</a></td>
+	<td class="summary">Reads a key from the console non-blocking.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#autotermrestore">autotermrestore ()</a></td>
+	<td class="summary">Backs up terminal settings and restores them on application exit.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getconsolecp">getconsolecp ()</a></td>
+	<td class="summary">Gets the current console code page (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getconsoleflags">getconsoleflags (file)</a></td>
+	<td class="summary">Gets console flags (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getconsoleoutputcp">getconsoleoutputcp ()</a></td>
+	<td class="summary">Gets the current console output code page (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getnonblock">getnonblock (fd)</a></td>
+	<td class="summary">Gets non-blocking mode status for a file (Posix).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isatty">isatty (file)</a></td>
+	<td class="summary">Checks if a file-handle is a TTY.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#listconsoleflags">listconsoleflags (fh)</a></td>
+	<td class="summary">Debug function for console flags (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#listtermflags">listtermflags (fh)</a></td>
+	<td class="summary">Debug function for terminal flags (Posix).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#readansi">readansi (timeout)</a></td>
+	<td class="summary">Reads a single key, if it is the start of ansi escape sequence then it reads
+ the full sequence.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#readkey">readkey (timeout)</a></td>
+	<td class="summary">Reads a single byte from the console, with a timeout.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setconsolecp">setconsolecp (cp)</a></td>
+	<td class="summary">Sets the current console code page (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setconsoleflags">setconsoleflags (file, bitflags)</a></td>
+	<td class="summary">Sets the console flags (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setconsoleoutputcp">setconsoleoutputcp (cp)</a></td>
+	<td class="summary">Sets the current console output code page (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setnonblock">setnonblock (fd, make_non_block)</a></td>
+	<td class="summary">Enables or disables non-blocking mode for a file (Posix).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tcgetattr">tcgetattr (fd)</a></td>
+	<td class="summary">Get termios state (Posix).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tcsetattr">tcsetattr (fd, actions, termios)</a></td>
+	<td class="summary">Set termios state (Posix).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#termbackup">termbackup ()</a></td>
+	<td class="summary">Returns a backup of terminal settings for stdin/out/err.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#termrestore">termrestore (backup)</a></td>
+	<td class="summary">Restores terminal settings from a backup</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#termsize">termsize ()</a></td>
+	<td class="summary">Get the size of the terminal in rows and columns.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#termwrap">termwrap (f)</a></td>
+	<td class="summary">Wraps a function to automatically restore terminal settings upon returning.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#utf8cwidth">utf8cwidth (utf8_char)</a></td>
+	<td class="summary">Get the width of a utf8 character for terminal display.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#utf8swidth">utf8swidth (utf8_string)</a></td>
+	<td class="summary">Get the width of a utf8 string for terminal display.</td>
+	</tr>
+</table>
+<h2><a href="#Time">Time </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#gettime">gettime ()</a></td>
+	<td class="summary">Get system time.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#monotime">monotime ()</a></td>
+	<td class="summary">Get monotonic time.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sleep">sleep (seconds[, precision=16])</a></td>
+	<td class="summary">Sleep without a busy loop.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "windows"></a>
+    <strong>windows</strong>
+    </dt>
+    <dd>
+    Flag to identify Windows.
+
+
+    <ul>
+        <li><span class="parameter">windows</span>
+         <code>true</code> if on Windows, <code>false</code> otherwise.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Environment"></a>Environment </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "getenv"></a>
+    <strong>getenv (name)</strong>
+    </dt>
+    <dd>
+    Gets the value of an environment variable. </p>
+
+<p><strong>NOTE</strong>: Windows has multiple copies of environment variables. For this reason,
+the <a href="../modules/system.html#setenv">setenv</a> function will not work with Lua's <a href="https://www.lua.org/manual/5.4/manual.html#pdf-os.getenv">os.getenv</a> on Windows. If you want
+to use <a href="../modules/system.html#setenv">setenv</a> then consider patching <a href="https://www.lua.org/manual/5.4/manual.html#pdf-os.getenv">os.getenv</a> with this implementation of <a href="../modules/system.html#getenv">getenv</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         name of the environment variable
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a> or <span class="type">nil</span></span>
+        value of the environment variable, or nil if the variable is not set
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getenvs"></a>
+    <strong>getenvs ()</strong>
+    </dt>
+    <dd>
+    Returns a table with all environment variables.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+        table with all environment variables and their values
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setenv"></a>
+    <strong>setenv (name[, value])</strong>
+    </dt>
+    <dd>
+    Sets an environment variable. </p>
+
+<p><strong>NOTE</strong>: Windows has multiple copies of environment variables. For this reason, the
+<a href="../modules/system.html#setenv">setenv</a> function will not work with Lua's <a href="https://www.lua.org/manual/5.4/manual.html#pdf-os.getenv">os.getenv</a> on Windows. If you want to use
+it then consider patching <a href="https://www.lua.org/manual/5.4/manual.html#pdf-os.getenv">os.getenv</a> with the implementation of <a href="../modules/system.html#getenv">system.getenv</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         name of the environment variable
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         value of the environment variable, if <code>nil</code> the variable will be deleted (on
+Windows, setting an empty string, will also delete the variable)
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        success
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Random"></a>Random </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "random"></a>
+    <strong>random ([length=1])</strong>
+    </dt>
+    <dd>
+    Generate random bytes.
+This uses <code>CryptGenRandom()</code> on Windows, and <code>/dev/urandom</code> on other platforms. It will return the
+requested number of bytes, or an error, never a partial result.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">length</span>
+            <span class="types"><span class="type">int</span></span>
+         number of bytes to get
+         (<em>default</em> 1)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        string of random bytes
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Terminal"></a>Terminal </h2>
+
+          <div class="section-description">
+           Unix: see https://blog.nelhage.com/2009/12/a-brief-introduction-to-termios-termios3-and-stty/</p>
+
+<p> Windows: see https://learn.microsoft.com/en-us/windows/console/console-reference
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "CODEPAGE_UTF8"></a>
+    <strong>CODEPAGE_UTF8</strong>
+    </dt>
+    <dd>
+    UTF8 codepage.
+ To be used with <a href="../modules/system.html#setconsoleoutputcp">system.setconsoleoutputcp</a> and <a href="../modules/system.html#setconsolecp">system.setconsolecp</a>.
+
+
+    <ul>
+        <li><span class="parameter">CODEPAGE_UTF8</span>
+         The Windows CodePage for UTF8.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "_readkey"></a>
+    <strong>_readkey ()</strong>
+    </dt>
+    <dd>
+    Reads a key from the console non-blocking.  This function should not be called
+directly, but through the <a href="../modules/system.html#readkey">system.readkey</a> or <a href="../modules/system.html#readansi">system.readansi</a> functions. It
+will return the next byte from the input stream, or <code>nil</code> if no key was pressed.</p>
+
+<p>On Posix, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a> must be set to non-blocking mode using <a href="../modules/system.html#setnonblock">setnonblock</a>
+and canonical mode must be turned off using <a href="../modules/system.html#tcsetattr">tcsetattr</a>,
+before calling this function. Otherwise it will block. No conversions are
+done on Posix, so the byte read is returned as-is.</p>
+
+<p>On Windows this reads a wide character and converts it to UTF-8. Multi-byte
+sequences will be buffered internally and returned one byte at a time.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">integer</span></span>
+        the byte read from the input stream
+    </ol>
+     <h3>Or</h3>
+    <ol>
+
+           <span class="types"><span class="type">nil</span></span>
+        if no key was pressed
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+        on error</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        errnum (on posix)</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "autotermrestore"></a>
+    <strong>autotermrestore ()</strong>
+    </dt>
+    <dd>
+    Backs up terminal settings and restores them on application exit.
+ Calls <a href="../modules/system.html#termbackup">termbackup</a> to back up terminal settings and sets up a GC method to
+ automatically restore them on application exit (also works on Lua 5.1).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        true
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+        if the backup was already created</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getconsolecp"></a>
+    <strong>getconsolecp ()</strong>
+    </dt>
+    <dd>
+    Gets the current console code page (Windows).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the current code page (always 65001 on Posix systems)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getconsoleflags"></a>
+    <strong>getconsoleflags (file)</strong>
+    </dt>
+    <dd>
+    Gets console flags (Windows).
+The <code>CIF_</code> and <code>COF_</code> constants are available on the module table. Where <code>CIF</code> are the
+input flags (for use with <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>) and <code>COF</code> are the output flags (for use with
+<a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>/<a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>).</p>
+
+<p><em>Note</em>: See <a href="https://learn.microsoft.com/en-us/windows/console/setconsolemode">setconsolemode documentation</a>
+for more information on the flags.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">file</span>
+            <span class="types"><span class="type">file</span></span>
+         file handle to operate on, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/bitflags.html#">bitflags</a></span>
+        the current console flags.
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> system = <span class="global">require</span>(<span class="string">'system'</span>)
+
+<span class="keyword">local</span> flags = system.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout)
+<span class="global">print</span>(<span class="string">"Current stdout flags:"</span>, <span class="global">tostring</span>(flags))
+
+<span class="keyword">if</span> flags:<span class="function-name">has_all_of</span>(system.COF_VIRTUAL_TERMINAL_PROCESSING + system.COF_PROCESSED_OUTPUT) <span class="keyword">then</span>
+    <span class="global">print</span>(<span class="string">"Both flags are set"</span>)
+<span class="keyword">else</span>
+    <span class="global">print</span>(<span class="string">"At least one flag is not set"</span>)
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "getconsoleoutputcp"></a>
+    <strong>getconsoleoutputcp ()</strong>
+    </dt>
+    <dd>
+    Gets the current console output code page (Windows).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the current code page (always 65001 on Posix systems)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getnonblock"></a>
+    <strong>getnonblock (fd)</strong>
+    </dt>
+    <dd>
+    Gets non-blocking mode status for a file (Posix).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fd</span>
+            <span class="types"><span class="type">file</span></span>
+         file handle to operate on, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>true</code> if set to non-blocking, <code>false</code> if not. Always returns <code>false</code> on Windows.
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        errnum</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isatty"></a>
+    <strong>isatty (file)</strong>
+    </dt>
+    <dd>
+    Checks if a file-handle is a TTY.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">file</span>
+            <span class="types"><span class="type">file</span></span>
+         the file-handle to check, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        true if the file is a tty
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> system = <span class="global">require</span>(<span class="string">'system'</span>)
+<span class="keyword">if</span> system.<span class="function-name">isatty</span>(<span class="global">io</span>.stdin) <span class="keyword">then</span>
+    <span class="comment">-- enable ANSI coloring etc on Windows, does nothing in Posix.
+</span>    <span class="keyword">local</span> flags = system.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout)
+    system.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdout, flags + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "listconsoleflags"></a>
+    <strong>listconsoleflags (fh)</strong>
+    </dt>
+    <dd>
+    Debug function for console flags (Windows).
+ Pretty prints the current flags set for the handle.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fh</span>
+         file handle (<a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- Print the flags for stdin/out/err
+</span>system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdin)
+system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdout)
+system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stderr)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "listtermflags"></a>
+    <strong>listtermflags (fh)</strong>
+    </dt>
+    <dd>
+    Debug function for terminal flags (Posix).
+ Pretty prints the current flags set for the handle.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fh</span>
+         file handle (<a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- Print the flags for stdin/out/err
+</span>system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdin)
+system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdout)
+system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stderr)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "readansi"></a>
+    <strong>readansi (timeout)</strong>
+    </dt>
+    <dd>
+    Reads a single key, if it is the start of ansi escape sequence then it reads
+ the full sequence.  The key can be a multi-byte string in case of multibyte UTF-8 character.
+ This function uses <a href="../modules/system.html#readkey">system.readkey</a>, and hence <a href="../modules/system.html#sleep">system.sleep</a> to wait until either a key is
+ available or the timeout is reached.
+ It returns immediately if a key is available or if <code>timeout</code> is less than or equal to <code>0</code>.
+ In case of an ANSI sequence, it will return the full sequence as a string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">number</span></span>
+         the timeout in seconds.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        the character that was received (can be multi-byte), or a complete ANSI sequence</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        the type of input: <code>&quot;char&quot;</code> for a single key, <code>&quot;ansi&quot;</code> for an ANSI sequence</li>
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+        in case of an error</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message; <code>&quot;timeout&quot;</code> if the timeout was reached.</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        partial result in case of an error while reading a sequence, the sequence so far.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "readkey"></a>
+    <strong>readkey (timeout)</strong>
+    </dt>
+    <dd>
+    Reads a single byte from the console, with a timeout.
+ This function uses <a href="../modules/system.html#sleep">system.sleep</a> to wait until either a byte is available or the timeout is reached.
+ The sleep period is exponentially backing off, starting at 0.0125 seconds, with a maximum of 0.2 seconds.
+ It returns immediately if a byte is available or if <code>timeout</code> is less than or equal to <code>0</code>.</p>
+
+<p> Using <a href="../modules/system.html#readansi">system.readansi</a> is preferred over this function. Since this function can leave stray/invalid
+ byte-sequences in the input buffer, while <a href="../modules/system.html#readansi">system.readansi</a> reads full ANSI and UTF8 sequences.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">number</span></span>
+         the timeout in seconds.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">byte</span></span>
+        the byte value that was read.
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+        if no key was read</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message; <code>&quot;timeout&quot;</code> if the timeout was reached.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setconsolecp"></a>
+    <strong>setconsolecp (cp)</strong>
+    </dt>
+    <dd>
+    Sets the current console code page (Windows).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cp</span>
+            <span class="types"><span class="type">int</span></span>
+         the code page to set, use <a href="../modules/system.html#CODEPAGE_UTF8">system.CODEPAGE_UTF8</a> (65001) for UTF-8
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>true</code> on success (always <code>true</code> on Posix systems)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setconsoleflags"></a>
+    <strong>setconsoleflags (file, bitflags)</strong>
+    </dt>
+    <dd>
+    Sets the console flags (Windows).
+The <code>CIF_</code> and <code>COF_</code> constants are available on the module table. Where <code>CIF</code> are the
+input flags (for use with <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>) and <code>COF</code> are the output flags (for use with
+<a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>/<a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>).</p>
+
+<p>To see flag status and constant names check <a href="../modules/system.html#listconsoleflags">listconsoleflags</a>.</p>
+
+<p>Note: not all combinations of flags are allowed, as some are mutually exclusive or mutually required.
+See <a href="https://learn.microsoft.com/en-us/windows/console/setconsolemode">setconsolemode documentation</a>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">file</span>
+            <span class="types"><span class="type">file</span></span>
+         file handle to operate on, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>
+        </li>
+        <li><span class="parameter">bitflags</span>
+            <span class="types"><a class="type" href="../classes/bitflags.html#">bitflags</a></span>
+         the flags to set/unset
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        <code>true</code> on success
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> system = <span class="global">require</span>(<span class="string">'system'</span>)
+system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdout) <span class="comment">-- List all the available flags and their current status
+</span>
+<span class="keyword">local</span> flags = system.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout)
+<span class="global">assert</span>(system.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdout,
+        flags + system.COF_VIRTUAL_TERMINAL_PROCESSING)
+
+system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdout) <span class="comment">-- List again to check the differences</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "setconsoleoutputcp"></a>
+    <strong>setconsoleoutputcp (cp)</strong>
+    </dt>
+    <dd>
+    Sets the current console output code page (Windows).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cp</span>
+            <span class="types"><span class="type">int</span></span>
+         the code page to set, use <a href="../modules/system.html#CODEPAGE_UTF8">system.CODEPAGE_UTF8</a> (65001) for UTF-8
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>true</code> on success (always <code>true</code> on Posix systems)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setnonblock"></a>
+    <strong>setnonblock (fd, make_non_block)</strong>
+    </dt>
+    <dd>
+    Enables or disables non-blocking mode for a file (Posix).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fd</span>
+            <span class="types"><span class="type">file</span></span>
+         file handle to operate on, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>
+        </li>
+        <li><span class="parameter">make_non_block</span>
+            <span class="types"><span class="type">boolean</span></span>
+         a truthy value will enable non-blocking mode, a falsy value will disable it.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>true</code>, if successful
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        errnum</li>
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/system.html#getnonblock">getnonblock</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sys = <span class="global">require</span>(<span class="string">'system'</span>)
+
+<span class="comment">-- set io.stdin to non-blocking mode
+</span><span class="keyword">local</span> old_setting = sys.<span class="function-name">getnonblock</span>(<span class="global">io</span>.stdin)
+sys.<span class="function-name">setnonblock</span>(<span class="global">io</span>.stdin, <span class="keyword">true</span>)
+
+<span class="comment">-- do stuff
+</span>
+<span class="comment">-- restore old setting
+</span>sys.<span class="function-name">setnonblock</span>(<span class="global">io</span>.stdin, old_setting)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "tcgetattr"></a>
+    <strong>tcgetattr (fd)</strong>
+    </dt>
+    <dd>
+
+<p>Get termios state (Posix).
+The terminal attributes is a table with the following fields:</p>
+
+<ul>
+    <li><code>iflag</code> input flags</li>
+    <li><code>oflag</code> output flags</li>
+    <li><code>lflag</code> local flags</li>
+    <li><code>cflag</code> control flags</li>
+    <li><code>ispeed</code> input speed</li>
+    <li><code>ospeed</code> output speed</li>
+    <li><code>cc</code> control characters</li>
+</ul>
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fd</span>
+            <span class="types"><span class="type">file</span></span>
+         file handle to operate on, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        error message if failed
+    </ol>
+     <h3>Or</h3>
+    <ol>
+
+           <span class="types"><span class="type">termios</span></span>
+        terminal attributes, if successful. On Windows the bitflags are all 0, and the <code>cc</code> table is empty.
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        errnum</li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> system = <span class="global">require</span>(<span class="string">'system'</span>)
+
+<span class="keyword">local</span> status = <span class="global">assert</span>(<span class="function-name">tcgetattr</span>(<span class="global">io</span>.stdin))
+<span class="keyword">if</span> status.iflag:<span class="function-name">has_all_of</span>(system.I_IGNBRK) <span class="keyword">then</span>
+    <span class="global">print</span>(<span class="string">"Ignoring break condition"</span>)
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "tcsetattr"></a>
+    <strong>tcsetattr (fd, actions, termios)</strong>
+    </dt>
+    <dd>
+    Set termios state (Posix).
+This function will set the flags as given.</p>
+
+<p>The <code>I_</code>, <code>O_</code>, and <code>L_</code> constants are available on the module table. They are the respective
+flags for the <code>iflags</code>, <code>oflags</code>, and <code>lflags</code> bitmasks.</p>
+
+<p>To see flag status and constant names check <a href="../modules/system.html#listtermflags">listtermflags</a>. For their meaning check
+<a href="https://www.man7.org/linux/man-pages/man3/termios.3.html">the manpage</a>.</p>
+
+<p><em>Note</em>: only <code>iflag</code>, <code>oflag</code>, and <code>lflag</code> are supported at the moment. The other fields are ignored.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fd</span>
+            <span class="types"><span class="type">file</span></span>
+         file handle to operate on, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>
+        </li>
+        <li><span class="parameter">actions</span>
+            <span class="types"><span class="type">integer</span></span>
+         one of <code>TCSANOW</code>, <code>TCSADRAIN</code>, <code>TCSAFLUSH</code>
+        </li>
+        <li><span class="parameter">termios</span> a table with bitflag fields:
+        <ul>
+        <li><span class="parameter">iflag</span>
+            <span class="types"><a class="type" href="../classes/bitflags.html#">bitflags</a></span>
+         if given will set the input flags
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">oflag</span>
+            <span class="types"><a class="type" href="../classes/bitflags.html#">bitflags</a></span>
+         if given will set the output flags
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">lflag</span>
+            <span class="types"><a class="type" href="../classes/bitflags.html#">bitflags</a></span>
+         if given will set the local flags
+         (<em>optional</em>)
+        </li>
+        </li></ul>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>true</code>, if successful. Always returns <code>true</code> on Windows.
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+        nil</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        errnum</li>
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> system = <span class="global">require</span>(<span class="string">'system'</span>)
+
+<span class="keyword">local</span> status = <span class="global">assert</span>(<span class="function-name">tcgetattr</span>(<span class="global">io</span>.stdin))
+<span class="keyword">if</span> <span class="keyword">not</span> status.lflag:<span class="function-name">has_all_of</span>(system.L_ECHO) <span class="keyword">then</span>
+    <span class="comment">-- if echo is off, turn echoing newlines on
+</span>    <span class="function-name">tcsetattr</span>(<span class="global">io</span>.stdin, system.TCSANOW, { lflag = status.lflag + system.L_ECHONL }))
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "termbackup"></a>
+    <strong>termbackup ()</strong>
+    </dt>
+    <dd>
+    Returns a backup of terminal settings for stdin/out/err.
+ Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
+ Backs up terminal/console flags only if a stream is a tty.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table with backup of terminal settings
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "termrestore"></a>
+    <strong>termrestore (backup)</strong>
+    </dt>
+    <dd>
+    Restores terminal settings from a backup
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">backup</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         the backup of terminal settings, see <a href="../modules/system.html#termbackup">termbackup</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        true
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "termsize"></a>
+    <strong>termsize ()</strong>
+    </dt>
+    <dd>
+    Get the size of the terminal in rows and columns.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        the number of rows</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        the number of columns</li>
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "termwrap"></a>
+    <strong>termwrap (f)</strong>
+    </dt>
+    <dd>
+    Wraps a function to automatically restore terminal settings upon returning.
+ Calls <a href="../modules/system.html#termbackup">termbackup</a> before calling the function and <a href="../modules/system.html#termrestore">termrestore</a> after.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         function to wrap
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">function</span></span>
+        wrapped function
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "utf8cwidth"></a>
+    <strong>utf8cwidth (utf8_char)</strong>
+    </dt>
+    <dd>
+    Get the width of a utf8 character for terminal display.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">utf8_char</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         the utf8 character to check, only the width of the first character will be returned
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the display width in columns of the first character in the string (0 for an empty string)
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "utf8swidth"></a>
+    <strong>utf8swidth (utf8_string)</strong>
+    </dt>
+    <dd>
+    Get the width of a utf8 string for terminal display.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">utf8_string</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         the utf8 string to check
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the display width of the string in columns (0 for an empty string)
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Time"></a>Time </h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "gettime"></a>
+    <strong>gettime ()</strong>
+    </dt>
+    <dd>
+    Get system time.
+The time is returned as the seconds since the epoch (1 January 1970 00:00:00).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        seconds (fractional)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "monotime"></a>
+    <strong>monotime ()</strong>
+    </dt>
+    <dd>
+    Get monotonic time.
+The time is returned as the seconds since system start.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        seconds (fractional)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sleep"></a>
+    <strong>sleep (seconds[, precision=16])</strong>
+    </dt>
+    <dd>
+    Sleep without a busy loop.
+This function will sleep, without doing a busy-loop and wasting CPU cycles.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">seconds</span>
+            <span class="types"><span class="type">number</span></span>
+         seconds to sleep (fractional).
+        </li>
+        <li><span class="parameter">precision</span>
+            <span class="types"><span class="type">integer</span></span>
+         minimum stepsize in milliseconds (Windows only, ignored elsewhere)
+         (<em>default</em> 16)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        <code>true</code> on success, or <code>nil+err</code> on failure
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-06-20 23:11:37 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

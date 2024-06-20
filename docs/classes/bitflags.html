@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Lua-System docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Lua-System</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Bit_flags">Bit flags </a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><strong>bitflags</strong></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/system.html">system</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/compat.lua.html">compat.lua</a></li>
+  <li><a href="../examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
+  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="../examples/read.lua.html">read.lua</a></li>
+  <li><a href="../examples/readline.lua.html">readline.lua</a></li>
+  <li><a href="../examples/spinner.lua.html">spinner.lua</a></li>
+  <li><a href="../examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
+  <li><a href="../examples/terminalsize.lua.html">terminalsize.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>bitflags</code></h1>
+<p>Bitflags module.</p>
+<p> The bitflag object makes it easy to manipulate flags in a bitmask.</p>
+
+<p> It has metamethods that do the hard work, adding flags sets them, substracting
+ unsets them. Comparing flags checks if all flags in the second set are also set
+ in the first set. The <code>has</code> method checks if all flags in the second set are
+ also set in the first set, but behaves slightly different.</p>
+
+<p> Indexing allows checking values or setting them by bit index (eg. 0-7 for flags
+ in the first byte).</p>
+
+<p> <em>NOTE</em>: unavailable flags (eg. Windows flags on a Posix system) should not be
+ omitted, but be assigned a value of 0. This is because the <code>has</code> method will
+ return <code>false</code> if the flags are checked and the value is 0.</p>
+
+<p> See <a href="../classes/bitflags.html#system.bitflag">system.bitflag</a> (the constructor) for extensive examples on usage.</p>
+
+
+<h2><a href="#Bit_flags">Bit flags </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#bitflag:has_all_of">bitflag:has_all_of (subset)</a></td>
+	<td class="summary">Checks if all the flags in the given subset are set.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#bitflag:has_any_of">bitflag:has_any_of (subset)</a></td>
+	<td class="summary">Checks if any of the flags in the given subset are set.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#bitflag:value">bitflag:value ()</a></td>
+	<td class="summary">Retrieves the numeric value of the bitflag object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#system.bitflag">system.bitflag ([value=0])</a></td>
+	<td class="summary">Creates a new bitflag object from the given value.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header has-description"><a name="Bit_flags"></a>Bit flags </h2>
+
+          <div class="section-description">
+           Bitflag objects can be used to easily manipulate and compare bit flags.
+ These are primarily for use with the terminal functions, but can be used
+ in other places as well.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "bitflag:has_all_of"></a>
+    <strong>bitflag:has_all_of (subset)</strong>
+    </dt>
+    <dd>
+    Checks if all the flags in the given subset are set.
+If the flags to check has a value <code>0</code>, it will always return <code>false</code>. So if there are flags that are
+unsupported on a platform, they can be set to 0 and the <a href="../classes/bitflags.html#bitflag:has_all_of">has_all_of</a> function will
+return <code>false</code> if the flags are checked.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">subset</span>
+            <span class="types"><a class="type" href="../classes/bitflags.html#system.bitflag">bitflag</a></span>
+         the flags to check for.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        true if all the flags are set, false otherwise.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sys = <span class="global">require</span> <span class="string">'system'</span>
+<span class="keyword">local</span> flags = sys.<span class="function-name">bitflag</span>(<span class="number">12</span>)     <span class="comment">-- b1100
+</span><span class="keyword">local</span> myflags = sys.<span class="function-name">bitflag</span>(<span class="number">15</span>)   <span class="comment">-- b1111
+</span><span class="global">print</span>(flags:<span class="function-name">has_all_of</span>(myflags))  <span class="comment">-- false, not all bits in myflags are set in flags
+</span><span class="global">print</span>(myflags:<span class="function-name">has_all_of</span>(flags))  <span class="comment">-- true, all bits in flags are set in myflags</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "bitflag:has_any_of"></a>
+    <strong>bitflag:has_any_of (subset)</strong>
+    </dt>
+    <dd>
+    Checks if any of the flags in the given subset are set.
+If the flags to check has a value <code>0</code>, it will always return <code>false</code>. So if there are flags that are
+unsupported on a platform, they can be set to 0 and the <a href="../classes/bitflags.html#bitflag:has_any_of">has_any_of</a> function will
+return <code>false</code> if the flags are checked.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">subset</span>
+            <span class="types"><a class="type" href="../classes/bitflags.html#system.bitflag">bitflag</a></span>
+         the flags to check for.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        true if any of the flags are set, false otherwise.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sys = <span class="global">require</span> <span class="string">'system'</span>
+<span class="keyword">local</span> flags = sys.<span class="function-name">bitflag</span>(<span class="number">12</span>)     <span class="comment">-- b1100
+</span><span class="keyword">local</span> myflags = sys.<span class="function-name">bitflag</span>(<span class="number">7</span>)    <span class="comment">-- b0111
+</span><span class="global">print</span>(flags:<span class="function-name">has_any_of</span>(myflags))  <span class="comment">-- true, some bits in myflags are set in flags
+</span><span class="global">print</span>(myflags:<span class="function-name">has_any_of</span>(flags))  <span class="comment">-- true, some bits in flags are set in myflags</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "bitflag:value"></a>
+    <strong>bitflag:value ()</strong>
+    </dt>
+    <dd>
+    Retrieves the numeric value of the bitflag object.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        the numeric value of the bitflags.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sys = <span class="global">require</span> <span class="string">'system'</span>
+<span class="keyword">local</span> flags = sys.<span class="function-name">bitflag</span>()     <span class="comment">-- b0000
+</span>flags[<span class="number">0</span>] = <span class="keyword">true</span>                 <span class="comment">-- b0001
+</span>flags[<span class="number">2</span>] = <span class="keyword">true</span>                 <span class="comment">-- b0101
+</span><span class="global">print</span>(flags:<span class="function-name">value</span>())            <span class="comment">-- 5</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "system.bitflag"></a>
+    <strong>system.bitflag ([value=0])</strong>
+    </dt>
+    <dd>
+    Creates a new bitflag object from the given value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">number</span></span>
+         the value to create the bitflag object from.
+         (<em>default</em> 0)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/bitflags.html#system.bitflag">bitflag</a></span>
+        bitflag object with the given values set.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> sys = <span class="global">require</span> <span class="string">'system'</span>
+<span class="keyword">local</span> flags = sys.<span class="function-name">bitflag</span>(<span class="number">2</span>)    <span class="comment">-- b0010
+</span>
+<span class="comment">-- get state of individual bits
+</span><span class="global">print</span>(flags[<span class="number">0</span>])                 <span class="comment">-- false
+</span><span class="global">print</span>(flags[<span class="number">1</span>])                 <span class="comment">-- true
+</span>
+<span class="comment">-- set individual bits
+</span>flags[<span class="number">0</span>] = <span class="keyword">true</span>                 <span class="comment">-- b0011
+</span><span class="global">print</span>(flags:<span class="function-name">value</span>())            <span class="comment">-- 3
+</span><span class="global">print</span>(flags)                    <span class="comment">-- "bitflags: 3"
+</span>
+<span class="comment">-- adding flags (bitwise OR)
+</span><span class="keyword">local</span> flags1 = sys.<span class="function-name">bitflag</span>(<span class="number">1</span>)   <span class="comment">-- b0001
+</span><span class="keyword">local</span> flags2 = sys.<span class="function-name">bitflag</span>(<span class="number">2</span>)   <span class="comment">-- b0010
+</span><span class="keyword">local</span> flags3 = flags1 + flags2  <span class="comment">-- b0011
+</span>
+<span class="comment">-- substracting flags (bitwise AND NOT)
+</span><span class="global">print</span>(flags3:<span class="function-name">value</span>())           <span class="comment">-- 3
+</span>flag3 = flag3 - flag3           <span class="comment">-- b0000
+</span><span class="global">print</span>(flags3:<span class="function-name">value</span>())           <span class="comment">-- 0
+</span>
+<span class="comment">-- comparing flags
+</span><span class="keyword">local</span> flags4 = sys.<span class="function-name">bitflag</span>(<span class="number">7</span>)   <span class="comment">-- b0111
+</span><span class="keyword">local</span> flags5 = sys.<span class="function-name">bitflag</span>(<span class="number">255</span>) <span class="comment">-- b11111111
+</span><span class="global">print</span>(flags5 ~= flags4)         <span class="comment">-- true, not the same flags
+</span><span class="keyword">local</span> flags6 = sys.<span class="function-name">bitflag</span>(<span class="number">7</span>)   <span class="comment">-- b0111
+</span><span class="global">print</span>(flags6 == flags4)         <span class="comment">-- true, same flags
+</span>
+<span class="comment">-- comparison of subsets
+</span><span class="keyword">local</span> flags7 = sys.<span class="function-name">bitflag</span>(<span class="number">0</span>)    <span class="comment">-- b0000
+</span><span class="keyword">local</span> flags8 = sys.<span class="function-name">bitflag</span>(<span class="number">3</span>)    <span class="comment">-- b0011
+</span><span class="keyword">local</span> flags9 = sys.<span class="function-name">bitflag</span>(<span class="number">7</span>)    <span class="comment">-- b0111
+</span><span class="global">print</span>(flags9:<span class="function-name">has_all_of</span>(flags8)) <span class="comment">-- true, flags8 bits are all set in flags9
+</span><span class="global">print</span>(flags8:<span class="function-name">has_any_of</span>(flags9)) <span class="comment">-- true, some of flags9 bits are set in flags8
+</span><span class="global">print</span>(flags8:<span class="function-name">has_all_of</span>(flags7)) <span class="comment">-- false, flags7 (== 0) is not set in flags8</span></pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-06-20 23:11:37 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

@@ -35,8 +35,8 @@
 
 <h2>Topics</h2>
 <ul class="">
-  <li><strong>1. Introduction</strong></li>
-  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><strong>2. Development</strong></li>
   <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
   <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
   <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
@@ -66,18 +66,18 @@
 <div id="content">
 
 
-<h1>1. Introduction</h1>
+<h1>2. Development</h1>
 
-<p>luasystem is a platform independent system call library for Lua.
-Supports Unix, Windows, MacOS, <code>Lua &gt;= 5.1</code> and <code>luajit &gt;= 2.0.0</code>.</p>
+<p>Some tests cannot be run in CI becasue they test system specifics that
+simply do not exist in a CI environment. An example is the <code>isatty</code> function
+Which cannot be set to return a truthy value in CI.</p>
 
-<p>Lua is typically platform independent, but it requires adhering to very old C
-standards. This in turn means that many common features (according to todays standards)
-are not available. This module attempts to overcome some of those hurdles by providing
-functions that cover those common needs.</p>
+<p>The tests concerned are all labelled with <code>#manual</code>. And in CI they will
+be skipped because <code>--exclude-tags=manual</code> is being passed to the
+<code>busted</code> command line.</p>
 
-<p>This is not a kitchen sink library, but a minimalistic one with a focus on platform
-independence.</p>
+<p>Hence if tests like this are being added, then please ensure the tests
+pass locally, and do not rely on CI only.</p>
 
 
 </div> <!-- id="content" -->

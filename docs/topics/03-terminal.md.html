@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Lua-System docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Lua-System</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#3_1_Backup_and_Restore_terminal_settings">3.1 Backup and Restore terminal settings </a></li>
+<li><a href="#3_1_Terminal_ANSI_sequences">3.1 Terminal ANSI sequences </a></li>
+<li><a href="#3_2_UTF_8_in_output_and_display_width">3.2 UTF-8 in/output and display width </a></li>
+<li><a href="#3_3_reading_keyboard_input">3.3 reading keyboard input </a></li>
+</ul>
+
+
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><strong>3. Terminal functionality</strong></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/system.html">system</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/bitflags.html">bitflags</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/compat.lua.html">compat.lua</a></li>
+  <li><a href="../examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
+  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="../examples/read.lua.html">read.lua</a></li>
+  <li><a href="../examples/readline.lua.html">readline.lua</a></li>
+  <li><a href="../examples/spinner.lua.html">spinner.lua</a></li>
+  <li><a href="../examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
+  <li><a href="../examples/terminalsize.lua.html">terminalsize.lua</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+
+<h1>3. Terminal functionality</h1>
+
+<p>Terminals are fundamentally different on Windows and Posix. So even though
+<code>luasystem</code> provides primitives to manipulate both the Windows and Posix terminals,
+the user will still have to write platform specific code.</p>
+
+<p>To mitigate this a little, all functions are available on all platforms. They just
+will be a no-op if invoked on another platform. This means that no platform specific
+branching is required (but still possible) in user code. The user must simply set
+up both platforms to make it work.</p>
+
+<p><a name="3_1_Backup_and_Restore_terminal_settings"></a></p>
+<h2>3.1 Backup and Restore terminal settings</h2>
+
+<p>Since there are a myriad of settings available;</p>
+
+<ul>
+    <li><a href="../modules/system.html#setconsoleflags">system.setconsoleflags</a> (Windows)</li>
+    <li><a href="../modules/system.html#setconsolecp">system.setconsolecp</a> (Windows)</li>
+    <li><a href="../modules/system.html#setconsoleoutputcp">system.setconsoleoutputcp</a> (Windows)</li>
+    <li><a href="../modules/system.html#setnonblock">system.setnonblock</a> (Posix)</li>
+    <li><a href="../modules/system.html#tcsetattr">system.tcsetattr</a> (Posix)</li>
+</ul>
+
+<p>Some helper functions are available to backup and restore them all at once.
+See <code>termbackup</code>, <code>termrestore</code>, <code>autotermrestore</code> and <code>termwrap</code>.</p>
+
+
+<p><a name="3_1_Terminal_ANSI_sequences"></a></p>
+<h2>3.1 Terminal ANSI sequences</h2>
+
+<p>Windows is catching up with this. In Windows 10 (since 2019), the Windows Terminal application (not to be
+mistaken for the <code>cmd</code> console application) supports ANSI sequences. However this
+might not be enabled by default.</p>
+
+<p>ANSI processing can be set up both on the input (key sequences, reading cursor position)
+as well as on the output (setting colors and cursor shapes).</p>
+
+<p>To enable it use <a href="../modules/system.html#setconsoleflags">system.setconsoleflags</a> like this:</p>
+
+
+<pre>
+<span class="comment">-- setup Windows console to handle ANSI processing on output
+</span>sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdout, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout) + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
+sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stderr, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stderr) + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
+
+<span class="comment">-- setup Windows console to handle ANSI processing on input
+</span>sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdin, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdin) + sys.CIF_VIRTUAL_TERMINAL_INPUT)
+</pre>
+
+<p><a name="3_2_UTF_8_in_output_and_display_width"></a></p>
+<h2>3.2 UTF-8 in/output and display width</h2>
+
+<h3>3.2.1 UTF-8 in/output</h3>
+
+<p>Where (most) Posix systems use UTF-8 by default, Windows internally uses UTF-16. More
+recent versions of Lua also have UTF-8 support. So <code>luasystem</code> also focusses on UTF-8.</p>
+
+<p>On Windows UTF-8 output can be enabled by setting the output codepage like this:</p>
+
+
+<pre>
+<span class="comment">-- setup Windows output codepage to UTF-8
+</span>sys.<span class="function-name">setconsoleoutputcp</span>(sys.CODEPAGE_UTF8)
+</pre>
+
+<p>Terminal input is handled by the <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/getchar-getwchar"><code>_getwchar()</code></a> function on Windows which returns
+UTF-16 surrogate pairs. <code>luasystem</code> will automatically convert those to UTF-8.
+So when using <code>readkey</code> or <code>readansi</code> to read keyboard input no additional changes
+are required.</p>
+
+<h3>3.2.2 UTF-8 display width</h3>
+
+<p>Typical western characters and symbols are single width characters and will use only
+a single column when displayed on a terminal. However many characters from other
+languages/cultures or emojis require 2 columns for display.</p>
+
+<p>Typically the <code>wcwidth</code> function is used on Posix to check the number of columns
+required for display. However since Windows doesn't provide this functionality a
+custom implementation is included based on <a href="http://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c">the work by Markus Kuhn</a>.</p>
+
+<p>2 functions are provided, <a href="../modules/system.html#utf8cwidth">system.utf8cwidth</a> for a single character, and <a href="../modules/system.html#utf8swidth">system.utf8swidth</a> for
+a string. When writing terminal applications the display width is relevant to
+positioning the cursor properly. For an example see the <a href="../examples/readline.lua.html"><code>examples/readline.lua</code></a> file.</p>
+
+
+<p><a name="3_3_reading_keyboard_input"></a></p>
+<h2>3.3 reading keyboard input</h2>
+
+<h3>3.3.1 Non-blocking</h3>
+
+<p>There are 2 functions for keyboard input (actually 3, if taking <a href="../modules/system.html#_readkey">system._readkey</a> into
+account): <code>readkey</code> and <code>readansi</code>.</p>
+
+<p><code>readkey</code> is a low level function and should preferably not be used, it returns
+a byte at a time, and hence can leave stray/invalid byte sequences in the buffer if
+only the start of a UTF-8 or ANSI sequence is consumed.</p>
+
+<p>The preferred way is to use <code>readansi</code> which will parse and return entire characters in
+single or multiple bytes, or a full ANSI sequence.</p>
+
+<p>On Windows the input is read using <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/getchar-getwchar"><code>_getwchar()</code></a> which bypasses the terminal and reads
+the input directly from the keyboard buffer. This means however that the character is
+also not being echoed to the terminal (independent of the echo settings used with
+<a href="../modules/system.html#setconsoleflags">system.setconsoleflags</a>).</p>
+
+<p>On Posix the traditional file approach is used, which:</p>
+
+<ul>
+    <li>is blocking by default</li>
+    <li>echoes input to the terminal</li>
+    <li>requires enter to be pressed to pass the input (canonical mode)</li>
+</ul>
+
+<p>To use non-blocking input here's how to set it up:</p>
+
+
+<pre>
+<span class="comment">-- setup Windows console to disable echo and line input (not required since _getwchar is used, just for consistency)
+</span>sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdin, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdin) - sys.CIF_ECHO_INPUT - sys.CIF_LINE_INPUT)
+
+<span class="comment">-- setup Posix by disabling echo, canonical mode, and making non-blocking
+</span><span class="keyword">local</span> of_attr = sys.<span class="function-name">tcgetattr</span>(<span class="global">io</span>.stdin)
+sys.<span class="function-name">tcsetattr</span>(<span class="global">io</span>.stdin, sys.TCSANOW, {
+  lflag = of_attr.lflag - sys.L_ICANON - sys.L_ECHO,
+})
+sys.<span class="function-name">setnonblock</span>(<span class="global">io</span>.stdin, <span class="keyword">true</span>)
+</pre>
+
+<p>Both functions require a timeout to be provided which allows for proper asynchronous
+code to be written. Since the underlying sleep method used is <a href="../modules/system.html#sleep">system.sleep</a>, just patching
+that function with a coroutine based yielding one should be all that is needed to make
+the result work with asynchroneous coroutine schedulers.</p>
+
+<h3>3.3.2 Blocking input</h3>
+
+<p>When using traditional input method like <code>io.stdin:read()</code> (which is blocking) the echo
+and newline properties should be set on Windows similar to Posix.
+For an example see <a href="../examples/password_input.lua.html"><code>examples/password_input.lua</code></a>.</p>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-06-20 23:11:37 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

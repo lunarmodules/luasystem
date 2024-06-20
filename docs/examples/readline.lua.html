@@ -1,0 +1,552 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Lua-System docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Lua-System</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/compat.lua.html">compat.lua</a></li>
+  <li><a href="../examples/flag_debugging.lua.html">flag_debugging.lua</a></li>
+  <li><a href="../examples/password_input.lua.html">password_input.lua</a></li>
+  <li><a href="../examples/read.lua.html">read.lua</a></li>
+  <li><strong>readline.lua</strong></li>
+  <li><a href="../examples/spinner.lua.html">spinner.lua</a></li>
+  <li><a href="../examples/spiral_snake.lua.html">spiral_snake.lua</a></li>
+  <li><a href="../examples/terminalsize.lua.html">terminalsize.lua</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/system.html">system</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/bitflags.html">bitflags</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/01-introduction.md.html">1. Introduction</a></li>
+  <li><a href="../topics/02-development.md.html">2. Development</a></li>
+  <li><a href="../topics/03-terminal.md.html">3. Terminal functionality</a></li>
+  <li><a href="../topics/CHANGELOG.md.html">CHANGELOG</a></li>
+  <li><a href="../topics/LICENSE.md.html">MIT License</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>readline.lua</h2>
+<pre>
+<span class="comment">--- An example class for reading a line of input from the user in a non-blocking way.
+</span><span class="comment">-- It uses ANSI escape sequences to move the cursor and handle input.
+</span><span class="comment">-- It can be used to read a line of input from the user, with a prompt.
+</span><span class="comment">-- It can handle double-width UTF-8 characters.
+</span><span class="comment">-- It can be used asynchroneously if <a href="../modules/system.html#sleep">system.sleep</a> is patched to yield to a coroutine scheduler.
+</span>
+<span class="keyword">local</span> sys = <span class="global">require</span>(<span class="string">"system"</span>)
+
+
+<span class="comment">-- Mapping of key-sequences to key-names
+</span><span class="keyword">local</span> key_names = {
+  [<span class="string">"\27[C"</span>] = <span class="string">"right"</span>,
+  [<span class="string">"\27[D"</span>] = <span class="string">"left"</span>,
+  [<span class="string">"\127"</span>] = <span class="string">"backspace"</span>,
+  [<span class="string">"\27[3~"</span>] = <span class="string">"delete"</span>,
+  [<span class="string">"\27[H"</span>] = <span class="string">"home"</span>,
+  [<span class="string">"\27[F"</span>] = <span class="string">"end"</span>,
+  [<span class="string">"\27"</span>] = <span class="string">"escape"</span>,
+  [<span class="string">"\9"</span>] = <span class="string">"tab"</span>,
+  [<span class="string">"\27[Z"</span>] = <span class="string">"shift-tab"</span>,
+}
+
+<span class="keyword">if</span> sys.windows <span class="keyword">then</span>
+  key_names[<span class="string">"\13"</span>] = <span class="string">"enter"</span>
+<span class="keyword">else</span>
+  key_names[<span class="string">"\10"</span>] = <span class="string">"enter"</span>
+<span class="keyword">end</span>
+
+
+<span class="comment">-- Mapping of key-names to key-sequences
+</span><span class="keyword">local</span> key_sequences = {}
+<span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="global">pairs</span>(key_names) <span class="keyword">do</span>
+  key_sequences[v] = k
+<span class="keyword">end</span>
+
+
+<span class="comment">-- bell character
+</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">bell</span>()
+  <span class="global">io</span>.<span class="function-name">write</span>(<span class="string">"\7"</span>)
+  <span class="global">io</span>.<span class="function-name">flush</span>()
+<span class="keyword">end</span>
+
+
+<span class="comment">-- generate string to move cursor horizontally
+</span><span class="comment">-- positive goes right, negative goes left
+</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">cursor_move_horiz</span>(n)
+  <span class="keyword">if</span> n == <span class="number">0</span> <span class="keyword">then</span>
+    <span class="keyword">return</span> <span class="string">""</span>
+  <span class="keyword">end</span>
+  <span class="keyword">return</span> <span class="string">"\27["</span> .. (n &gt; <span class="number">0</span> <span class="keyword">and</span> n <span class="keyword">or</span> -n) .. (n &gt; <span class="number">0</span> <span class="keyword">and</span> <span class="string">"C"</span> <span class="keyword">or</span> <span class="string">"D"</span>)
+<span class="keyword">end</span>
+
+
+<span class="comment">-- -- generate string to move cursor vertically
+</span><span class="comment">-- -- positive goes down, negative goes up
+</span><span class="comment">-- local function cursor_move_vert(n)
+</span><span class="comment">--   if n == 0 then
+</span><span class="comment">--     return ""
+</span><span class="comment">--   end
+</span><span class="comment">--   return "\27[" .. (n &gt; 0 and n or -n) .. (n &gt; 0 and "B" or "A")
+</span><span class="comment">-- end
+</span>
+
+<span class="comment">-- -- log to the line above the current line
+</span><span class="comment">-- local function log(...)
+</span><span class="comment">--   local arg = { n = select("#", ...), ...}
+</span><span class="comment">--   for i = 1, arg.n do
+</span><span class="comment">--     arg[i] = tostring(arg[i])
+</span><span class="comment">--   end
+</span><span class="comment">--   arg = " " .. table.concat(arg, " ") .. " "
+</span>
+<span class="comment">--   io.write(cursor_move_vert(-1), arg, cursor_move_vert(1), cursor_move_horiz(-#arg))
+</span><span class="comment">-- end
+</span>
+
+<span class="comment">-- UTF8 character size in bytes
+</span><span class="comment">-- @tparam number b the byte value of the first byte of a UTF8 character
+</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">utf8size</span>(b)
+  <span class="keyword">return</span> b &lt; <span class="number">128</span> <span class="keyword">and</span> <span class="number">1</span> <span class="keyword">or</span> b &lt; <span class="number">224</span> <span class="keyword">and</span> <span class="number">2</span> <span class="keyword">or</span> b &lt; <span class="number">240</span> <span class="keyword">and</span> <span class="number">3</span> <span class="keyword">or</span> b &lt; <span class="number">248</span> <span class="keyword">and</span> <span class="number">4</span>
+<span class="keyword">end</span>
+
+
+
+<span class="keyword">local</span> utf8parse <span class="keyword">do</span>
+  <span class="keyword">local</span> utf8_value_mt = {
+    __tostring = <span class="keyword">function</span>(self)
+      <span class="keyword">return</span> <span class="global">table</span>.<span class="function-name">concat</span>(self, <span class="string">""</span>)
+    <span class="keyword">end</span>,
+  }
+
+  <span class="comment">-- Parses a UTF8 string into list of individual characters.
+</span>  <span class="comment">-- key 'chars' gets the length in UTF8 characters, whilst # returns the length
+</span>  <span class="comment">-- for display (to handle double-width UTF8 chars).
+</span>  <span class="comment">-- in the list the double-width characters are followed by an empty string.
+</span>  <span class="comment">-- @tparam string s the UTF8 string to parse
+</span>  <span class="comment">-- @treturn table the list of characters
+</span>  <span class="keyword">function</span> <span class="function-name">utf8parse</span>(s)
+    <span class="keyword">local</span> t = <span class="global">setmetatable</span>({ chars = <span class="number">0</span> }, utf8_value_mt)
+    <span class="keyword">local</span> i = <span class="number">1</span>
+    <span class="keyword">while</span> i &lt;= #s <span class="keyword">do</span>
+      <span class="keyword">local</span> b = s:<span class="function-name">byte</span>(i)
+      <span class="keyword">local</span> w = <span class="function-name">utf8size</span>(b)
+      <span class="keyword">local</span> char = s:<span class="function-name">sub</span>(i, i + w - <span class="number">1</span>)
+      t[#t + <span class="number">1</span>] = char
+      t.chars = t.chars + <span class="number">1</span>
+      <span class="keyword">if</span> sys.<span class="function-name">utf8cwidth</span>(char) == <span class="number">2</span> <span class="keyword">then</span>
+        <span class="comment">-- double width character, add empty string to keep the length of the
+</span>        <span class="comment">-- list the same as the character width on screen
+</span>        t[#t + <span class="number">1</span>] = <span class="string">""</span>
+      <span class="keyword">end</span>
+      i = i + w
+    <span class="keyword">end</span>
+    <span class="keyword">return</span> t
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+
+
+<span class="comment">-- inline tests for utf8parse
+</span><span class="comment">-- do
+</span><span class="comment">--   local t = utf8parse("a你b好c")
+</span><span class="comment">--   assert(t[1] == "a")
+</span><span class="comment">--   assert(t[2] == "你")  -- double width
+</span><span class="comment">--   assert(t[3] == "")
+</span><span class="comment">--   assert(t[4] == "b")
+</span><span class="comment">--   assert(t[5] == "好")  -- double width
+</span><span class="comment">--   assert(t[6] == "")
+</span><span class="comment">--   assert(t[7] == "c")
+</span><span class="comment">--   assert(#t == 7)       -- size as displayed
+</span><span class="comment">-- end
+</span>
+
+
+<span class="comment">-- readline class
+</span>
+<span class="keyword">local</span> readline = {}
+readline.__index = readline
+
+
+<span class="comment">--- Create a new readline object.
+</span><span class="comment">-- @tparam table opts the options for the readline object
+</span><span class="comment">-- @tparam[opt=""] string opts.prompt the prompt to display
+</span><span class="comment">-- @tparam[opt=80] number opts.max_length the maximum length of the input (in characters, not bytes)
+</span><span class="comment">-- @tparam[opt=""] string opts.value the default value
+</span><span class="comment">-- @tparam[opt=<code>#value</code>] number opts.position of the cursor in the input
+</span><span class="comment">-- @tparam[opt={"\10"/"\13"}] table opts.exit_keys an array of keys that will cause the readline to exit
+</span><span class="comment">-- @treturn readline the new readline object
+</span><span class="keyword">function</span> readline.<span class="function-name">new</span>(opts)
+  <span class="keyword">local</span> value = <span class="function-name">utf8parse</span>(opts.value <span class="keyword">or</span> <span class="string">""</span>)
+  <span class="keyword">local</span> prompt = <span class="function-name">utf8parse</span>(opts.prompt <span class="keyword">or</span> <span class="string">""</span>)
+  <span class="keyword">local</span> pos = <span class="global">math</span>.<span class="function-name">floor</span>(opts.position <span class="keyword">or</span> (#value + <span class="number">1</span>))
+  pos = <span class="global">math</span>.<span class="function-name">max</span>(<span class="global">math</span>.<span class="function-name">min</span>(pos, (#value + <span class="number">1</span>)), <span class="number">1</span>)
+  <span class="keyword">local</span> len = <span class="global">math</span>.<span class="function-name">floor</span>(opts.max_length <span class="keyword">or</span> <span class="number">80</span>)
+  <span class="keyword">if</span> len &lt; <span class="number">1</span> <span class="keyword">then</span>
+    <span class="global">error</span>(<span class="string">"max_length must be at least 1"</span>, <span class="number">2</span>)
+  <span class="keyword">end</span>
+
+  <span class="keyword">if</span> value.chars &gt; len <span class="keyword">then</span>
+    <span class="global">error</span>(<span class="string">"value is longer than max_length"</span>, <span class="number">2</span>)
+  <span class="keyword">end</span>
+
+  <span class="keyword">local</span> exit_keys = {}
+  <span class="keyword">for</span> _, key <span class="keyword">in</span> <span class="global">ipairs</span>(opts.exit_keys <span class="keyword">or</span> {}) <span class="keyword">do</span>
+    exit_keys[key] = <span class="keyword">true</span>
+  <span class="keyword">end</span>
+  <span class="keyword">if</span> exit_keys[<span class="number">1</span>] == <span class="keyword">nil</span> <span class="keyword">then</span>
+    <span class="comment">-- nothing provided, default to Enter-key
+</span>    exit_keys[<span class="number">1</span>] = key_sequences.enter
+  <span class="keyword">end</span>
+
+  <span class="keyword">local</span> self = {
+    value = value,          <span class="comment">-- the default value
+</span>    max_length = len,       <span class="comment">-- the maximum length of the input
+</span>    prompt = prompt,        <span class="comment">-- the prompt to display
+</span>    position = pos,         <span class="comment">-- the current position in the input
+</span>    drawn_before = <span class="keyword">false</span>,   <span class="comment">-- if the prompt has been drawn
+</span>    exit_keys = exit_keys,  <span class="comment">-- the keys that will cause the readline to exit
+</span>  }
+
+  <span class="global">setmetatable</span>(self, readline)
+  <span class="keyword">return</span> self
+<span class="keyword">end</span>
+
+
+
+<span class="comment">-- draw the prompt and the input value, and position the cursor.
+</span><span class="keyword">local</span> <span class="keyword">function</span> <span class="function-name">draw</span>(self, redraw)
+  <span class="keyword">if</span> redraw <span class="keyword">or</span> <span class="keyword">not</span> self.drawn_before <span class="keyword">then</span>
+    <span class="comment">-- we are at start of prompt
+</span>    self.drawn_before = <span class="keyword">true</span>
+  <span class="keyword">else</span>
+    <span class="comment">-- we are at current cursor position, move to start of prompt
+</span>    <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(-(#self.prompt + self.position)))
+  <span class="keyword">end</span>
+  <span class="comment">-- write prompt &amp; value
+</span>  <span class="global">io</span>.<span class="function-name">write</span>(<span class="global">tostring</span>(self.prompt) .. <span class="global">tostring</span>(self.value))
+  <span class="comment">-- clear remainder of input size
+</span>  <span class="global">io</span>.<span class="function-name">write</span>(<span class="global">string</span>.<span class="function-name">rep</span>(<span class="string">" "</span>, self.max_length - self.value.chars))
+  <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(-(self.max_length - self.value.chars)))
+  <span class="comment">-- move to cursor position
+</span>  <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(-(#self.value + <span class="number">1</span> - self.position)))
+  <span class="global">io</span>.<span class="function-name">flush</span>()
+<span class="keyword">end</span>
+
+
+<span class="keyword">local</span> handle_key <span class="keyword">do</span> <span class="comment">-- keyboard input handler
+</span>
+  <span class="keyword">local</span> key_handlers
+  key_handlers = {
+    left = <span class="keyword">function</span>(self)
+      <span class="keyword">if</span> self.position == <span class="number">1</span> <span class="keyword">then</span>
+        <span class="function-name">bell</span>()
+        <span class="keyword">return</span>
+      <span class="keyword">end</span>
+
+      <span class="keyword">local</span> new_pos = self.position - <span class="number">1</span>
+      <span class="keyword">while</span> self.value[new_pos] == <span class="string">""</span> <span class="keyword">do</span> <span class="comment">-- skip empty strings; double width chars
+</span>        new_pos = new_pos - <span class="number">1</span>
+      <span class="keyword">end</span>
+
+      <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(-(self.position - new_pos)))
+      <span class="global">io</span>.<span class="function-name">flush</span>()
+      self.position = new_pos
+    <span class="keyword">end</span>,
+
+    right = <span class="keyword">function</span>(self)
+      <span class="keyword">if</span> self.position == #self.value + <span class="number">1</span> <span class="keyword">then</span>
+        <span class="function-name">bell</span>()
+        <span class="keyword">return</span>
+      <span class="keyword">end</span>
+
+      <span class="keyword">local</span> new_pos = self.position + <span class="number">1</span>
+      <span class="keyword">while</span> self.value[new_pos] == <span class="string">""</span> <span class="keyword">do</span> <span class="comment">-- skip empty strings; double width chars
+</span>        new_pos = new_pos + <span class="number">1</span>
+      <span class="keyword">end</span>
+
+      <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(new_pos - self.position))
+      <span class="global">io</span>.<span class="function-name">flush</span>()
+      self.position = new_pos
+    <span class="keyword">end</span>,
+
+    backspace = <span class="keyword">function</span>(self)
+      <span class="keyword">if</span> self.position == <span class="number">1</span> <span class="keyword">then</span>
+        <span class="function-name">bell</span>()
+        <span class="keyword">return</span>
+      <span class="keyword">end</span>
+
+      <span class="keyword">while</span> self.value[self.position - <span class="number">1</span>] == <span class="string">""</span> <span class="keyword">do</span> <span class="comment">-- remove empty strings; double width chars
+</span>        <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(-<span class="number">1</span>))
+        self.position = self.position - <span class="number">1</span>
+        <span class="global">table</span>.<span class="function-name">remove</span>(self.value, self.position)
+      <span class="keyword">end</span>
+      <span class="comment">-- remove char itself
+</span>      <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(-<span class="number">1</span>))
+      self.position = self.position - <span class="number">1</span>
+      <span class="global">table</span>.<span class="function-name">remove</span>(self.value, self.position)
+      self.value.chars = self.value.chars - <span class="number">1</span>
+      <span class="function-name">draw</span>(self)
+    <span class="keyword">end</span>,
+
+    home = <span class="keyword">function</span>(self)
+      <span class="keyword">local</span> new_pos = <span class="number">1</span>
+      <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(new_pos - self.position))
+      self.position = new_pos
+    <span class="keyword">end</span>,
+
+    [<span class="string">"end"</span>] = <span class="keyword">function</span>(self)
+      <span class="keyword">local</span> new_pos = #self.value + <span class="number">1</span>
+      <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(new_pos - self.position))
+      self.position = new_pos
+    <span class="keyword">end</span>,
+
+    delete = <span class="keyword">function</span>(self)
+      <span class="keyword">if</span> self.position &gt; #self.value <span class="keyword">then</span>
+        <span class="function-name">bell</span>()
+        <span class="keyword">return</span>
+      <span class="keyword">end</span>
+
+      key_handlers.<span class="function-name">right</span>(self)
+      key_handlers.<span class="function-name">backspace</span>(self)
+    <span class="keyword">end</span>,
+  }
+
+
+  <span class="comment">-- handles a single input key/ansi-sequence.
+</span>  <span class="comment">-- @tparam string key the key or ansi-sequence (from <a href="../modules/system.html#readansi">system.readansi</a>)
+</span>  <span class="comment">-- @tparam string keytype the type of the key, either "char" or "ansi" (from <a href="../modules/system.html#readansi">system.readansi</a>)
+</span>  <span class="comment">-- @treturn string status the status of the key handling, either "ok", "exit_key" or an error message
+</span>  <span class="keyword">function</span> <span class="function-name">handle_key</span>(self, key, keytype)
+    <span class="keyword">if</span> self.exit_keys[key] <span class="keyword">then</span>
+      <span class="comment">-- registered exit key
+</span>      <span class="keyword">return</span> <span class="string">"exit_key"</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">local</span> handler = key_handlers[key_names[key] <span class="keyword">or</span> <span class="keyword">true</span> ]
+    <span class="keyword">if</span> handler <span class="keyword">then</span>
+      <span class="function-name">handler</span>(self)
+      <span class="keyword">return</span> <span class="string">"ok"</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">if</span> keytype == <span class="string">"ansi"</span> <span class="keyword">then</span>
+      <span class="comment">-- we got an ansi sequence, but dunno how to handle it, ignore
+</span>      <span class="comment">-- print("unhandled ansi: ", key:sub(2,-1), string.byte(key, 1, -1))
+</span>      <span class="function-name">bell</span>()
+      <span class="keyword">return</span> <span class="string">"ok"</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- just a single key
+</span>    <span class="keyword">if</span> key &lt; <span class="string">" "</span> <span class="keyword">then</span>
+      <span class="comment">-- control character
+</span>      <span class="function-name">bell</span>()
+      <span class="keyword">return</span> <span class="string">"ok"</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">if</span> self.value.chars &gt;= self.max_length <span class="keyword">then</span>
+      <span class="function-name">bell</span>()
+      <span class="keyword">return</span> <span class="string">"ok"</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">-- insert the key into the value
+</span>    <span class="keyword">if</span> sys.<span class="function-name">utf8cwidth</span>(key) == <span class="number">2</span> <span class="keyword">then</span>
+      <span class="comment">-- double width character, insert empty string after it
+</span>      <span class="global">table</span>.<span class="function-name">insert</span>(self.value, self.position, <span class="string">""</span>)
+      <span class="global">table</span>.<span class="function-name">insert</span>(self.value, self.position, key)
+      self.position = self.position + <span class="number">2</span>
+      <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(<span class="number">2</span>))
+    <span class="keyword">else</span>
+      <span class="global">table</span>.<span class="function-name">insert</span>(self.value, self.position, key)
+      self.position = self.position + <span class="number">1</span>
+      <span class="global">io</span>.<span class="function-name">write</span>(<span class="function-name">cursor_move_horiz</span>(<span class="number">1</span>))
+    <span class="keyword">end</span>
+    self.value.chars = self.value.chars + <span class="number">1</span>
+    <span class="function-name">draw</span>(self)
+    <span class="keyword">return</span> <span class="string">"ok"</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+
+
+<span class="comment">--- Get_size returns the maximum size of the input box (prompt + input).
+</span><span class="comment">-- The size is in rows and columns. Columns is determined by
+</span><span class="comment">-- the prompt and the <code>max_length * 2</code> (characters can be double-width).
+</span><span class="comment">-- @treturn number the number of rows (always 1)
+</span><span class="comment">-- @treturn number the number of columns
+</span><span class="keyword">function</span> readline:<span class="function-name">get_size</span>()
+  <span class="keyword">return</span> <span class="number">1</span>, #self.prompt + self.max_length * <span class="number">2</span>
+<span class="keyword">end</span>
+
+
+
+<span class="comment">--- Get coordinates of the cursor in the input box (prompt + input).
+</span><span class="comment">-- The coordinates are 1-based. They are returned as row and column, within the
+</span><span class="comment">-- size as reported by <code>get_size</code>.
+</span><span class="comment">-- @treturn number the row of the cursor (always 1)
+</span><span class="comment">-- @treturn number the column of the cursor
+</span><span class="keyword">function</span> readline:<span class="function-name">get_cursor</span>()
+  <span class="keyword">return</span> <span class="number">1</span>, #self.prompt + self.position
+<span class="keyword">end</span>
+
+
+
+<span class="comment">--- Set the coordinates of the cursor in the input box (prompt + input).
+</span><span class="comment">-- The coordinates are 1-based. They are expected to be within the
+</span><span class="comment">-- size as reported by <code>get_size</code>, and beyond the prompt.
+</span><span class="comment">-- If the position is invalid, it will be corrected.
+</span><span class="comment">-- Use the results to check if the position was adjusted.
+</span><span class="comment">-- @tparam number row the row of the cursor (always 1)
+</span><span class="comment">-- @tparam number col the column of the cursor
+</span><span class="comment">-- @return results of get_cursor
+</span><span class="keyword">function</span> readline:<span class="function-name">set_cursor</span>(row, col)
+  <span class="keyword">local</span> l_prompt = #self.prompt
+  <span class="keyword">local</span> l_value = #self.value
+
+  <span class="keyword">if</span> col &lt; l_prompt + <span class="number">1</span> <span class="keyword">then</span>
+    col = l_prompt + <span class="number">1</span>
+  <span class="keyword">elseif</span> col &gt; l_prompt + l_value + <span class="number">1</span> <span class="keyword">then</span>
+    col = l_prompt + l_value + <span class="number">1</span>
+  <span class="keyword">end</span>
+
+  <span class="keyword">while</span> self.value[col - l_prompt] == <span class="string">""</span> <span class="keyword">do</span>
+    col = col - <span class="number">1</span> <span class="comment">-- on an empty string, so move back to start of double-width char
+</span>  <span class="keyword">end</span>
+
+  <span class="keyword">local</span> new_pos = col - l_prompt
+
+  <span class="function-name">cursor_move_horiz</span>(self.position - new_pos)
+  <span class="global">io</span>.<span class="function-name">flush</span>()
+
+  self.position = new_pos
+  <span class="keyword">return</span> self:<span class="function-name">get_cursor</span>()
+<span class="keyword">end</span>
+
+
+
+<span class="comment">--- Read a line of input from the user.
+</span><span class="comment">-- It will first print the <code>prompt</code> and then wait for input. Ensure the cursor
+</span><span class="comment">-- is at the correct position before calling this function. This function will
+</span><span class="comment">-- do all cursor movements in a relative way.
+</span><span class="comment">-- Can be called again after an exit-key or timeout has occurred. Just make sure
+</span><span class="comment">-- the cursor is at the same position where is was when it returned the last time.
+</span><span class="comment">-- Alternatively the cursor can be set to the position of the prompt (the position
+</span><span class="comment">-- the cursor was in before the first call), and the parameter <code>redraw</code> can be set
+</span><span class="comment">-- to <code>true</code>.
+</span><span class="comment">-- @tparam[opt=math.huge] number timeout the maximum time to wait for input in seconds
+</span><span class="comment">-- @tparam[opt=false] boolean redraw if <code>true</code> the prompt will be redrawn (cursor must be at prompt position!)
+</span><span class="comment">-- @treturn[1] string the input string as entered the user
+</span><span class="comment">-- @treturn[1] string the exit-key used to exit the readline (see <code>new</code>)
+</span><span class="comment">-- @treturn[2] nil when input is incomplete
+</span><span class="comment">-- @treturn[2] string error message, the reason why the input is incomplete, <code>&quot;timeout&quot;</code>, or an error reading a key
+</span><span class="keyword">function</span> readline:<span class="function-name">__call</span>(timeout, redraw)
+  <span class="function-name">draw</span>(self, redraw)
+  timeout = timeout <span class="keyword">or</span> <span class="global">math</span>.huge
+  <span class="keyword">local</span> timeout_end = sys.<span class="function-name">gettime</span>() + timeout
+
+  <span class="keyword">while</span> <span class="keyword">true</span> <span class="keyword">do</span>
+    <span class="keyword">local</span> key, keytype = sys.<span class="function-name">readansi</span>(timeout_end - sys.<span class="function-name">gettime</span>())
+    <span class="keyword">if</span> <span class="keyword">not</span> key <span class="keyword">then</span>
+      <span class="comment">-- error or timeout
+</span>      <span class="keyword">return</span> <span class="keyword">nil</span>, keytype
+    <span class="keyword">end</span>
+
+    <span class="keyword">local</span> status = <span class="function-name">handle_key</span>(self, key, keytype)
+    <span class="keyword">if</span> status == <span class="string">"exit_key"</span> <span class="keyword">then</span>
+      <span class="keyword">return</span> <span class="global">tostring</span>(self.value), key
+
+    <span class="keyword">elseif</span> status ~= <span class="string">"ok"</span> <span class="keyword">then</span>
+      <span class="global">error</span>(<span class="string">"unknown status received: "</span> .. <span class="global">tostring</span>(status))
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+
+
+<span class="comment">-- return readline  -- normally we'd return here, but for the example we continue
+</span>
+
+
+
+<span class="keyword">local</span> backup = sys.<span class="function-name">termbackup</span>()
+
+<span class="comment">-- setup Windows console to handle ANSI processing
+</span>sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdout, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout) + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
+sys.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdin, sys.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdin) + sys.CIF_VIRTUAL_TERMINAL_INPUT)
+<span class="comment">-- set output to UTF-8
+</span>sys.<span class="function-name">setconsoleoutputcp</span>(sys.CODEPAGE_UTF8)
+
+<span class="comment">-- setup Posix terminal to disable canonical mode and echo
+</span>sys.<span class="function-name">tcsetattr</span>(<span class="global">io</span>.stdin, sys.TCSANOW, {
+  lflag = sys.<span class="function-name">tcgetattr</span>(<span class="global">io</span>.stdin).lflag - sys.L_ICANON - sys.L_ECHO,
+})
+<span class="comment">-- setup stdin to non-blocking mode
+</span>sys.<span class="function-name">setnonblock</span>(<span class="global">io</span>.stdin, <span class="keyword">true</span>)
+
+
+<span class="keyword">local</span> rl = readline.<span class="function-name">new</span>{
+  prompt = <span class="string">"Enter something: "</span>,
+  max_length = <span class="number">60</span>,
+  value = <span class="string">"Hello, 你-好 World 🚀!"</span>,
+  <span class="comment">-- position = 2,
+</span>  exit_keys = {key_sequences.enter, <span class="string">"\27"</span>, <span class="string">"\t"</span>, <span class="string">"\27[Z"</span>}, <span class="comment">-- enter, escape, tab, shift-tab
+</span>}
+
+
+<span class="keyword">local</span> result, key = <span class="function-name">rl</span>()
+<span class="global">print</span>(<span class="string">""</span>)  <span class="comment">-- newline after input, to move cursor down from the input line
+</span><span class="global">print</span>(<span class="string">"Result (string): '"</span> .. result .. <span class="string">"'"</span>)
+<span class="global">print</span>(<span class="string">"Result (bytes):"</span>, result:<span class="function-name">byte</span>(<span class="number">1</span>,-<span class="number">1</span>))
+<span class="global">print</span>(<span class="string">"Exit-Key (bytes):"</span>, key:<span class="function-name">byte</span>(<span class="number">1</span>,-<span class="number">1</span>))
+
+
+<span class="comment">-- Clean up afterwards
+</span>sys.<span class="function-name">termrestore</span>(backup)</pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2024-06-20 23:11:37 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
