@@ -1,4 +1,3 @@
--- Import the library that contains the environment-related functions
 local system = require("system")
 require("spec.helpers")
 
@@ -221,7 +220,7 @@ describe("Terminal:", function()
   describe("tcsetattr()", function()
 
     nix_it("sets the terminal flags, if called with flags #manual", function()
-      system.listtermflags(io.stdin)
+      -- system.listtermflags(io.stdin)
       local old_flags = assert(system.tcgetattr(io.stdin))
       finally(function()
         system.tcsetattr(io.stdin, system.TCSANOW, old_flags)  -- ensure we restore the original ones
@@ -667,6 +666,87 @@ describe("Terminal:", function()
       assert.equals(1, a)
       assert.is_nil(b)
       assert.equals(3, c)
+    end)
+
+  end)
+
+
+
+  describe("autotermrestore()", function()
+
+    local old_backup
+    local old_restore
+    local result
+
+
+    before_each(function()
+      _G._TEST = true
+
+      package.loaded["system"] = nil
+      system = require("system")
+
+      old_backup = system.termbackup
+      old_restore = system.termrestore
+      system.termbackup = function(...)
+        table.insert(result,"backup")
+        return old_backup(...)
+      end
+
+      system.termrestore = function(...)
+        table.insert(result,"restore")
+        return old_restore(...)
+      end
+
+      result = {}
+    end)
+
+
+    after_each(function()
+      -- system.termbackup = old_backup
+      -- system.termrestore = old_restore
+      _G._TEST = false
+
+      package.loaded["system"] = nil
+      system = require("system")
+    end)
+
+
+
+    it("calls backup", function()
+      local ok, err = system.autotermrestore()
+      assert.is_nil(err)
+      assert.is_true(ok)
+
+      assert.are.same({"backup"}, result)
+    end)
+
+
+    it("returns an error on the second call", function()
+      local ok, err = system.autotermrestore()
+      assert.is_nil(err)
+      assert.is_true(ok)
+
+      local ok, err = system.autotermrestore()
+      assert.are.equal("global terminal backup was already set up", err)
+      assert.is_nil(ok)
+    end)
+
+
+    it("calls restore upon being garbage collected", function()
+      local ok, err = system.autotermrestore()
+      assert.is_nil(err)
+      assert.is_true(ok)
+
+      -- ensure tables from previous tests are GC'ed
+      collectgarbage()
+      collectgarbage()
+      -- clear references
+      result = {}
+      system._reset_global_backup()
+      collectgarbage()
+      collectgarbage()
+
+      assert.are.same({"restore"}, result)
     end)
 
   end)

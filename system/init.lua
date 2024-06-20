@@ -124,6 +124,13 @@ do -- autotermrestore
       system.termrestore(self) end)
     return true
   end
+
+  -- export a reset function only upon testing
+  if _G._TEST then
+    function system._reset_global_backup()
+      global_backup = nil
+    end
+  end
 end
 
 
