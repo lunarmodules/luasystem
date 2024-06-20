@@ -8,9 +8,10 @@ style="./doc_topics/"
 
 file={'./src/', './system/'}
 topics={'./doc_topics/', './LICENSE.md', './CHANGELOG.md'}
--- examples = {'./examples'}
+examples = {'./examples'}
 
 dir='docs'
 sort=true
 sort_modules=true
 all=false
+merge=true

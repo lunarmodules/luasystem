@@ -6,11 +6,23 @@
 
 #if LUA_VERSION_NUM == 501
 void luaL_setfuncs(lua_State *L, const luaL_Reg *l, int nup);
+void *luaL_testudata(lua_State *L, int ud, const char *tname);
 #endif
 
 
 #ifdef __MINGW32__
 #include <sys/types.h>
+#endif
+
+// Windows compatibility; define DWORD and TRUE/FALSE on non-Windows
+#ifndef _WIN32
+#ifndef DWORD
+#define DWORD unsigned long
+#endif
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
 #endif
 
 #ifdef _MSC_VER

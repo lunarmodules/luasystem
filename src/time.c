@@ -1,4 +1,8 @@
-/// @submodule system
+/// @module system
+
+/// Time.
+// @section time
+
 #include <lua.h>
 #include <lauxlib.h>
 

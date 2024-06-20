@@ -45,3 +45,13 @@ install-all:
 	@cd src && $(MAKE) install LUA_VERSION=5.3
 
 .PHONY: test
+test:
+	busted
+
+.PHONY: lint
+lint:
+	luacheck .
+
+.PHONY: docs
+docs:
+	ldoc .
