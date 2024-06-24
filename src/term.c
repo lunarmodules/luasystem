@@ -19,6 +19,9 @@
 #ifdef _WIN32
 # include <windows.h>
 # include <locale.h>
+# ifdef __MINGW32__
+#  include <conio.h>
+# endif
 #else
 # include <termios.h>
 # include <string.h>
