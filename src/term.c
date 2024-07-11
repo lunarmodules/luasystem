@@ -19,6 +19,7 @@
 # ifndef _MSC_VER
 #  include <conio.h>
 #  include <unistd.h>
+#  include <stddef.h>
 # endif
 #else
 # include <termios.h>
@@ -27,9 +28,9 @@
 # include <fcntl.h>
 # include <sys/ioctl.h>
 # include <unistd.h>
-# include <wchar.h>
 # include <locale.h>
 #endif
+#include <wchar.h>
 
 
 // Windows does not have a wcwidth function, so we use compatibilty code from

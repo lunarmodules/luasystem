@@ -9,6 +9,7 @@
 
 #ifdef _WIN32
 #include <stdint.h>
+#include <stddef.h>
 typedef uint32_t mk_wchar_t; // Windows wchar_t can be 16-bit, we need 32-bit
 #else
 #include <wchar.h>
