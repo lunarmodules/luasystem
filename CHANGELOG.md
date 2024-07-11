@@ -28,6 +28,10 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### Version 0.4.2, released 25-Jun-2024
+
+- Fix: include additional headers for some MinGW installations
+
 ### Version 0.4.1, released 25-Jun-2024
 
 - Fix: when compiling with `msys2` the `conio.h` header is required
