@@ -28,6 +28,10 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### unreleased
+
+- Chore: add compiler error on Windows if Virtual Terminal Processing is unavailable.
+
 ### Version 0.4.2, released 25-Jun-2024
 
 - Fix: include additional headers for some MinGW installations
