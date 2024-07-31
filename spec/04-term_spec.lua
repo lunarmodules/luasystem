@@ -27,7 +27,8 @@ describe("Terminal:", function()
       assert(type(serr) == "boolean", "serr must be a boolean")
 
       local tmpfile = "./spec/04-term_helper.output"
-      local execcmd = "lua ./spec/04-term_helper.lua -- " .. tmpfile
+      local lua_bin = system.getenv("LUA") or "lua"
+      local execcmd = lua_bin .. " ./spec/04-term_helper.lua -- " .. tmpfile
 
       sin = sin and "" or 'echo "hello" | '
       if system.windows then

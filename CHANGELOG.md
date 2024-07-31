@@ -31,6 +31,7 @@ The scope of what is covered by the version number excludes:
 ### unreleased
 
 - Chore: add compiler error on Windows if Virtual Terminal Processing is unavailable.
+- Fix: fix the freebsd build
 
 ### Version 0.4.2, released 25-Jun-2024
 
