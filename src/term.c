@@ -107,6 +107,11 @@ typedef struct ls_RegConst {
 // This is needed because some flags are not defined on all platforms. So we
 // still export the constants, but they will be all 0, and hence not do anything.
 #ifdef _WIN32
+// check compatibility: Windows virtual terminal processing was added in 2015,
+// some older compiler suites don't have the proper headers.
+#ifndef ENABLE_VIRTUAL_TERMINAL_INPUT
+#error Virtual terminal macros are undefined (eg. ENABLE_VIRTUAL_TERMINAL_INPUT). Update the toolchain or revert to Luasystem < 0.4
+#endif
 #define CHECK_WIN_FLAG_OR_ZERO(flag) flag
 #define CHECK_NIX_FLAG_OR_ZERO(flag) 0
 #else
