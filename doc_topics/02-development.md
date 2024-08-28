@@ -8,5 +8,5 @@ The tests concerned are all labelled with `#manual`. And in CI they will
 be skipped because `--exclude-tags=manual` is being passed to the
 `busted` command line.
 
-Hence if tests like this are being added, then please ensure the tests
+Hence if tests like these are being added, then please ensure the tests
 pass locally, and do not rely on CI only.
