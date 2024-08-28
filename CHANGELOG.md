@@ -28,7 +28,7 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
-### unreleased
+### version 0.4.3, released 28-Aug-2024
 
 - Chore: add compiler error on Windows if Virtual Terminal Processing is unavailable.
 - Fix: fix the freebsd build
