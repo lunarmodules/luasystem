@@ -28,7 +28,7 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
-### unreleased
+### version 0.4.4, released 03-Sep-2024
 
 - Fix: include all objects in Makefile
 
