@@ -28,6 +28,11 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### version 0.4.5, released 18-Dec-2024
+
+- Fix: suppress a warning when building with clang
+- Fix: do not rely on luaconf.h to include limits.h, fixes builds with latest LuaJIT (#38).
+
 ### version 0.4.4, released 03-Sep-2024
 
 - Fix: include all objects in Makefile
