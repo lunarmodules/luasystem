@@ -5,10 +5,10 @@
 
 #include <lua.h>
 #include <lauxlib.h>
+#include <limits.h>
 
 #ifdef _WIN32
 #include <float.h>
-#include <limits.h>
 #include <windows.h>
 #else
 #include <time.h>
