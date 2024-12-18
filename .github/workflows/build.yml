@@ -95,14 +95,13 @@ jobs:
         with:
           luarocksVersion: "3.11.0"
 
-      - name: dependencies
-        run: |
-          luarocks install busted
-
       - name: install
         run: |
-          luarocks remove --force luasystem
           luarocks make
+
+      - name: test dependencies
+        run: |
+          luarocks install busted
 
       - name: test
         run: |
