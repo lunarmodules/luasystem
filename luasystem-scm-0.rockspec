@@ -61,6 +61,7 @@ local function make_platform(plat)
           'src/term.c',
           'src/bitflags.c',
           'src/wcwidth.c',
+          'src/wcwidtha.c',
         },
         defines = defines[plat],
         libraries = libraries[plat],

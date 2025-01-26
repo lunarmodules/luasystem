@@ -36,6 +36,7 @@
 // Windows does not have a wcwidth function, so we use compatibilty code from
 // http://www.cl.cam.ac.uk/~mgk25/ucs/wcwidth.c by Markus Kuhn
 #include "wcwidth.h"
+#include "wcwidtha.h" // ambiguous width checks for East Asian characters
 
 
 #ifdef _WIN32
@@ -950,14 +951,16 @@ int utf8_to_wchar(const char *utf8, size_t len, mk_wchar_t *codepoint) {
 Get the width of a utf8 character for terminal display.
 @function utf8cwidth
 @tparam string utf8_char the utf8 character to check, only the width of the first character will be returned
+@tparam bool ambiguous if `true` a second return value will be returned; boolean indicating if the character is ambiguous
 @treturn[1] int the display width in columns of the first character in the string (0 for an empty string)
-@treturn[2] nil
+@treturn[2] nil|bool if `ambiguous` is `true`, a boolean indicating if the character is ambiguous
 @treturn[2] string error message
 */
 int lst_utf8cwidth(lua_State *L) {
     const char *utf8_char;
     size_t utf8_len;
     utf8_char = luaL_checklstring(L, 1, &utf8_len);
+    int ambiguous = lua_toboolean(L, 2);
     int width = 0;
 
     mk_wchar_t wc;
@@ -984,6 +987,12 @@ int lst_utf8cwidth(lua_State *L) {
     }
 
     lua_pushinteger(L, width);
+
+    if (ambiguous) {
+        // also check if the width is ambiguous
+        lua_pushboolean(L, mk_wcwidth_a(wc));
+        return 2;
+    }
     return 1;
 }
 
