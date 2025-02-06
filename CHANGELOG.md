@@ -33,6 +33,8 @@ The scope of what is covered by the version number excludes:
 - Feat: when detecting character display width, also accept unicode codepoints (integers),
   since the Lua utf8 library returns codepoints, not strings
 - Fix: NetBSD fix compilation, undeclared directives
+- Refactor: random bytes; remove deprecated API usage on Windows, move to
+  binary api instead of /dev/urandom file on linux and bsd
 
 ### version 0.4.5, released 18-Dec-2024
 
