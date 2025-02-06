@@ -953,30 +953,47 @@ int utf8_to_wchar(const char *utf8, size_t len, mk_wchar_t *codepoint) {
 /***
 Get the width of a utf8 character for terminal display.
 @function utf8cwidth
-@tparam string utf8_char the utf8 character to check, only the width of the first character will be returned
+@tparam string|int utf8_char the utf8 character, or unicode codepoint, to check, only the width of the first character will be returned
 @treturn[1] int the display width in columns of the first character in the string (0 for an empty string)
 @treturn[2] nil
 @treturn[2] string error message
 */
 int lst_utf8cwidth(lua_State *L) {
-    const char *utf8_char;
-    size_t utf8_len;
-    utf8_char = luaL_checklstring(L, 1, &utf8_len);
     int width = 0;
-
     mk_wchar_t wc;
 
-    if (utf8_len == 0) {
-        lua_pushinteger(L, 0);
-        return 1;
-    }
+    if (lua_type(L, 1) == LUA_TSTRING) {
+        // Handle UTF8 as string input
+        const char *utf8_char;
+        size_t utf8_len;
+        utf8_char = luaL_checklstring(L, 1, &utf8_len);
 
-    // Convert the UTF-8 string to a wide character
-    int bytes_processed = utf8_to_wchar(utf8_char, utf8_len, &wc);
-    if (bytes_processed == -1) {
-        lua_pushnil(L);
-        lua_pushstring(L, "Invalid UTF-8 character");
-        return 2;
+        if (utf8_len == 0) {
+            lua_pushinteger(L, 0);
+            return 1;
+        }
+
+        // Convert the UTF-8 string to a wide character
+        int bytes_processed = utf8_to_wchar(utf8_char, utf8_len, &wc);
+        if (bytes_processed == -1) {
+            lua_pushnil(L);
+            lua_pushstring(L, "Invalid UTF-8 character");
+            return 2;
+        }
+
+    } else if (lua_type(L, 1) == LUA_TNUMBER) {
+        // Handle codepoint input
+        int codepoint = luaL_checkinteger(L, 1);
+
+        if (codepoint < 0 || codepoint > 0x10FFFF) {
+            lua_pushnil(L);
+            lua_pushstring(L, "Invalid Unicode codepoint");
+            return 2;
+        }
+        wc = (mk_wchar_t)codepoint;
+
+    } else {
+        return luaL_argerror(L, 1, "Expected UTF-8-string or codepoint-integer as first argument");
     }
 
     // Get the width of the wide character

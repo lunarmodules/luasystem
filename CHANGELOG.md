@@ -30,6 +30,8 @@ The scope of what is covered by the version number excludes:
 
 ### unreleased
 
+- Feat: when detecting character display width, also accept unicode codepoints (integers),
+  since the Lua utf8 library returns codepoints, not strings
 - Fix: NetBSD fix compilation, undeclared directives
 
 ### version 0.4.5, released 18-Dec-2024

@@ -511,10 +511,17 @@ describe("Terminal:", function()
 
   describe("utf8cwidth()", function()
 
+    -- utf-8 strings
     local ch1 = string.char(226, 130, 172)       -- "€"   single
     local ch2 = string.char(240, 159, 154, 128)  -- "🚀"  double
     local ch3 = string.char(228, 189, 160)       -- "你"  double
     local ch4 = string.char(229, 165, 189)       -- "好"  double
+
+    -- unicode codepoints
+    local cp1 = 8364    -- "€"   single
+    local cp2 = 128640  -- "🚀"  double
+    local cp3 = 20320   -- "你"  double
+    local cp4 = 22909   -- "好"  double
 
     it("handles zero width characters", function()
       assert.same({0}, {system.utf8cwidth("")}) -- empty string returns 0-size
@@ -537,6 +544,24 @@ describe("Terminal:", function()
       assert.same({nil, 'Character width determination failed'}, {system.utf8cwidth("\a" .. ch1)})  -- bell character + EURO
       assert.same({1}, {system.utf8cwidth(ch1 .. ch2)})
       assert.same({2}, {system.utf8cwidth(ch2 .. ch3 .. ch4)})
+    end)
+
+    it("handles integer codepoints", function()
+      assert.same({1}, {system.utf8cwidth(cp1)})
+      assert.same({2}, {system.utf8cwidth(cp2)})
+      assert.same({2}, {system.utf8cwidth(cp3)})
+      assert.same({2}, {system.utf8cwidth(cp4)})
+    end)
+
+    it("returns an error on bad argument", function()
+      assert.has.error(function()
+        system.utf8cwidth(true)
+      end, "bad argument #1 to 'utf8cwidth' (Expected UTF-8-string or codepoint-integer as first argument)")
+    end)
+
+    it("returns an error on bad unicode values", function()
+      assert.same({nil, "Invalid Unicode codepoint"}, {system.utf8cwidth(-10)})
+      assert.same({nil, "Invalid Unicode codepoint"}, {system.utf8cwidth(999999999999)})
     end)
 
   end)
