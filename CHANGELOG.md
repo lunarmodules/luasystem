@@ -28,6 +28,10 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### unreleased
+
+- Fix: NetBSD fix compilation, undeclared directives
+
 ### version 0.4.5, released 18-Dec-2024
 
 - Fix: suppress a warning when building with clang
