@@ -589,7 +589,7 @@ static int lst_tcsetattr(lua_State *L)
 {
 #ifndef _WIN32
     struct termios t;
-    int r, i;
+    int r;
     int fd = get_console_handle(L);     // first is the console handle
     int act = luaL_checkinteger(L, 2);  // second is the action to take
 
