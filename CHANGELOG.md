@@ -31,6 +31,8 @@ The scope of what is covered by the version number excludes:
 ### unreleased
 
 - Fix: NetBSD fix compilation, undeclared directives
+- Refactor: random bytes; remove deprecated API usage on Windows, move to
+  binary api instead of /dev/urandom file on linux and bsd
 
 ### version 0.4.5, released 18-Dec-2024
 
