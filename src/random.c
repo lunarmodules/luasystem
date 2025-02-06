@@ -10,8 +10,8 @@
 #include <fcntl.h>
 
 #ifdef _WIN32
-#include "windows.h"
-#include "wincrypt.h"
+    #include <windows.h>
+    #include <bcrypt.h>
 #else
 #include <errno.h>
 #include <unistd.h>
@@ -21,7 +21,7 @@
 
 /***
 Generate random bytes.
-This uses `CryptGenRandom()` on Windows, and `/dev/urandom` on other platforms. It will return the
+This uses `BCryptGenRandom()` on Windows, and `/dev/urandom` on other platforms. It will return the
 requested number of bytes, or an error, never a partial result.
 @function random
 @tparam[opt=1] int length number of bytes to get
@@ -53,25 +53,14 @@ static int lua_get_random_bytes(lua_State* L) {
     ssize_t total_read = 0;
 
 #ifdef _WIN32
-    HCRYPTPROV hCryptProv;
-    if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
-        DWORD error = GetLastError();
-        lua_pushnil(L);
-        lua_pushfstring(L, "failed to acquire cryptographic context: %lu", error);
-        return 2;
-    }
-
-    if (!CryptGenRandom(hCryptProv, num_bytes, buffer)) {
+    if (!BCRYPT_SUCCESS(BCryptGenRandom(NULL, buffer, num_bytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG))) {
         DWORD error = GetLastError();
         lua_pushnil(L);
         lua_pushfstring(L, "failed to get random data: %lu", error);
-        CryptReleaseContext(hCryptProv, 0);
         return 2;
     }
 
-    CryptReleaseContext(hCryptProv, 0);
 #else
-
     // for macOS/unixes use /dev/urandom for non-blocking
     int fd = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
     if (fd < 0) {
