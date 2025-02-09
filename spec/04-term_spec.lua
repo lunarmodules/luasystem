@@ -539,6 +539,12 @@ describe("Terminal:", function()
       assert.same({2}, {system.utf8cwidth(ch2 .. ch3 .. ch4)})
     end)
 
+    it("returns 2nd ambigious boolean value only if requested", function()
+      assert.same({1}, {system.utf8cwidth("¡", false)})
+      assert.same({1, true}, {system.utf8cwidth("¡", true)})
+      assert.same({1, false}, {system.utf8cwidth("a", true)})
+    end)
+
   end)
 
 
