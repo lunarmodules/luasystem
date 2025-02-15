@@ -17,6 +17,9 @@ endif
 ifeq ($(UNAME_S),FreeBSD)
     PLAT=freebsd
 endif
+ifeq ($(UNAME_S),OpenBSD)
+    PLAT=openbsd
+endif
 ifeq ($(patsubst MINGW%,MINGW,$(UNAME_S)),MINGW)
     PLAT=mingw
 endif
@@ -63,6 +66,13 @@ LUAINC_freebsd?=$(LUAINC_freebsd_base)/lua$(LUA_VERSION)
 LUAPREFIX_freebsd?=/usr/local/
 CDIR_freebsd?=lib/lua/$(LUA_VERSION)
 LDIR_freebsd?=share/lua/$(LUA_VERSION)
+
+# LUAINC_openbsd:
+LUAINC_openbsd_base?=/usr/local/include
+LUAINC_openbsd?=$(LUAINC_openbsd_base)/lua-$(LUA_VERSION)
+LUAPREFIX_openbsd?=/usr/local/
+CDIR_openbsd?=lib/lua/$(LUA_VERSION)
+LDIR_openbsd?=share/lua/$(LUA_VERSION)
 
 # where lua headers are found for mingw builds
 # LUAINC_mingw:
@@ -162,6 +172,18 @@ LD_freebsd=gcc
 
 #------
 # Compiler and linker settings
+# for FreeBSD
+SO_openbsd=so
+O_openbsd=o
+CC_openbsd=clang
+DEF_openbsd=
+CFLAGS_openbsd= -I$(LUAINC) $(DEF) -Wall -Wshadow -Wextra \
+	-Wimplicit -O2 -ggdb3 -fpic -fvisibility=hidden
+LDFLAGS_openbsd=-O -shared -fpic -o
+LD_openbsd=clang
+
+#------
+# Compiler and linker settings
 # for MingW
 SO_mingw=dll
 O_mingw=o
@@ -226,6 +248,9 @@ default: $(PLAT)
 
 freebsd:
 	$(MAKE) all PLAT=freebsd
+
+openbsd:
+	$(MAKE) all PLAT=openbsd
 
 macosx:
 	$(MAKE) all PLAT=macosx

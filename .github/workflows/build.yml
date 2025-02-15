@@ -127,3 +127,20 @@ jobs:
             LUA_VERSION=5.4 luarocks54 make
             luarocks54 install busted
             busted --exclude-tags=manual --Xoutput "--color"
+
+  openbsd:
+    runs-on: ubuntu-latest
+    name: Run tests on OpenBSD
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests inside OpenBSD VM
+        uses: vmactions/openbsd-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            pkg_add luarocks-lua54
+          run: |
+            LUA_VERSION=5.4 luarocks-5.4 make
+            luarocks-5.4 install busted
+            busted --exclude-tags=manual --Xoutput "--color"
