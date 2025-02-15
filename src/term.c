@@ -166,8 +166,8 @@ static const struct ls_RegConst nix_console_i_flags[] = {
     {"I_INLCR", CHECK_NIX_FLAG_OR_ZERO(INLCR)},
     {"I_IGNCR", CHECK_NIX_FLAG_OR_ZERO(IGNCR)},
     {"I_ICRNL", CHECK_NIX_FLAG_OR_ZERO(ICRNL)},
-#if !defined(__APPLE__) && !defined(__FreeBSD__) && !defined(__NetBSD__)
-    {"I_IUCLC", CHECK_NIX_FLAG_OR_ZERO(IUCLC)}, // Might not be available on all systems
+#ifdef __linux__
+    {"I_IUCLC", CHECK_NIX_FLAG_OR_ZERO(IUCLC)}, // Might also exist on AIX
 #else
     {"I_IUCLC", 0},
 #endif
@@ -181,8 +181,8 @@ static const struct ls_RegConst nix_console_i_flags[] = {
 static const struct ls_RegConst nix_console_o_flags[] = {
     // Output flags (c_oflag)
     {"O_OPOST", CHECK_NIX_FLAG_OR_ZERO(OPOST)},
-#if !defined(__APPLE__) && !defined(__FreeBSD__) && !defined(__NetBSD__)
-    {"O_OLCUC", CHECK_NIX_FLAG_OR_ZERO(OLCUC)}, // Might not be available on all systems
+#ifdef __linux__
+    {"O_OLCUC", CHECK_NIX_FLAG_OR_ZERO(OLCUC)}, // Might also exist on AIX
 #else
     {"O_OLCUC", 0},
 #endif
@@ -190,11 +190,11 @@ static const struct ls_RegConst nix_console_o_flags[] = {
     {"O_OCRNL", CHECK_NIX_FLAG_OR_ZERO(OCRNL)},
     {"O_ONOCR", CHECK_NIX_FLAG_OR_ZERO(ONOCR)},
     {"O_ONLRET", CHECK_NIX_FLAG_OR_ZERO(ONLRET)},
-#if !defined(__FreeBSD__) && !defined(__NetBSD__)
-    {"O_OFILL", CHECK_NIX_FLAG_OR_ZERO(OFILL)},
-    {"O_OFDEL", CHECK_NIX_FLAG_OR_ZERO(OFDEL)},
-    {"O_NLDLY", CHECK_NIX_FLAG_OR_ZERO(NLDLY)},
-    {"O_CRDLY", CHECK_NIX_FLAG_OR_ZERO(CRDLY)},
+#if defined(__APPLE__) || defined(__linux__)
+    {"O_OFILL", CHECK_NIX_FLAG_OR_ZERO(OFILL)}, // Might also exist on AIX
+    {"O_OFDEL", CHECK_NIX_FLAG_OR_ZERO(OFDEL)}, // Might also exist on AIX
+    {"O_NLDLY", CHECK_NIX_FLAG_OR_ZERO(NLDLY)}, // Might also exist on AIX
+    {"O_CRDLY", CHECK_NIX_FLAG_OR_ZERO(CRDLY)}, // Might also exist on AIX
 #else
     {"O_OFILL", 0},
     {"O_OFDEL", 0},
@@ -206,10 +206,10 @@ static const struct ls_RegConst nix_console_o_flags[] = {
 #else
     {"O_TABDLY", 0},
 #endif
-#if !defined(__FreeBSD__) && !defined(__NetBSD__)
-    {"O_BSDLY", CHECK_NIX_FLAG_OR_ZERO(BSDLY)},
-    {"O_VTDLY", CHECK_NIX_FLAG_OR_ZERO(VTDLY)},
-    {"O_FFDLY", CHECK_NIX_FLAG_OR_ZERO(FFDLY)},
+#if defined(__APPLE__) || defined(__linux__)
+    {"O_BSDLY", CHECK_NIX_FLAG_OR_ZERO(BSDLY)}, // Might also exist on AIX
+    {"O_VTDLY", CHECK_NIX_FLAG_OR_ZERO(VTDLY)}, // Might also exist on AIX
+    {"O_FFDLY", CHECK_NIX_FLAG_OR_ZERO(FFDLY)}, // Might also exist on AIX
 #else
     {"O_BSDLY", 0},
     {"O_VTDLY", 0},
@@ -222,8 +222,8 @@ static const struct ls_RegConst nix_console_l_flags[] = {
     // Local flags (c_lflag)
     {"L_ISIG", CHECK_NIX_FLAG_OR_ZERO(ISIG)},
     {"L_ICANON", CHECK_NIX_FLAG_OR_ZERO(ICANON)},
-#if !defined(__APPLE__) && !defined(__FreeBSD__) && !defined(__NetBSD__)
-    {"L_XCASE", CHECK_NIX_FLAG_OR_ZERO(XCASE)}, // Might not be available on all systems
+#ifdef __linux__
+    {"L_XCASE", CHECK_NIX_FLAG_OR_ZERO(XCASE)}, // Might also exist on AIX
 #else
     {"L_XCASE", 0},
 #endif

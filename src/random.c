@@ -18,7 +18,7 @@
     #include <string.h>
     #if defined(__linux__)
         #include <sys/random.h> // getrandom()
-    #elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+    #elif defined(__APPLE__) || defined(__unix__)
         #include <stdlib.h>     // arc4random_buf()
     #endif
 #endif
@@ -80,7 +80,7 @@ static int lua_get_random_bytes(lua_State* L) {
         total_read += n;
     }
 
-#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#elif defined(__APPLE__) || defined(__unix__)
     // Use arc4random_buf() on BSD/macOS
     arc4random_buf(buffer, num_bytes);
 
