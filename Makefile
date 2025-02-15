@@ -18,12 +18,15 @@ endif
 ifeq ($(UNAME_S),FreeBSD)
     PLAT=freebsd
 endif
+ifeq ($(UNAME_S),OpenBSD)
+    PLAT=openbsd
+endif
 ifeq ($(patsubst MINGW%,MINGW,$(UNAME_S)),MINGW)
     PLAT=mingw
 endif
 endif
 PLAT?= linux
-PLATS= macosx linux win32 mingw freebsd
+PLATS= macosx linux win32 mingw freebsd openbsd
 
 all: $(PLAT)
 
