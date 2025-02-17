@@ -110,3 +110,20 @@ jobs:
       - name: test
         run: |
           busted --exclude-tags=manual --Xoutput "--color"
+
+  freebsd:
+    runs-on: ubuntu-latest
+    name: Run tests on FreeBSD
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests inside FreeBSD VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            pkg install -y lua54-luarocks
+          run: |
+            LUA_VERSION=5.4 luarocks54 make
+            luarocks54 install busted
+            busted --exclude-tags=manual --Xoutput "--color"
