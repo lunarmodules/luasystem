@@ -1,11 +1,13 @@
+---
 name: Deploy
 
-on: [ push, workflow_dispatch ]
+on: [push, workflow_dispatch]
 
 jobs:
 
   affected:
-    uses: lunarmodules/.github/.github/workflows/list_affected_rockspecs.yml@main
+    uses:
+      lunarmodules/.github/.github/workflows/list_affected_rockspecs.yml@main
 
   build:
     needs: affected
@@ -15,16 +17,19 @@ jobs:
       rockspecs: ${{ needs.affected.outputs.rockspecs }}
 
   upload:
-    needs: [ affected, build ]
+    needs: [affected, build]
     # Only run upload if:
     # 1. We are on the canonical repository (no uploads from forks)
-    # 2. The current commit is either tagged or on the default branch (the workflow will upload dev/scm rockspecs any
-    #    time they are touched, tagged ones whenever the edited rockspec and tag match)
-    # 3. Some rockspecs were changed — this implies the commit changing the rockspec is the same one that gets tagged
+    # 2. The current commit is either tagged or on the default branch (the
+    #    workflow will upload dev/scm rockspecs any time they are touched,
+    #    tagged ones whenever the edited rockspec and tag match)
+    # 3. Some rockspecs were changed — this implies the commit changing the
+    #    rockspec is the same one that gets tagged
     if: >-
       ${{
         github.repository == 'lunarmodules/luasystem' &&
-        ( github.ref_name == 'master' || startsWith(github.ref, 'refs/tags/') ) &&
+        ( github.ref_name == 'master' ||
+        startsWith(github.ref, 'refs/tags/') ) &&
         needs.affected.outputs.rockspecs
       }}
     uses: lunarmodules/.github/.github/workflows/upload_to_luarocks.yml@main
