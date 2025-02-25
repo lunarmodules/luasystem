@@ -1,0 +1,6 @@
+---
+extends: default
+
+rules:
+  # MSGH Actions has a key called 'on', which causes false positives.
+  truthy: disable

@@ -1,3 +1,4 @@
+---
 name: Luacheck
 
 on: [push, pull_request]
@@ -11,3 +12,18 @@ jobs:
         uses: actions/checkout@v4
       - name: Luacheck
         uses: lunarmodules/luacheck@v1
+
+  yamllint:
+    name: Run yamllint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+      - name: Install yamllint
+        run: pip install yamllint
+      - name: Run yamllint
+        run: |
+          yamllint -c .github/workflows/.yamllint.yaml .
