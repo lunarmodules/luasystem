@@ -144,10 +144,12 @@ readline.__index = readline
 -- @tparam[opt=""] string opts.value the default value
 -- @tparam[opt=`#value`] number opts.position of the cursor in the input
 -- @tparam[opt={"\10"/"\13"}] table opts.exit_keys an array of keys that will cause the readline to exit
+-- @tparam[opt=system.sleep] function opts.fsleep the sleep function to use (see `system.readansi`)
 -- @treturn readline the new readline object
 function readline.new(opts)
   local value = utf8parse(opts.value or "")
   local prompt = utf8parse(opts.prompt or "")
+  local fsleep = opts.fsleep or sys.sleep
   local pos = math.floor(opts.position or (#value + 1))
   pos = math.max(math.min(pos, (#value + 1)), 1)
   local len = math.floor(opts.max_length or 80)
@@ -175,6 +177,7 @@ function readline.new(opts)
     position = pos,         -- the current position in the input
     drawn_before = false,   -- if the prompt has been drawn
     exit_keys = exit_keys,  -- the keys that will cause the readline to exit
+    fsleep = fsleep,        -- the sleep function to use
   }
 
   setmetatable(self, readline)
@@ -413,7 +416,7 @@ function readline:__call(timeout, redraw)
   local timeout_end = sys.gettime() + timeout
 
   while true do
-    local key, keytype = sys.readansi(timeout_end - sys.gettime())
+    local key, keytype = sys.readansi(timeout_end - sys.gettime(), self.fsleep)
     if not key then
       -- error or timeout
       return nil, keytype
@@ -458,6 +461,7 @@ local rl = readline.new{
   value = "Hello, 你-好 World 🚀!",
   -- position = 2,
   exit_keys = {key_sequences.enter, "\27", "\t", "\27[Z"}, -- enter, escape, tab, shift-tab
+  fsleep = sys.sleep,
 }
 
 

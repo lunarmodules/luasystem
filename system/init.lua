@@ -229,17 +229,18 @@ end
 
 do
   --- Reads a single byte from the console, with a timeout.
-  -- This function uses `system.sleep` to wait until either a byte is available or the timeout is reached.
+  -- This function uses `fsleep` to wait until either a byte is available or the timeout is reached.
   -- The sleep period is exponentially backing off, starting at 0.0125 seconds, with a maximum of 0.2 seconds.
   -- It returns immediately if a byte is available or if `timeout` is less than or equal to `0`.
   --
   -- Using `system.readansi` is preferred over this function. Since this function can leave stray/invalid
   -- byte-sequences in the input buffer, while `system.readansi` reads full ANSI and UTF8 sequences.
   -- @tparam number timeout the timeout in seconds.
+  -- @tparam[opt=system.sleep] function fsleep the function to call for sleeping.
   -- @treturn[1] byte the byte value that was read.
   -- @treturn[2] nil if no key was read
   -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
-  function system.readkey(timeout)
+  function system.readkey(timeout, fsleep)
     if type(timeout) ~= "number" then
       error("arg #1 to readkey, expected timeout in seconds, got " .. type(timeout), 2)
     end
@@ -247,7 +248,7 @@ do
     local interval = 0.0125
     local key = system._readkey()
     while key == nil and timeout > 0 do
-      system.sleep(math.min(interval, timeout))
+      (fsleep or system.sleep)(math.min(interval, timeout))
       timeout = timeout - interval
       interval = math.min(0.2, interval * 2)
       key = system._readkey()
@@ -270,20 +271,22 @@ do
 
   --- Reads a single key, if it is the start of ansi escape sequence then it reads
   -- the full sequence. The key can be a multi-byte string in case of multibyte UTF-8 character.
-  -- This function uses `system.readkey`, and hence `system.sleep` to wait until either a key is
+  -- This function uses `system.readkey`, and hence `fsleep` to wait until either a key is
   -- available or the timeout is reached.
   -- It returns immediately if a key is available or if `timeout` is less than or equal to `0`.
   -- In case of an ANSI sequence, it will return the full sequence as a string.
   -- @tparam number timeout the timeout in seconds.
+  -- @tparam[opt=system.sleep] function fsleep the function to call for sleeping.
   -- @treturn[1] string the character that was received (can be multi-byte), or a complete ANSI sequence
   -- @treturn[1] string the type of input: `"char"` for a single key, `"ansi"` for an ANSI sequence
   -- @treturn[2] nil in case of an error
   -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
   -- @treturn[2] string partial result in case of an error while reading a sequence, the sequence so far.
-  function system.readansi(timeout)
+  function system.readansi(timeout, fsleep)
     if type(timeout) ~= "number" then
       error("arg #1 to readansi, expected timeout in seconds, got " .. type(timeout), 2)
     end
+    fsleep = fsleep or system.sleep
 
     local key
 
@@ -297,7 +300,7 @@ do
       else
         -- read a new key
         local err
-        key, err = system.readkey(timeout)
+        key, err = system.readkey(timeout, fsleep)
         if key == nil then -- timeout or error
           return nil, err
         end
@@ -306,7 +309,7 @@ do
       if key == 27 then
         -- looks like an ansi escape sequence, immediately read next char
         -- as an heuristic against manually typing escape sequences
-        local key2 = system.readkey(0)
+        local key2 = system.readkey(0, fsleep)
         if key2 ~= 91 and key2 ~= 79 then -- we expect either "[" or "O" for an ANSI sequence
           -- not the expected [ or O character, so we return the key as is
           -- and store the extra key read for the next call
@@ -335,7 +338,7 @@ do
       -- read remainder of UTF8 sequence
       local timeout_end = system.gettime() + timeout
       while true do
-        key, err = system.readkey(timeout_end - system.gettime())
+        key, err = system.readkey(timeout_end - system.gettime(), fsleep)
         if err then
           break
         end
@@ -354,7 +357,7 @@ do
       -- read remainder of ANSI sequence
       local timeout_end = system.gettime() + timeout
       while true do
-        key, err = system.readkey(timeout_end - system.gettime())
+        key, err = system.readkey(timeout_end - system.gettime(), fsleep)
         if err then
           break
         end
