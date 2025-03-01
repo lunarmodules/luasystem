@@ -112,10 +112,10 @@ To use non-blocking input here's how to set it up:
     sys.setnonblock(io.stdin, true)
 
 
-Both functions require a timeout to be provided which allows for proper asynchronous
-code to be written. Since the underlying sleep method used is `system.sleep`, just patching
-that function with a coroutine based yielding one should be all that is needed to make
-the result work with asynchroneous coroutine schedulers.
+Both `readkey` and `readansi` require a timeout to be provided which allows for proper asynchronous
+code to be written. The underlying sleep method to use can be provided, and defaults to `system.sleep`.
+Just passing a coroutine enabled sleep method should be all that is needed to make
+the result work with asynchroneous coroutine schedulers. Alternatively just patch `system.sleep`.
 
 ### 3.3.2 Blocking input
 
