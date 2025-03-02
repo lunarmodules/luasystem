@@ -107,16 +107,16 @@ typedef struct ls_RegConst {
 // This is needed because some flags are not defined on all platforms. So we
 // still export the constants, but they will be all 0, and hence not do anything.
 #ifdef _WIN32
-// check compatibility: Windows virtual terminal processing was added in 2015,
-// some older compiler suites don't have the proper headers.
-#ifndef ENABLE_VIRTUAL_TERMINAL_INPUT
-#error Virtual terminal macros are undefined (eg. ENABLE_VIRTUAL_TERMINAL_INPUT). Update the toolchain or revert to Luasystem < 0.4
-#endif
-#define CHECK_WIN_FLAG_OR_ZERO(flag) flag
-#define CHECK_NIX_FLAG_OR_ZERO(flag) 0
+ // check compatibility: Windows virtual terminal processing was added in 2015,
+ // some older compiler suites don't have the proper headers.
+ #ifndef ENABLE_VIRTUAL_TERMINAL_INPUT
+  #error Virtual terminal macros are undefined (eg. ENABLE_VIRTUAL_TERMINAL_INPUT). Update the toolchain or revert to Luasystem < 0.4
+ #endif
+ #define CHECK_WIN_FLAG_OR_ZERO(flag) flag
+ #define CHECK_NIX_FLAG_OR_ZERO(flag) 0
 #else
-#define CHECK_WIN_FLAG_OR_ZERO(flag) 0
-#define CHECK_NIX_FLAG_OR_ZERO(flag) flag
+ #define CHECK_WIN_FLAG_OR_ZERO(flag) 0
+ #define CHECK_NIX_FLAG_OR_ZERO(flag) flag
 #endif
 
 // Export Windows constants to Lua
@@ -166,8 +166,8 @@ static const struct ls_RegConst nix_console_i_flags[] = {
     {"I_INLCR", CHECK_NIX_FLAG_OR_ZERO(INLCR)},
     {"I_IGNCR", CHECK_NIX_FLAG_OR_ZERO(IGNCR)},
     {"I_ICRNL", CHECK_NIX_FLAG_OR_ZERO(ICRNL)},
-#ifdef __linux__
-    {"I_IUCLC", CHECK_NIX_FLAG_OR_ZERO(IUCLC)}, // Might also exist on AIX
+#ifdef IUCLC
+    {"I_IUCLC", CHECK_NIX_FLAG_OR_ZERO(IUCLC)},
 #else
     {"I_IUCLC", 0},
 #endif
@@ -181,8 +181,8 @@ static const struct ls_RegConst nix_console_i_flags[] = {
 static const struct ls_RegConst nix_console_o_flags[] = {
     // Output flags (c_oflag)
     {"O_OPOST", CHECK_NIX_FLAG_OR_ZERO(OPOST)},
-#ifdef __linux__
-    {"O_OLCUC", CHECK_NIX_FLAG_OR_ZERO(OLCUC)}, // Might also exist on AIX
+#ifdef OLCUC
+    {"O_OLCUC", CHECK_NIX_FLAG_OR_ZERO(OLCUC)},
 #else
     {"O_OLCUC", 0},
 #endif
@@ -190,29 +190,44 @@ static const struct ls_RegConst nix_console_o_flags[] = {
     {"O_OCRNL", CHECK_NIX_FLAG_OR_ZERO(OCRNL)},
     {"O_ONOCR", CHECK_NIX_FLAG_OR_ZERO(ONOCR)},
     {"O_ONLRET", CHECK_NIX_FLAG_OR_ZERO(ONLRET)},
-#if defined(__APPLE__) || defined(__linux__)
-    {"O_OFILL", CHECK_NIX_FLAG_OR_ZERO(OFILL)}, // Might also exist on AIX
-    {"O_OFDEL", CHECK_NIX_FLAG_OR_ZERO(OFDEL)}, // Might also exist on AIX
-    {"O_NLDLY", CHECK_NIX_FLAG_OR_ZERO(NLDLY)}, // Might also exist on AIX
-    {"O_CRDLY", CHECK_NIX_FLAG_OR_ZERO(CRDLY)}, // Might also exist on AIX
+#ifdef OFILL
+    {"O_OFILL", CHECK_NIX_FLAG_OR_ZERO(OFILL)},
 #else
     {"O_OFILL", 0},
+#endif
+#ifdef OFDEL
+    {"O_OFDEL", CHECK_NIX_FLAG_OR_ZERO(OFDEL)},
+#else
     {"O_OFDEL", 0},
+#endif
+#ifdef NLDLY
+    {"O_NLDLY", CHECK_NIX_FLAG_OR_ZERO(NLDLY)},
+#else
     {"O_NLDLY", 0},
+#endif
+#ifdef CRDLY
+    {"O_CRDLY", CHECK_NIX_FLAG_OR_ZERO(CRDLY)},
+#else
     {"O_CRDLY", 0},
 #endif
-#if !defined(__NetBSD__)
+#ifdef TABDLY
     {"O_TABDLY", CHECK_NIX_FLAG_OR_ZERO(TABDLY)},
 #else
     {"O_TABDLY", 0},
 #endif
-#if defined(__APPLE__) || defined(__linux__)
-    {"O_BSDLY", CHECK_NIX_FLAG_OR_ZERO(BSDLY)}, // Might also exist on AIX
-    {"O_VTDLY", CHECK_NIX_FLAG_OR_ZERO(VTDLY)}, // Might also exist on AIX
-    {"O_FFDLY", CHECK_NIX_FLAG_OR_ZERO(FFDLY)}, // Might also exist on AIX
+#ifdef BSDLY
+    {"O_BSDLY", CHECK_NIX_FLAG_OR_ZERO(BSDLY)},
 #else
     {"O_BSDLY", 0},
+#endif
+#ifdef VTDLY
+    {"O_VTDLY", CHECK_NIX_FLAG_OR_ZERO(VTDLY)},
+#else
     {"O_VTDLY", 0},
+#endif
+#ifdef FFDLY
+    {"O_FFDLY", CHECK_NIX_FLAG_OR_ZERO(FFDLY)},
+#else
     {"O_FFDLY", 0},
 #endif
     {NULL, 0}
@@ -222,8 +237,8 @@ static const struct ls_RegConst nix_console_l_flags[] = {
     // Local flags (c_lflag)
     {"L_ISIG", CHECK_NIX_FLAG_OR_ZERO(ISIG)},
     {"L_ICANON", CHECK_NIX_FLAG_OR_ZERO(ICANON)},
-#ifdef __linux__
-    {"L_XCASE", CHECK_NIX_FLAG_OR_ZERO(XCASE)}, // Might also exist on AIX
+#ifdef XCASE
+    {"L_XCASE", CHECK_NIX_FLAG_OR_ZERO(XCASE)},
 #else
     {"L_XCASE", 0},
 #endif
@@ -233,9 +248,9 @@ static const struct ls_RegConst nix_console_l_flags[] = {
     {"L_ECHONL", CHECK_NIX_FLAG_OR_ZERO(ECHONL)},
     {"L_NOFLSH", CHECK_NIX_FLAG_OR_ZERO(NOFLSH)},
     {"L_TOSTOP", CHECK_NIX_FLAG_OR_ZERO(TOSTOP)},
-    {"L_ECHOCTL", CHECK_NIX_FLAG_OR_ZERO(ECHOCTL)}, // Might not be available on all systems
-    {"L_ECHOPRT", CHECK_NIX_FLAG_OR_ZERO(ECHOPRT)}, // Might not be available on all systems
-    {"L_ECHOKE", CHECK_NIX_FLAG_OR_ZERO(ECHOKE)}, // Might not be available on all systems
+    {"L_ECHOCTL", CHECK_NIX_FLAG_OR_ZERO(ECHOCTL)},
+    {"L_ECHOPRT", CHECK_NIX_FLAG_OR_ZERO(ECHOPRT)},
+    {"L_ECHOKE", CHECK_NIX_FLAG_OR_ZERO(ECHOKE)},
     {"L_FLUSHO", CHECK_NIX_FLAG_OR_ZERO(FLUSHO)},
     {"L_PENDIN", CHECK_NIX_FLAG_OR_ZERO(PENDIN)},
     {"L_IEXTEN", CHECK_NIX_FLAG_OR_ZERO(IEXTEN)},
