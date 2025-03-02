@@ -21,14 +21,13 @@ The scope of what is covered by the version number excludes:
 - commit the changes as `Release vX.Y.Z`
 - push the commit, and create a release PR
 - after merging tag the release commit with `vX.Y.Z`
-- upload to LuaRocks:<br/>
-  `luarocks upload ./rockspecs/luasystem-X.Y.Z-1.rockspec --api-key=ABCDEFGH`
+- upload to LuaRocks will be automatic by the CI runners
 - test the newly created rock:<br/>
   `luarocks install luasystem`
 
 ## Version history
 
-### unreleased
+### version 0.5.0, released 02-Mar-2025
 
 - Feat: when detecting character display width, also accept unicode codepoints (integers),
   since the Lua utf8 library returns codepoints, not strings
