@@ -99,13 +99,14 @@ jobs:
         with:
           luarocksVersion: "3.11.0"
 
-      - name: install
-        run: |
-          luarocks make
-
       - name: test dependencies
         run: |
           luarocks install busted
+          luarocks remove luasystem --force
+
+      - name: install
+        run: |
+          luarocks make
 
       - name: test
         run: |
@@ -123,9 +124,10 @@ jobs:
           usesh: true
           prepare: |
             pkg install -y lua54-luarocks
+            luarocks54 install busted
+            luarocks54 remove luasystem --force
           run: |
             LUA_VERSION=5.4 luarocks54 make
-            luarocks54 install busted
             busted --exclude-tags=manual --Xoutput "--color"
 
   openbsd:
@@ -140,9 +142,10 @@ jobs:
           usesh: true
           prepare: |
             pkg_add luarocks-lua54
+            luarocks-5.4 install busted
+            luarocks-5.4 remove luasystem --force
           run: |
             LUA_VERSION=5.4 luarocks-5.4 make
-            luarocks-5.4 install busted
             busted --exclude-tags=manual --Xoutput "--color"
 
   netbsd:
@@ -159,7 +162,10 @@ jobs:
             export PATH=/usr/pkg/bin:/usr/pkg/sbin:/usr/sbin:$PATH
             env ASSUME_ALWAYS_YES=YES /usr/sbin/pkg_add -v pkgin
             pkgin -y update
-            pkgin -y install lua54-rocks lua54-busted
+            pkgin -y install lua54-rocks
+            luarocks-5.4 install busted
+            luarocks-5.4 remove luasystem --force
           run: |
+            eval `luarocks-5.4 path`
             luarocks-5.4 make
             busted --exclude-tags=manual --Xoutput "--color"
