@@ -144,3 +144,22 @@ jobs:
             LUA_VERSION=5.4 luarocks-5.4 make
             luarocks-5.4 install busted
             busted --exclude-tags=manual --Xoutput "--color"
+
+  netbsd:
+    runs-on: ubuntu-latest
+    name: Run tests on NetBSD
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests inside NetBSD VM
+        uses: vmactions/netbsd-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            export PATH=/usr/pkg/bin:/usr/pkg/sbin:/usr/sbin:$PATH
+            env ASSUME_ALWAYS_YES=YES /usr/sbin/pkg_add -v pkgin
+            pkgin -y update
+            pkgin -y install lua54-rocks lua54-busted
+          run: |
+            luarocks-5.4 make
+            busted --exclude-tags=manual --Xoutput "--color"
