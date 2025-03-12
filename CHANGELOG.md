@@ -27,6 +27,10 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### version 0.5.1, released 12-Mar-2025
+
+- Fix: on older unixes with glibc < 2.25, fall back to `/dev/urandom`
+
 ### version 0.5.0, released 02-Mar-2025
 
 - Feat: when detecting character display width, also accept unicode codepoints (integers),
