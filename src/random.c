@@ -17,7 +17,12 @@
     #include <unistd.h>
     #include <string.h>
     #if defined(__linux__)
-        #include <sys/random.h> // getrandom()
+        // getrandom() requires random.h and is available from glibc 2.25
+        #if !defined(__GLIBC__) || (__GLIBC__ < 2 || __GLIBC_MINOR__ < 25)
+            #define USE_DEV_URANDOM 1
+        #else
+            #include <sys/random.h> // getrandom()
+        #endif
     #elif defined(__APPLE__) || defined(__unix__)
         #include <stdlib.h>     // arc4random_buf()
     #endif
@@ -67,8 +72,8 @@ static int lua_get_random_bytes(lua_State* L) {
         return 2;
     }
 
-#elif defined(__linux__)
-    // Use getrandom() on Linux (Kernel 3.17+, 2014)
+#elif defined(__linux__) && !defined(USE_DEV_URANDOM)
+    // Use getrandom() on Linux
     while (total_read < num_bytes) {
         ssize_t n = getrandom(buffer + total_read, num_bytes - total_read, 0);
         if (n < 0) {
@@ -80,7 +85,7 @@ static int lua_get_random_bytes(lua_State* L) {
         total_read += n;
     }
 
-#elif defined(__APPLE__) || defined(__unix__)
+#elif defined(__APPLE__) || (defined(__unix__) && !defined(USE_DEV_URANDOM))
     // Use arc4random_buf() on BSD/macOS
     arc4random_buf(buffer, num_bytes);
 
