@@ -16,6 +16,7 @@ Since there are a myriad of settings available;
 - `system.setconsoleflags` (Windows)
 - `system.setconsolecp` (Windows)
 - `system.setconsoleoutputcp` (Windows)
+- `system.detachfds` (Posix)
 - `system.setnonblock` (Posix)
 - `system.tcsetattr` (Posix)
 
@@ -100,6 +101,9 @@ On Posix the traditional file approach is used, which:
 - requires enter to be pressed to pass the input (canonical mode)
 
 To use non-blocking input here's how to set it up:
+
+    -- Detach stdin/out/err; to get their own independent file descriptions
+    sys.detachfds()
 
     -- setup Windows console to disable echo and line input (not required since _getwchar is used, just for consistency)
     sys.setconsoleflags(io.stdin, sys.getconsoleflags(io.stdin) - sys.CIF_ECHO_INPUT - sys.CIF_LINE_INPUT)

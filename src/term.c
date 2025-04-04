@@ -649,8 +649,105 @@ static int lst_tcsetattr(lua_State *L)
 
 
 
+#ifndef _WIN32
+/*
+reopen FDs for independent file descriptions.
+fd should be either 1 or 2 (stdout or stderr)
+*/
+static int reopen_fd(lua_State *L, int fd, int flags) {
+    char path[64];
+    int newfd = -1;
+
+    // If fd is a terminal, reopen its actual device (e.g. /dev/ttys003)
+    // Works on all POSIX platforms that have terminals (macOS, Linux, BSD, etc.)
+    if (isatty(fd)) {
+        const char *tty = ttyname(fd);
+        if (tty) {
+            newfd = open(tty, flags);
+            if (newfd >= 0) return newfd;
+        }
+    }
+
+    // For non-tty: try /dev/fd/N — POSIX-compliant and standard on macOS, Linux, BSD.
+    // This gives a new file description even if the target is a file or pipe.
+    snprintf(path, sizeof(path), "/dev/fd/%d", fd);
+    newfd = open(path, flags);
+    if (newfd >= 0) return newfd;
+
+    // Fallback: for platforms/environments where /dev/fd/N doesn't exist.
+    // /dev/stdout and /dev/stderr are standard on Linux, but may not create new descriptions.
+    const char *fallback_path = (fd == 1) ? "/dev/stdout" :
+                                (fd == 2) ? "/dev/stderr" : NULL;
+
+    if (fallback_path) {
+        newfd = open(fallback_path, flags);
+        if (newfd >= 0) return newfd;
+    }
+
+    // All attempts failed — raise error with detailed info
+    return luaL_error(L, "Failed to reopen fd %d: tried ttyname(), /dev/fd/%d, and fallback %s: %s",
+                      fd, fd, fallback_path ? fallback_path : "(none)", strerror(errno));
+}
+#endif
+
+
+
+/***
+Creates new file descriptions for `stdout` and `stderr`.
+Even if the file descriptors are unique, they still might point to the same
+file description, and hence share settings like `O_NONBLOCK`. This means that
+if one of them is set to non-blocking, the other will be as well. This can
+lead to unexpected behavior.
+
+This function is used to detach `stdout` and `stderr` from the original
+file descriptions, and create new file descriptions for them. This allows
+independent control of flags (e.g., `O_NONBLOCK`) on `stdout` and `stderr`,
+avoiding shared side effects.
+
+Does not modify `stdin` (fd 0), and does nothing on Windows.
+@function detachfds
+@return boolean `true` on success, or throws an error on failure.
+@see setnonblock
+*/
+static int lst_detachfds(lua_State *L) {
+    static int already_detached = 0; // detaching is once per process(not per thread or Lua state)
+    if (already_detached) {
+        lua_pushnil(L);
+        lua_pushliteral(L, "stdout and stderr already detached");
+        return 1;
+    }
+    already_detached = 1;
+
+#ifndef _WIN32
+    // Reopen stdout and stderr with new file descriptions
+    int fd_out = reopen_fd(L, 1, O_WRONLY);
+    int fd_err = reopen_fd(L, 2, O_WRONLY);
+
+    // Replace fd 1 and 2 in-place using dup2
+    if (dup2(fd_out, 1) < 0) {
+        close(fd_out);
+        return luaL_error(L, "dup2 failed for stdout: %s", strerror(errno));
+    }
+    if (dup2(fd_err, 2) < 0) {
+        close(fd_err);
+        return luaL_error(L, "dup2 failed for stderr: %s", strerror(errno));
+    }
+
+    // Clean up temporary file descriptors — fd 1 and 2 now own them
+    close(fd_out);
+    close(fd_err);
+
+#endif
+
+    lua_pushboolean(L, 1);
+    return 1;
+}
+
+
+
 /***
 Enables or disables non-blocking mode for a file (Posix).
+Check `detachfds` in case there are shared file descriptions.
 @function setnonblock
 @tparam file fd file handle to operate on, one of `io.stdin`, `io.stdout`, `io.stderr`
 @tparam boolean make_non_block a truthy value will enable non-blocking mode, a falsy value will disable it.
@@ -659,8 +756,10 @@ Enables or disables non-blocking mode for a file (Posix).
 @treturn[2] string error message
 @treturn[2] int errnum
 @see getnonblock
+@see detachfds
 @usage
 local sys = require('system')
+sys.detachfds() -- detach stdout and stderr, so only stdin becomes non-blocking
 
 -- set io.stdin to non-blocking mode
 local old_setting = sys.getnonblock(io.stdin)
@@ -717,6 +816,7 @@ Gets non-blocking mode status for a file (Posix).
 @treturn[2] nil
 @treturn[2] string error message
 @treturn[2] int errnum
+@see setnonblock
 */
 static int lst_getnonblock(lua_State *L)
 {
@@ -1157,6 +1257,7 @@ static luaL_Reg func[] = {
     { "setconsoleflags", lst_setconsoleflags },
     { "tcgetattr", lst_tcgetattr },
     { "tcsetattr", lst_tcsetattr },
+    { "detachfds", lst_detachfds },
     { "getnonblock", lst_getnonblock },
     { "setnonblock", lst_setnonblock },
     { "_readkey", lst_readkey },
