@@ -102,13 +102,11 @@ On Posix the traditional file approach is used, which:
 
 To use non-blocking input here's how to set it up:
 
-    -- Detach stdin/out/err; to get their own independent file descriptions
-    sys.detachfds()
-
     -- setup Windows console to disable echo and line input (not required since _getwchar is used, just for consistency)
     sys.setconsoleflags(io.stdin, sys.getconsoleflags(io.stdin) - sys.CIF_ECHO_INPUT - sys.CIF_LINE_INPUT)
 
     -- setup Posix by disabling echo, canonical mode, and making non-blocking
+    sys.detachfds()  -- ensure stdin/out/err have their own file descriptions
     local of_attr = sys.tcgetattr(io.stdin)
     sys.tcsetattr(io.stdin, sys.TCSANOW, {
       lflag = of_attr.lflag - sys.L_ICANON - sys.L_ECHO,
