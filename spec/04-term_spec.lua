@@ -855,6 +855,32 @@ describe("Terminal:", function()
         assert.is.near(1, timing, 0.5)       -- this also works for MacOS in CI
       end)
 
+
+      it("calls flseep to execute the sleep", function()
+        setbuffer("")
+
+        local sleep_called = false
+        local mysleep = function()
+          sleep_called = true
+        end
+
+        system.readkey(0.01, mysleep)
+        assert.is_true(sleep_called)
+      end)
+
+
+      it("returns errors by fsleep", function()
+        setbuffer("")
+
+        local mysleep = function()
+          return nil, "boom!"
+        end
+
+        local ok, err = system.readkey(1, mysleep)
+        assert.is.falsy(ok)
+        assert.equals("boom!", err)
+      end)
+
     end)
 
 

@@ -27,6 +27,10 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### version 0.6.0, unreleased
+
+- Fix: when sleep returns an error, pass that on in `readkey`.
+
 ### version 0.5.1, released 12-Mar-2025
 
 - Fix: on older unixes with glibc < 2.25, fall back to `/dev/urandom`

@@ -236,10 +236,10 @@ do
   -- Using `system.readansi` is preferred over this function. Since this function can leave stray/invalid
   -- byte-sequences in the input buffer, while `system.readansi` reads full ANSI and UTF8 sequences.
   -- @tparam number timeout the timeout in seconds.
-  -- @tparam[opt=system.sleep] function fsleep the function to call for sleeping.
+  -- @tparam[opt=system.sleep] function fsleep the function to call for sleeping; `ok, err = fsleep(secs)`
   -- @treturn[1] byte the byte value that was read.
   -- @treturn[2] nil if no key was read
-  -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
+  -- @treturn[2] string error message when the timeout was reached (`"timeout"`), or if `sleep` failed.
   function system.readkey(timeout, fsleep)
     if type(timeout) ~= "number" then
       error("arg #1 to readkey, expected timeout in seconds, got " .. type(timeout), 2)
@@ -248,7 +248,10 @@ do
     local interval = 0.0125
     local key = system._readkey()
     while key == nil and timeout > 0 do
-      (fsleep or system.sleep)(math.min(interval, timeout))
+      local ok, err = (fsleep or system.sleep)(math.min(interval, timeout))
+      if not ok then
+        return nil, err
+      end
       timeout = timeout - interval
       interval = math.min(0.2, interval * 2)
       key = system._readkey()
