@@ -652,11 +652,17 @@ static int lst_tcsetattr(lua_State *L)
 #ifndef _WIN32
 /*
 reopen FDs for independent file descriptions.
-fd should be either 1 or 2 (stdout or stderr)
 */
-static int reopen_fd(lua_State *L, int fd, int flags) {
+static void reopen_fd(lua_State *L, int fd, int flags) {
     char path[64];
     int newfd = -1;
+
+    if (fd != STDOUT_FILENO && fd != STDERR_FILENO) {
+        luaL_error(L, "Invalid file descriptor: %d. Only stdout (1) and stderr (2) are supported.", fd);
+    }
+
+    const char *fallback_path = (fd == STDOUT_FILENO) ? "/dev/stdout" :
+                                (fd == STDERR_FILENO) ? "/dev/stderr" : NULL;
 
     // If fd is a terminal, reopen its actual device (e.g. /dev/ttys003)
     // Works on all POSIX platforms that have terminals (macOS, Linux, BSD, etc.)
@@ -664,29 +670,37 @@ static int reopen_fd(lua_State *L, int fd, int flags) {
         const char *tty = ttyname(fd);
         if (tty) {
             newfd = open(tty, flags);
-            if (newfd >= 0) return newfd;
         }
     }
 
-    // For non-tty: try /dev/fd/N — POSIX-compliant and standard on macOS, Linux, BSD.
-    // This gives a new file description even if the target is a file or pipe.
-    snprintf(path, sizeof(path), "/dev/fd/%d", fd);
-    newfd = open(path, flags);
-    if (newfd >= 0) return newfd;
-
-    // Fallback: for platforms/environments where /dev/fd/N doesn't exist.
-    // /dev/stdout and /dev/stderr are standard on Linux, but may not create new descriptions.
-    const char *fallback_path = (fd == 1) ? "/dev/stdout" :
-                                (fd == 2) ? "/dev/stderr" : NULL;
-
-    if (fallback_path) {
-        newfd = open(fallback_path, flags);
-        if (newfd >= 0) return newfd;
+    if (newfd < 0) {
+        // For non-tty: try /dev/fd/N — POSIX-compliant and standard on macOS, Linux, BSD.
+        // This gives a new file description even if the target is a file or pipe.
+        snprintf(path, sizeof(path), "/dev/fd/%d", fd);
+        newfd = open(path, flags);
     }
 
-    // All attempts failed — raise error with detailed info
-    return luaL_error(L, "Failed to reopen fd %d: tried ttyname(), /dev/fd/%d, and fallback %s: %s",
-                      fd, fd, fallback_path ? fallback_path : "(none)", strerror(errno));
+    if (newfd < 0) {
+        // Fallback: for platforms/environments where /dev/fd/N doesn't exist.
+        // /dev/stdout and /dev/stderr are standard on Linux, but may not create new descriptions.
+        if (fallback_path) {
+            newfd = open(fallback_path, flags);
+        }
+    }
+
+    if (newfd < 0) {
+        // All attempts failed — raise error with detailed info (call will not return)
+        luaL_error(L, "Failed to reopen fd %d: tried ttyname(), /dev/fd/%d, and fallback %s: %s",
+                    fd, fd, fallback_path ? fallback_path : "(none)", strerror(errno));
+    }
+
+    // Replace the original fd with the new one
+    if (dup2(newfd, fd) < 0) {
+        close(newfd);
+        luaL_error(L, "dup2 failed for fd %d: %s", fd, strerror(errno));
+    }
+
+    close(newfd); // Close the new fd, as dup2 has replaced the original fd with it
 }
 #endif
 
@@ -720,23 +734,8 @@ static int lst_detachfds(lua_State *L) {
 
 #ifndef _WIN32
     // Reopen stdout and stderr with new file descriptions
-    int fd_out = reopen_fd(L, 1, O_WRONLY);
-    int fd_err = reopen_fd(L, 2, O_WRONLY);
-
-    // Replace fd 1 and 2 in-place using dup2
-    if (dup2(fd_out, 1) < 0) {
-        close(fd_out);
-        return luaL_error(L, "dup2 failed for stdout: %s", strerror(errno));
-    }
-    if (dup2(fd_err, 2) < 0) {
-        close(fd_err);
-        return luaL_error(L, "dup2 failed for stderr: %s", strerror(errno));
-    }
-
-    // Clean up temporary file descriptors — fd 1 and 2 now own them
-    close(fd_out);
-    close(fd_err);
-
+    reopen_fd(L, STDOUT_FILENO, O_WRONLY);
+    reopen_fd(L, STDERR_FILENO, O_WRONLY);
 #endif
 
     lua_pushboolean(L, 1);
