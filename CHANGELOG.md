@@ -27,7 +27,7 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
-### version 0.6.0, unreleased
+### version 0.6.0, released 10-Apr-2025
 
 - Fix: when sleep returns an error, pass that on in `readkey`.
 - Feat: added `detachfds` which will create separate file descriptions for `stdout`
