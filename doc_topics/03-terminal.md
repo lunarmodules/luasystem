@@ -16,6 +16,7 @@ Since there are a myriad of settings available;
 - `system.setconsoleflags` (Windows)
 - `system.setconsolecp` (Windows)
 - `system.setconsoleoutputcp` (Windows)
+- `system.detachfds` (Posix)
 - `system.setnonblock` (Posix)
 - `system.tcsetattr` (Posix)
 
@@ -105,6 +106,7 @@ To use non-blocking input here's how to set it up:
     sys.setconsoleflags(io.stdin, sys.getconsoleflags(io.stdin) - sys.CIF_ECHO_INPUT - sys.CIF_LINE_INPUT)
 
     -- setup Posix by disabling echo, canonical mode, and making non-blocking
+    sys.detachfds()  -- ensure stdin/out/err have their own file descriptions
     local of_attr = sys.tcgetattr(io.stdin)
     sys.tcsetattr(io.stdin, sys.TCSANOW, {
       lflag = of_attr.lflag - sys.L_ICANON - sys.L_ECHO,

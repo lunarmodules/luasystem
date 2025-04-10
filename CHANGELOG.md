@@ -30,6 +30,9 @@ The scope of what is covered by the version number excludes:
 ### version 0.6.0, unreleased
 
 - Fix: when sleep returns an error, pass that on in `readkey`.
+- Feat: added `detachfds` which will create separate file descriptions for `stdout`
+  and `stderr` to ensure that related settings (eg. non-blocking flag) will not be shared
+  amongst those streams and `stdin`.
 
 ### version 0.5.1, released 12-Mar-2025
 
@@ -42,12 +45,12 @@ The scope of what is covered by the version number excludes:
 - Feat: allow passing in a sleep function to `readkey` and `readansi`
 - Fix: NetBSD fix compilation, undeclared directives
 - Refactor: random bytes; remove deprecated API usage on Windows, move to
-  binary api instead of /dev/urandom file on linux and bsd
+  binary api instead of `/dev/urandom` file on linux and bsd
 
 ### version 0.4.5, released 18-Dec-2024
 
 - Fix: suppress a warning when building with clang
-- Fix: do not rely on luaconf.h to include limits.h, fixes builds with latest LuaJIT (#38).
+- Fix: do not rely on `luaconf.h` to include `limits.h`, fixes builds with latest LuaJIT (#38).
 
 ### version 0.4.4, released 03-Sep-2024
 
