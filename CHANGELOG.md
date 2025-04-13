@@ -27,6 +27,11 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### version xxx, unreleased
+
+- Docs: document readansi internal buffer for incomplete sequences.
+- Fix: ensure to properly parse `<alt>+key` key presses
+
 ### version 0.6.0, released 10-Apr-2025
 
 - Fix: when sleep returns an error, pass that on in `readkey`.
