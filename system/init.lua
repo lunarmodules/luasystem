@@ -267,7 +267,6 @@ end
 
 
 do
-  local left_over_key
   local sequence -- table to store the sequence in progress
   local utf8_length -- length of utf8 sequence currently being processed
   local unpack = unpack or table.unpack
@@ -285,6 +284,8 @@ do
   -- @treturn[2] nil in case of an error
   -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
   -- @treturn[2] string partial result in case of an error while reading a sequence, the sequence so far.
+  -- The function retains its own internal buffer, so on the next call the incomplete buffer is used to
+  -- complete the sequence.
   function system.readansi(timeout, fsleep)
     if type(timeout) ~= "number" then
       error("arg #1 to readansi, expected timeout in seconds, got " .. type(timeout), 2)
@@ -295,33 +296,47 @@ do
 
     if not sequence then
       -- no sequence in progress, read a key
-
-      if left_over_key then
-        -- we still have a cached key from the last call
-        key = left_over_key
-        left_over_key = nil
-      else
-        -- read a new key
-        local err
-        key, err = system.readkey(timeout, fsleep)
-        if key == nil then -- timeout or error
-          return nil, err
-        end
+      local err
+      key, err = system.readkey(timeout, fsleep)
+      if key == nil then -- timeout or error
+        return nil, err
       end
 
       if key == 27 then
         -- looks like an ansi escape sequence, immediately read next char
         -- as an heuristic against manually typing escape sequences
         local key2 = system.readkey(0, fsleep)
-        if key2 ~= 91 and key2 ~= 79 then -- we expect either "[" or "O" for an ANSI sequence
-          -- not the expected [ or O character, so we return the key as is
-          -- and store the extra key read for the next call
-          left_over_key = key2
+        if key2 == nil then
+          -- no key available, return the escape key, on its own
+          sequence = nil
           return string.char(key), "char"
+
+        elseif key2 == 91 then
+          -- "[" means it is for sure an ANSI sequence
+          sequence = { key, key2 }
+
+        elseif key2 == 79 then
+          -- "O" means it is either an ANSI sequence or just an <alt>+O key stroke
+          -- check if there is yet another byte available
+          local key3 = system.readkey(0, fsleep)
+          if key3 == nil then
+            -- no key available, return the <alt>O key stroke, report as ANSI
+            sequence = nil
+            return string.char(key, key2), "ansi"
+          end
+          -- it's an ANSI sequence, marked with <ESC>O
+          if (key3 >= 65 and key3 <= 90) or (key3 >= 97 and key3 <= 126) then
+            -- end of sequence, return the full sequence
+            return string.char(key, key2, key3), "ansi"
+          end
+          sequence = { key, key2, key3 }
+
+        else
+          -- not an ANSI sequence, but an <alt>+<key2> key stroke, so report as ANSI
+          sequence = nil
+          return string.char(key, key2), "ansi"
         end
 
-        -- escape sequence detected
-        sequence = { key, key2 }
       else
         -- check UTF8 length
         utf8_length = key < 128 and 1 or key < 224 and 2 or key < 240 and 3 or key < 248 and 4

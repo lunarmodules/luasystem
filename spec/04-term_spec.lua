@@ -928,10 +928,31 @@ describe("Terminal:", function()
       end)
 
 
+      it("reads ANSI escape sequences, just an '<esc>O' (<alt><O> key press)", function()
+        setbuffer("\27O")
+        assert.are.same({"\27O", "ansi"}, {system.readansi(0)})
+      end)
+
+
+      it("reads <alt>+key key presses; <esc>+<key>", function()
+        setbuffer("\27a\27b\27c\27d")
+        assert.are.same({"\27a", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27b", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27c", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27d", "ansi"}, {system.readansi(0)})
+      end)
+
+
+      it("reads <ctrl><alt>[ key press; <esc>+<esc>", function()
+        setbuffer("\27\27\27\27")
+        assert.are.same({"\27\27", "ansi"}, {system.readansi(0)})
+        assert.are.same({"\27\27", "ansi"}, {system.readansi(0)})
+      end)
+
+
       it("returns a single <esc> character if no sequence is found", function()
-        setbuffer("\27\27[A")
+        setbuffer("\27")
         assert.are.same({"\27", "char"}, {system.readansi(0)})
-        assert.are.same({"\27[A", "ansi"}, {system.readansi(0)})
       end)
 
 
@@ -943,6 +964,22 @@ describe("Terminal:", function()
         timing = system.gettime() - timing
         -- assert.is.near(0.5, timing, 0.1)  -- this works in CI for Unix and Windows, but not MacOS (locally it passes)
         assert.is.near(1, timing, 0.5)       -- this also works for MacOS in CI
+      end)
+
+
+      it("incomplete ANSI sequences will be completed on next call", function()
+        setbuffer("\27[")
+        assert.are.same({nil, "timeout", "\27["}, {system.readansi(0)})
+        setbuffer("A")
+        assert.are.same({"\27[A", "ansi"}, {system.readansi(0)})
+      end)
+
+
+      it("incomplete UTF8 sequences will be completed on next call", function()
+        setbuffer(string.char(240, 159))
+        assert.are.same({nil, "timeout", string.char(240, 159)}, {system.readansi(0)})
+        setbuffer(string.char(154, 128))
+        assert.are.same({"🚀", "char"}, {system.readansi(0)})
       end)
 
     end)
