@@ -27,7 +27,7 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
-### version xxx, unreleased
+### version 0.6.1, released 13-Apr-2025
 
 - Docs: document readansi internal buffer for incomplete sequences.
 - Fix: ensure to properly parse `<alt>+key` key presses
