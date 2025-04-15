@@ -27,7 +27,7 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
-### version 0.6.2, unreleased
+### version 0.6.2, released 15-Apr-2025
 
  - Fix: autotermrestore didn't work because its metatable was overwritten.
 
