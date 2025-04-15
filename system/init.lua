@@ -13,14 +13,16 @@ local system = require 'system.core'
 system.CODEPAGE_UTF8 = 65001
 
 do
-  local backup_mt = {}
+  local backup_indicator = {}
 
   --- Returns a backup of terminal settings for stdin/out/err.
   -- Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
   -- Backs up terminal/console flags only if a stream is a tty.
   -- @return table with backup of terminal settings
   function system.termbackup()
-    local backup = setmetatable({}, backup_mt)
+    local backup = {
+      __type = backup_indicator, -- cannot set a metatable, since autotermrestore uses it for GC
+    }
 
     if system.isatty(io.stdin) then
       backup.console_in = system.getconsoleflags(io.stdin)
@@ -51,7 +53,7 @@ do
   -- @tparam table backup the backup of terminal settings, see `termbackup`.
   -- @treturn boolean true
   function system.termrestore(backup)
-    if getmetatable(backup) ~= backup_mt then
+    if type(backup) ~= "table" or backup.__type ~= backup_indicator then
       error("arg #1 to termrestore, expected backup table, got " .. type(backup), 2)
     end
 
