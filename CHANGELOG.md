@@ -27,6 +27,10 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### version 0.6.2, unreleased
+
+ - Fix: autotermrestore didn't work because its metatable was overwritten.
+
 ### version 0.6.1, released 13-Apr-2025
 
 - Docs: document readansi internal buffer for incomplete sequences.
