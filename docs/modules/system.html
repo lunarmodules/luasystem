@@ -37,7 +37,12 @@
 <li><a href="#Environment">Environment </a></li>
 <li><a href="#Random">Random </a></li>
 <li><a href="#Terminal">Terminal </a></li>
+<li><a href="#Terminal_Windows">Terminal_Windows</a></li>
+<li><a href="#Terminal_Posix">Terminal_Posix</a></li>
+<li><a href="#Terminal_Input">Terminal_Input</a></li>
+<li><a href="#Terminal_UTF_8">Terminal_UTF-8</a></li>
 <li><a href="#Time">Time </a></li>
+<li><a href="#Terminal_Backup">Terminal_Backup</a></li>
 </ul>
 
 
@@ -112,69 +117,42 @@
 <h2><a href="#Terminal">Terminal </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#CODEPAGE_UTF8">CODEPAGE_UTF8</a></td>
-	<td class="summary">UTF8 codepage.</td>
+	<td class="name" nowrap><a href="#isatty">isatty (file)</a></td>
+	<td class="summary">Checks if a file-handle is a TTY.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#_readkey">_readkey ()</a></td>
-	<td class="summary">Reads a key from the console non-blocking.</td>
+	<td class="name" nowrap><a href="#termsize">termsize ()</a></td>
+	<td class="summary">Get the size of the terminal in rows and columns.</td>
 	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#autotermrestore">autotermrestore ()</a></td>
-	<td class="summary">Backs up terminal settings and restores them on application exit.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#detachfds">detachfds ()</a></td>
-	<td class="summary">Creates new file descriptions for <code>stdout</code> and <code>stderr</code>.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#getconsolecp">getconsolecp ()</a></td>
-	<td class="summary">Gets the current console code page (Windows).</td>
-	</tr>
+</table>
+<h2><a href="#Terminal_Windows">Terminal_Windows</a></h2>
+<table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#getconsoleflags">getconsoleflags (file)</a></td>
 	<td class="summary">Gets console flags (Windows).</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#getconsoleoutputcp">getconsoleoutputcp ()</a></td>
-	<td class="summary">Gets the current console output code page (Windows).</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#getnonblock">getnonblock (fd)</a></td>
-	<td class="summary">Gets non-blocking mode status for a file (Posix).</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#isatty">isatty (file)</a></td>
-	<td class="summary">Checks if a file-handle is a TTY.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#listconsoleflags">listconsoleflags (fh)</a></td>
 	<td class="summary">Debug function for console flags (Windows).</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#listtermflags">listtermflags (fh)</a></td>
-	<td class="summary">Debug function for terminal flags (Posix).</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#readansi">readansi (timeout[, fsleep=system.sleep])</a></td>
-	<td class="summary">Reads a single key, if it is the start of ansi escape sequence then it reads
- the full sequence.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#readkey">readkey (timeout[, fsleep=system.sleep])</a></td>
-	<td class="summary">Reads a single byte from the console, with a timeout.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#setconsolecp">setconsolecp (cp)</a></td>
-	<td class="summary">Sets the current console code page (Windows).</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#setconsoleflags">setconsoleflags (file, bitflags)</a></td>
 	<td class="summary">Sets the console flags (Windows).</td>
 	</tr>
+</table>
+<h2><a href="#Terminal_Posix">Terminal_Posix</a></h2>
+<table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#setconsoleoutputcp">setconsoleoutputcp (cp)</a></td>
-	<td class="summary">Sets the current console output code page (Windows).</td>
+	<td class="name" nowrap><a href="#detachfds">detachfds ()</a></td>
+	<td class="summary">Creates new file descriptions for <code>stdout</code> and <code>stderr</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getnonblock">getnonblock (fd)</a></td>
+	<td class="summary">Gets non-blocking mode status for a file (Posix).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#listtermflags">listtermflags (fh)</a></td>
+	<td class="summary">Debug function for terminal flags (Posix).</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#setnonblock">setnonblock (fd, make_non_block)</a></td>
@@ -188,21 +166,44 @@
 	<td class="name" nowrap><a href="#tcsetattr">tcsetattr (fd, actions, termios)</a></td>
 	<td class="summary">Set termios state (Posix).</td>
 	</tr>
+</table>
+<h2><a href="#Terminal_Input">Terminal_Input</a></h2>
+<table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#termbackup">termbackup ()</a></td>
-	<td class="summary">Returns a backup of terminal settings for stdin/out/err.</td>
+	<td class="name" nowrap><a href="#_readkey">_readkey ()</a></td>
+	<td class="summary">Reads a key from the console non-blocking.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#termrestore">termrestore (backup)</a></td>
-	<td class="summary">Restores terminal settings from a backup</td>
+	<td class="name" nowrap><a href="#readansi">readansi (timeout[, fsleep=system.sleep])</a></td>
+	<td class="summary">Reads a single key, if it is the start of ansi escape sequence then it reads
+ the full sequence.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#termsize">termsize ()</a></td>
-	<td class="summary">Get the size of the terminal in rows and columns.</td>
+	<td class="name" nowrap><a href="#readkey">readkey (timeout[, fsleep=system.sleep])</a></td>
+	<td class="summary">Reads a single byte from the console, with a timeout.</td>
+	</tr>
+</table>
+<h2><a href="#Terminal_UTF_8">Terminal_UTF-8</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#CODEPAGE_UTF8">CODEPAGE_UTF8</a></td>
+	<td class="summary">UTF8 codepage.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#termwrap">termwrap (f)</a></td>
-	<td class="summary">Wraps a function to automatically restore terminal settings upon returning.</td>
+	<td class="name" nowrap><a href="#getconsolecp">getconsolecp ()</a></td>
+	<td class="summary">Gets the current console code page (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getconsoleoutputcp">getconsoleoutputcp ()</a></td>
+	<td class="summary">Gets the current console output code page (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setconsolecp">setconsolecp (cp)</a></td>
+	<td class="summary">Sets the current console code page (Windows).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setconsoleoutputcp">setconsoleoutputcp (cp)</a></td>
+	<td class="summary">Sets the current console output code page (Windows).</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#utf8cwidth">utf8cwidth (utf8_char)</a></td>
@@ -226,6 +227,25 @@
 	<tr>
 	<td class="name" nowrap><a href="#sleep">sleep (seconds[, precision=16])</a></td>
 	<td class="summary">Sleep without a busy loop.</td>
+	</tr>
+</table>
+<h2><a href="#Terminal_Backup">Terminal_Backup</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#autotermrestore">autotermrestore ()</a></td>
+	<td class="summary">Backs up terminal settings and restores them on application exit.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#termbackup">termbackup ()</a></td>
+	<td class="summary">Returns a backup of terminal settings for stdin/out/err.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#termrestore">termrestore (backup)</a></td>
+	<td class="summary">Restores terminal settings from a backup</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#termwrap">termwrap (f)</a></td>
+	<td class="summary">Wraps a function to automatically restore terminal settings upon returning.</td>
 	</tr>
 </table>
 
@@ -403,95 +423,66 @@ requested number of bytes, or an error, never a partial result.
           </div>
     <dl class="function">
     <dt>
-    <a name = "CODEPAGE_UTF8"></a>
-    <strong>CODEPAGE_UTF8</strong>
+    <a name = "isatty"></a>
+    <strong>isatty (file)</strong>
     </dt>
     <dd>
-    UTF8 codepage.
- To be used with <a href="../modules/system.html#setconsoleoutputcp">system.setconsoleoutputcp</a> and <a href="../modules/system.html#setconsolecp">system.setconsolecp</a>.
+    Checks if a file-handle is a TTY.
 
 
+    <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">CODEPAGE_UTF8</span>
-         The Windows CodePage for UTF8.
+        <li><span class="parameter">file</span>
+            <span class="types"><span class="type">file</span></span>
+         the file-handle to check, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>.
         </li>
     </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "_readkey"></a>
-    <strong>_readkey ()</strong>
-    </dt>
-    <dd>
-    Reads a key from the console non-blocking.  This function should not be called
-directly, but through the <a href="../modules/system.html#readkey">system.readkey</a> or <a href="../modules/system.html#readansi">system.readansi</a> functions. It
-will return the next byte from the input stream, or <code>nil</code> if no key was pressed.</p>
-
-<p>On Posix, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a> must be set to non-blocking mode using <a href="../modules/system.html#setnonblock">setnonblock</a>
-and canonical mode must be turned off using <a href="../modules/system.html#tcsetattr">tcsetattr</a>,
-before calling this function. Otherwise it will block. No conversions are
-done on Posix, so the byte read is returned as-is.</p>
-
-<p>On Windows this reads a wide character and converts it to UTF-8. Multi-byte
-sequences will be buffered internally and returned one byte at a time.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">integer</span></span>
-        the byte read from the input stream
-    </ol>
-     <h3>Or</h3>
-    <ol>
-
-           <span class="types"><span class="type">nil</span></span>
-        if no key was pressed
-    </ol>
-     <h3>Or</h3>
-    <ol>
-        <li>
-           <span class="types"><span class="type">nil</span></span>
-        on error</li>
-        <li>
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        error message</li>
-        <li>
-           <span class="types"><span class="type">int</span></span>
-        errnum (on posix)</li>
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "autotermrestore"></a>
-    <strong>autotermrestore ()</strong>
-    </dt>
-    <dd>
-    Backs up terminal settings and restores them on application exit.
- Calls <a href="../modules/system.html#termbackup">termbackup</a> to back up terminal settings and sets up a GC method to
- automatically restore them on application exit (also works on Lua 5.1).
-
-
 
     <h3>Returns:</h3>
     <ol>
 
            <span class="types"><span class="type">boolean</span></span>
-        true
+        true if the file is a tty
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> system = <span class="global">require</span>(<span class="string">'system'</span>)
+<span class="keyword">if</span> system.<span class="function-name">isatty</span>(<span class="global">io</span>.stdin) <span class="keyword">then</span>
+    <span class="comment">-- enable ANSI coloring etc on Windows, does nothing in Posix.
+</span>    <span class="keyword">local</span> flags = system.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout)
+    system.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdout, flags + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "termsize"></a>
+    <strong>termsize ()</strong>
+    </dt>
+    <dd>
+    Get the size of the terminal in rows and columns.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        the number of rows</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        the number of columns</li>
     </ol>
      <h3>Or</h3>
     <ol>
         <li>
            <span class="types"><span class="type">nil</span></span>
-        if the backup was already created</li>
+
+
+</li>
         <li>
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
         error message</li>
@@ -501,60 +492,10 @@ sequences will be buffered internally and returned one byte at a time.
 
 
 </dd>
-    <dt>
-    <a name = "detachfds"></a>
-    <strong>detachfds ()</strong>
-    </dt>
-    <dd>
-    Creates new file descriptions for <code>stdout</code> and <code>stderr</code>.
-Even if the file descriptors are unique, they still might point to the same
-file description, and hence share settings like <code>O_NONBLOCK</code>. This means that
-if one of them is set to non-blocking, the other will be as well. This can
-lead to unexpected behavior.</p>
+</dl>
+    <h2 class="section-header "><a name="Terminal_Windows"></a>Terminal_Windows</h2>
 
-<p>This function is used to detach <code>stdout</code> and <code>stderr</code> from the original
-file descriptions, and create new file descriptions for them. This allows
-independent control of flags (e.g., <code>O_NONBLOCK</code>) on <code>stdout</code> and <code>stderr</code>,
-avoiding shared side effects.</p>
-
-<p>Does not modify <code>stdin</code> (fd 0), and does nothing on Windows.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-        boolean <code>true</code> on success, or throws an error on failure.
-    </ol>
-
-
-    <h3>See also:</h3>
-    <ul>
-         <a href="../modules/system.html#setnonblock">setnonblock</a>
-    </ul>
-
-
-</dd>
-    <dt>
-    <a name = "getconsolecp"></a>
-    <strong>getconsolecp ()</strong>
-    </dt>
-    <dd>
-    Gets the current console code page (Windows).
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        the current code page (always 65001 on Posix systems)
-    </ol>
-
-
-
-
-</dd>
+    <dl class="function">
     <dt>
     <a name = "getconsoleflags"></a>
     <strong>getconsoleflags (file)</strong>
@@ -613,107 +554,6 @@ for more information on the flags.
 
 </dd>
     <dt>
-    <a name = "getconsoleoutputcp"></a>
-    <strong>getconsoleoutputcp ()</strong>
-    </dt>
-    <dd>
-    Gets the current console output code page (Windows).
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        the current code page (always 65001 on Posix systems)
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "getnonblock"></a>
-    <strong>getnonblock (fd)</strong>
-    </dt>
-    <dd>
-    Gets non-blocking mode status for a file (Posix).
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">fd</span>
-            <span class="types"><span class="type">file</span></span>
-         file handle to operate on, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        <code>true</code> if set to non-blocking, <code>false</code> if not. Always returns <code>false</code> on Windows.
-    </ol>
-     <h3>Or</h3>
-    <ol>
-        <li>
-           <span class="types"><span class="type">nil</span></span>
-
-
-</li>
-        <li>
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        error message</li>
-        <li>
-           <span class="types"><span class="type">int</span></span>
-        errnum</li>
-    </ol>
-
-
-    <h3>See also:</h3>
-    <ul>
-         <a href="../modules/system.html#setnonblock">setnonblock</a>
-    </ul>
-
-
-</dd>
-    <dt>
-    <a name = "isatty"></a>
-    <strong>isatty (file)</strong>
-    </dt>
-    <dd>
-    Checks if a file-handle is a TTY.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">file</span>
-            <span class="types"><span class="type">file</span></span>
-         the file-handle to check, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">boolean</span></span>
-        true if the file is a tty
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> system = <span class="global">require</span>(<span class="string">'system'</span>)
-<span class="keyword">if</span> system.<span class="function-name">isatty</span>(<span class="global">io</span>.stdin) <span class="keyword">then</span>
-    <span class="comment">-- enable ANSI coloring etc on Windows, does nothing in Posix.
-</span>    <span class="keyword">local</span> flags = system.<span class="function-name">getconsoleflags</span>(<span class="global">io</span>.stdout)
-    system.<span class="function-name">setconsoleflags</span>(<span class="global">io</span>.stdout, flags + sys.COF_VIRTUAL_TERMINAL_PROCESSING)
-<span class="keyword">end</span></pre>
-    </ul>
-
-</dd>
-    <dt>
     <a name = "listconsoleflags"></a>
     <strong>listconsoleflags (fh)</strong>
     </dt>
@@ -739,162 +579,6 @@ for more information on the flags.
 system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdout)
 system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stderr)</pre>
     </ul>
-
-</dd>
-    <dt>
-    <a name = "listtermflags"></a>
-    <strong>listtermflags (fh)</strong>
-    </dt>
-    <dd>
-    Debug function for terminal flags (Posix).
- Pretty prints the current flags set for the handle.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">fh</span>
-         file handle (<a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>)
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="comment">-- Print the flags for stdin/out/err
-</span>system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdin)
-system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdout)
-system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stderr)</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "readansi"></a>
-    <strong>readansi (timeout[, fsleep=system.sleep])</strong>
-    </dt>
-    <dd>
-    Reads a single key, if it is the start of ansi escape sequence then it reads
- the full sequence.  The key can be a multi-byte string in case of multibyte UTF-8 character.
- This function uses <a href="../modules/system.html#readkey">system.readkey</a>, and hence <code>fsleep</code> to wait until either a key is
- available or the timeout is reached.
- It returns immediately if a key is available or if <code>timeout</code> is less than or equal to <code>0</code>.
- In case of an ANSI sequence, it will return the full sequence as a string.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">timeout</span>
-            <span class="types"><span class="type">number</span></span>
-         the timeout in seconds.
-        </li>
-        <li><span class="parameter">fsleep</span>
-            <span class="types"><span class="type">function</span></span>
-         the function to call for sleeping.
-         (<em>default</em> system.sleep)
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-        <li>
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        the character that was received (can be multi-byte), or a complete ANSI sequence</li>
-        <li>
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        the type of input: <code>&quot;char&quot;</code> for a single key, <code>&quot;ansi&quot;</code> for an ANSI sequence</li>
-    </ol>
-     <h3>Or</h3>
-    <ol>
-        <li>
-           <span class="types"><span class="type">nil</span></span>
-        in case of an error</li>
-        <li>
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        error message; <code>&quot;timeout&quot;</code> if the timeout was reached.</li>
-        <li>
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         partial result in case of an error while reading a sequence, the sequence so far.
- The function retains its own internal buffer, so on the next call the incomplete buffer is used to
- complete the sequence.</li>
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "readkey"></a>
-    <strong>readkey (timeout[, fsleep=system.sleep])</strong>
-    </dt>
-    <dd>
-    Reads a single byte from the console, with a timeout.
- This function uses <code>fsleep</code> to wait until either a byte is available or the timeout is reached.
- The sleep period is exponentially backing off, starting at 0.0125 seconds, with a maximum of 0.2 seconds.
- It returns immediately if a byte is available or if <code>timeout</code> is less than or equal to <code>0</code>.</p>
-
-<p> Using <a href="../modules/system.html#readansi">system.readansi</a> is preferred over this function. Since this function can leave stray/invalid
- byte-sequences in the input buffer, while <a href="../modules/system.html#readansi">system.readansi</a> reads full ANSI and UTF8 sequences.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">timeout</span>
-            <span class="types"><span class="type">number</span></span>
-         the timeout in seconds.
-        </li>
-        <li><span class="parameter">fsleep</span>
-            <span class="types"><span class="type">function</span></span>
-         the function to call for sleeping; <code>ok, err = fsleep(secs)</code>
-         (<em>default</em> system.sleep)
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">byte</span></span>
-        the byte value that was read.
-    </ol>
-     <h3>Or</h3>
-    <ol>
-        <li>
-           <span class="types"><span class="type">nil</span></span>
-        if no key was read</li>
-        <li>
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        error message when the timeout was reached (<code>&quot;timeout&quot;</code>), or if <a href="../modules/system.html#sleep">sleep</a> failed.</li>
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "setconsolecp"></a>
-    <strong>setconsolecp (cp)</strong>
-    </dt>
-    <dd>
-    Sets the current console code page (Windows).
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">cp</span>
-            <span class="types"><span class="type">int</span></span>
-         the code page to set, use <a href="../modules/system.html#CODEPAGE_UTF8">system.CODEPAGE_UTF8</a> (65001) for UTF-8
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        <code>true</code> on success (always <code>true</code> on Posix systems)
-    </ol>
-
-
-
 
 </dd>
     <dt>
@@ -958,19 +642,57 @@ system.<span class="function-name">listconsoleflags</span>(<span class="global">
     </ul>
 
 </dd>
+</dl>
+    <h2 class="section-header "><a name="Terminal_Posix"></a>Terminal_Posix</h2>
+
+    <dl class="function">
     <dt>
-    <a name = "setconsoleoutputcp"></a>
-    <strong>setconsoleoutputcp (cp)</strong>
+    <a name = "detachfds"></a>
+    <strong>detachfds ()</strong>
     </dt>
     <dd>
-    Sets the current console output code page (Windows).
+    Creates new file descriptions for <code>stdout</code> and <code>stderr</code>.
+Even if the file descriptors are unique, they still might point to the same
+file description, and hence share settings like <code>O_NONBLOCK</code>. This means that
+if one of them is set to non-blocking, the other will be as well. This can
+lead to unexpected behavior.</p>
+
+<p>This function is used to detach <code>stdout</code> and <code>stderr</code> from the original
+file descriptions, and create new file descriptions for them. This allows
+independent control of flags (e.g., <code>O_NONBLOCK</code>) on <code>stdout</code> and <code>stderr</code>,
+avoiding shared side effects.</p>
+
+<p>Does not modify <code>stdin</code> (fd 0), and does nothing on Windows.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean <code>true</code> on success, or throws an error on failure.
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/system.html#setnonblock">setnonblock</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "getnonblock"></a>
+    <strong>getnonblock (fd)</strong>
+    </dt>
+    <dd>
+    Gets non-blocking mode status for a file (Posix).
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">cp</span>
-            <span class="types"><span class="type">int</span></span>
-         the code page to set, use <a href="../modules/system.html#CODEPAGE_UTF8">system.CODEPAGE_UTF8</a> (65001) for UTF-8
+        <li><span class="parameter">fd</span>
+            <span class="types"><span class="type">file</span></span>
+         file handle to operate on, one of <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>
         </li>
     </ul>
 
@@ -978,11 +700,57 @@ system.<span class="function-name">listconsoleflags</span>(<span class="global">
     <ol>
 
            <span class="types"><span class="type">bool</span></span>
-        <code>true</code> on success (always <code>true</code> on Posix systems)
+        <code>true</code> if set to non-blocking, <code>false</code> if not. Always returns <code>false</code> on Windows.
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+
+
+</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        errnum</li>
     </ol>
 
 
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/system.html#setnonblock">setnonblock</a>
+    </ul>
 
+
+</dd>
+    <dt>
+    <a name = "listtermflags"></a>
+    <strong>listtermflags (fh)</strong>
+    </dt>
+    <dd>
+    Debug function for terminal flags (Posix).
+ Pretty prints the current flags set for the handle.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fh</span>
+         file handle (<a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdout">io.stdout</a>, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stderr">io.stderr</a>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- Print the flags for stdin/out/err
+</span>system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdin)
+system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stdout)
+system.<span class="function-name">listconsoleflags</span>(<span class="global">io</span>.stderr)</pre>
+    </ul>
 
 </dd>
     <dt>
@@ -1198,82 +966,52 @@ flags for the <code>iflags</code>, <code>oflags</code>, and <code>lflags</code> 
     </ul>
 
 </dd>
+</dl>
+    <h2 class="section-header "><a name="Terminal_Input"></a>Terminal_Input</h2>
+
+    <dl class="function">
     <dt>
-    <a name = "termbackup"></a>
-    <strong>termbackup ()</strong>
+    <a name = "_readkey"></a>
+    <strong>_readkey ()</strong>
     </dt>
     <dd>
-    Returns a backup of terminal settings for stdin/out/err.
- Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
- Backs up terminal/console flags only if a stream is a tty.
+    Reads a key from the console non-blocking.  This function should not be called
+directly, but through the <a href="../modules/system.html#readkey">system.readkey</a> or <a href="../modules/system.html#readansi">system.readansi</a> functions. It
+will return the next byte from the input stream, or <code>nil</code> if no key was pressed.</p>
+
+<p>On Posix, <a href="https://www.lua.org/manual/5.4/manual.html#pdf-io.stdin">io.stdin</a> must be set to non-blocking mode using <a href="../modules/system.html#setnonblock">setnonblock</a>
+and canonical mode must be turned off using <a href="../modules/system.html#tcsetattr">tcsetattr</a>,
+before calling this function. Otherwise it will block. No conversions are
+done on Posix, so the byte read is returned as-is.</p>
+
+<p>On Windows this reads a wide character and converts it to UTF-8. Multi-byte
+sequences will be buffered internally and returned one byte at a time.
 
 
 
     <h3>Returns:</h3>
     <ol>
 
-        table with backup of terminal settings
+           <span class="types"><span class="type">integer</span></span>
+        the byte read from the input stream
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "termrestore"></a>
-    <strong>termrestore (backup)</strong>
-    </dt>
-    <dd>
-    Restores terminal settings from a backup
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">backup</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         the backup of terminal settings, see <a href="../modules/system.html#termbackup">termbackup</a>.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
+     <h3>Or</h3>
     <ol>
 
-           <span class="types"><span class="type">boolean</span></span>
-        true
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "termsize"></a>
-    <strong>termsize ()</strong>
-    </dt>
-    <dd>
-    Get the size of the terminal in rows and columns.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-        <li>
-           <span class="types"><span class="type">int</span></span>
-        the number of rows</li>
-        <li>
-           <span class="types"><span class="type">int</span></span>
-        the number of columns</li>
+           <span class="types"><span class="type">nil</span></span>
+        if no key was pressed
     </ol>
      <h3>Or</h3>
     <ol>
         <li>
            <span class="types"><span class="type">nil</span></span>
-
-
-</li>
+        on error</li>
         <li>
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
         error message</li>
+        <li>
+           <span class="types"><span class="type">int</span></span>
+        errnum (on posix)</li>
     </ol>
 
 
@@ -1281,27 +1019,218 @@ flags for the <code>iflags</code>, <code>oflags</code>, and <code>lflags</code> 
 
 </dd>
     <dt>
-    <a name = "termwrap"></a>
-    <strong>termwrap (f)</strong>
+    <a name = "readansi"></a>
+    <strong>readansi (timeout[, fsleep=system.sleep])</strong>
     </dt>
     <dd>
-    Wraps a function to automatically restore terminal settings upon returning.
- Calls <a href="../modules/system.html#termbackup">termbackup</a> before calling the function and <a href="../modules/system.html#termrestore">termrestore</a> after.
+    Reads a single key, if it is the start of ansi escape sequence then it reads
+ the full sequence.  The key can be a multi-byte string in case of multibyte UTF-8 character.
+ This function uses <a href="../modules/system.html#readkey">system.readkey</a>, and hence <code>fsleep</code> to wait until either a key is
+ available or the timeout is reached.
+ It returns immediately if a key is available or if <code>timeout</code> is less than or equal to <code>0</code>.
+ In case of an ANSI sequence, it will return the full sequence as a string.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">f</span>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">number</span></span>
+         the timeout in seconds.
+        </li>
+        <li><span class="parameter">fsleep</span>
             <span class="types"><span class="type">function</span></span>
-         function to wrap
+         the function to call for sleeping.
+         (<em>default</em> system.sleep)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        the character that was received (can be multi-byte), or a complete ANSI sequence</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        the type of input: <code>&quot;char&quot;</code> for a single key, <code>&quot;ansi&quot;</code> for an ANSI sequence</li>
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+        in case of an error</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message; <code>&quot;timeout&quot;</code> if the timeout was reached.</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         partial result in case of an error while reading a sequence, the sequence so far.
+ The function retains its own internal buffer, so on the next call the incomplete buffer is used to
+ complete the sequence.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "readkey"></a>
+    <strong>readkey (timeout[, fsleep=system.sleep])</strong>
+    </dt>
+    <dd>
+    Reads a single byte from the console, with a timeout.
+ This function uses <code>fsleep</code> to wait until either a byte is available or the timeout is reached.
+ The sleep period is exponentially backing off, starting at 0.0125 seconds, with a maximum of 0.2 seconds.
+ It returns immediately if a byte is available or if <code>timeout</code> is less than or equal to <code>0</code>.</p>
+
+<p> Using <a href="../modules/system.html#readansi">system.readansi</a> is preferred over this function. Since this function can leave stray/invalid
+ byte-sequences in the input buffer, while <a href="../modules/system.html#readansi">system.readansi</a> reads full ANSI and UTF8 sequences.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">number</span></span>
+         the timeout in seconds.
+        </li>
+        <li><span class="parameter">fsleep</span>
+            <span class="types"><span class="type">function</span></span>
+         the function to call for sleeping; <code>ok, err = fsleep(secs)</code>
+         (<em>default</em> system.sleep)
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">function</span></span>
-        wrapped function
+           <span class="types"><span class="type">byte</span></span>
+        the byte value that was read.
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+        if no key was read</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message when the timeout was reached (<code>&quot;timeout&quot;</code>), or if <a href="../modules/system.html#sleep">sleep</a> failed.</li>
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Terminal_UTF_8"></a>Terminal_UTF-8</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "CODEPAGE_UTF8"></a>
+    <strong>CODEPAGE_UTF8</strong>
+    </dt>
+    <dd>
+    UTF8 codepage.
+ To be used with <a href="../modules/system.html#setconsoleoutputcp">system.setconsoleoutputcp</a> and <a href="../modules/system.html#setconsolecp">system.setconsolecp</a>.
+
+
+    <ul>
+        <li><span class="parameter">CODEPAGE_UTF8</span>
+         The Windows CodePage for UTF8.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getconsolecp"></a>
+    <strong>getconsolecp ()</strong>
+    </dt>
+    <dd>
+    Gets the current console code page (Windows).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the current code page (always 65001 on Posix systems)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getconsoleoutputcp"></a>
+    <strong>getconsoleoutputcp ()</strong>
+    </dt>
+    <dd>
+    Gets the current console output code page (Windows).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the current code page (always 65001 on Posix systems)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setconsolecp"></a>
+    <strong>setconsolecp (cp)</strong>
+    </dt>
+    <dd>
+    Sets the current console code page (Windows).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cp</span>
+            <span class="types"><span class="type">int</span></span>
+         the code page to set, use <a href="../modules/system.html#CODEPAGE_UTF8">system.CODEPAGE_UTF8</a> (65001) for UTF-8
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>true</code> on success (always <code>true</code> on Posix systems)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setconsoleoutputcp"></a>
+    <strong>setconsoleoutputcp (cp)</strong>
+    </dt>
+    <dd>
+    Sets the current console output code page (Windows).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cp</span>
+            <span class="types"><span class="type">int</span></span>
+         the code page to set, use <a href="../modules/system.html#CODEPAGE_UTF8">system.CODEPAGE_UTF8</a> (65001) for UTF-8
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>true</code> on success (always <code>true</code> on Posix systems)
     </ol>
 
 
@@ -1463,13 +1392,124 @@ This function will sleep, without doing a busy-loop and wasting CPU cycles.
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Terminal_Backup"></a>Terminal_Backup</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "autotermrestore"></a>
+    <strong>autotermrestore ()</strong>
+    </dt>
+    <dd>
+    Backs up terminal settings and restores them on application exit.
+ Calls <a href="../modules/system.html#termbackup">termbackup</a> to back up terminal settings and sets up a GC method to
+ automatically restore them on application exit (also works on Lua 5.1).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        true
+    </ol>
+     <h3>Or</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">nil</span></span>
+        if the backup was already created</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        error message</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "termbackup"></a>
+    <strong>termbackup ()</strong>
+    </dt>
+    <dd>
+    Returns a backup of terminal settings for stdin/out/err.
+ Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
+ Backs up terminal/console flags only if a stream is a tty.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table with backup of terminal settings
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "termrestore"></a>
+    <strong>termrestore (backup)</strong>
+    </dt>
+    <dd>
+    Restores terminal settings from a backup
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">backup</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         the backup of terminal settings, see <a href="../modules/system.html#termbackup">termbackup</a>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        true
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "termwrap"></a>
+    <strong>termwrap (f)</strong>
+    </dt>
+    <dd>
+    Wraps a function to automatically restore terminal settings upon returning.
+ Calls <a href="../modules/system.html#termbackup">termbackup</a> before calling the function and <a href="../modules/system.html#termrestore">termrestore</a> after.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         function to wrap
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">function</span></span>
+        wrapped function
+    </ol>
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2025-04-15 13:14:45 </i>
+<i style="float:right;">Last updated 2025-04-17 09:50:39 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
