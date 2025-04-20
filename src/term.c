@@ -384,6 +384,7 @@ See [setconsolemode documentation](https://learn.microsoft.com/en-us/windows/con
 @treturn[1] boolean `true` on success
 @treturn[2] nil
 @treturn[2] string error message
+@within Terminal_Windows
 @usage
 local system = require('system')
 system.listconsoleflags(io.stdout) -- List all the available flags and their current status
@@ -427,13 +428,12 @@ input flags (for use with `io.stdin`) and `COF` are the output flags (for use wi
 _Note_: See [setconsolemode documentation](https://learn.microsoft.com/en-us/windows/console/setconsolemode)
 for more information on the flags.
 
-
-
 @function getconsoleflags
 @tparam file file file handle to operate on, one of `io.stdin`, `io.stdout`, `io.stderr`
 @treturn[1] bitflags the current console flags.
 @treturn[2] nil
 @treturn[2] string error message
+@within Terminal_Windows
 @usage
 local system = require('system')
 
@@ -497,6 +497,7 @@ The terminal attributes is a table with the following fields:
 @treturn[2] string error message
 @treturn[2] int errnum
 @return error message if failed
+@within Terminal_Posix
 @usage
 local system = require('system')
 
@@ -591,6 +592,7 @@ _Note_: only `iflag`, `oflag`, and `lflag` are supported at the moment. The othe
 @return[2] nil
 @treturn[2] string error message
 @treturn[2] int errnum
+@within Terminal_Posix
 @usage
 local system = require('system')
 
@@ -721,6 +723,7 @@ avoiding shared side effects.
 Does not modify `stdin` (fd 0), and does nothing on Windows.
 @function detachfds
 @return boolean `true` on success, or throws an error on failure.
+@within Terminal_Posix
 @see setnonblock
 */
 static int lst_detachfds(lua_State *L) {
@@ -754,6 +757,7 @@ Check `detachfds` in case there are shared file descriptions.
 @treturn[2] nil
 @treturn[2] string error message
 @treturn[2] int errnum
+@within Terminal_Posix
 @see getnonblock
 @see detachfds
 @usage
@@ -815,6 +819,7 @@ Gets non-blocking mode status for a file (Posix).
 @treturn[2] nil
 @treturn[2] string error message
 @treturn[2] int errnum
+@within Terminal_Posix
 @see setnonblock
 */
 static int lst_getnonblock(lua_State *L)
@@ -882,6 +887,7 @@ sequences will be buffered internally and returned one byte at a time.
 @treturn[3] nil on error
 @treturn[3] string error message
 @treturn[3] int errnum (on posix)
+@within Terminal_Input
 */
 static int lst_readkey(lua_State *L) {
 #ifdef _WIN32
@@ -1071,6 +1077,7 @@ Get the width of a utf8 character for terminal display.
 @treturn[1] int the display width in columns of the first character in the string (0 for an empty string)
 @treturn[2] nil
 @treturn[2] string error message
+@within Terminal_UTF-8
 */
 int lst_utf8cwidth(lua_State *L) {
     int width = 0;
@@ -1132,6 +1139,7 @@ Get the width of a utf8 string for terminal display.
 @treturn[1] int the display width of the string in columns (0 for an empty string)
 @treturn[2] nil
 @treturn[2] string error message
+@within Terminal_UTF-8
 */
 int lst_utf8swidth(lua_State *L) {
     const char *utf8_str;
@@ -1182,6 +1190,7 @@ int lst_utf8swidth(lua_State *L) {
 Gets the current console code page (Windows).
 @function getconsolecp
 @treturn[1] int the current code page (always 65001 on Posix systems)
+@within Terminal_UTF-8
 */
 static int lst_getconsolecp(lua_State *L) {
     unsigned int cp = 65001;
@@ -1199,6 +1208,7 @@ Sets the current console code page (Windows).
 @function setconsolecp
 @tparam int cp the code page to set, use `system.CODEPAGE_UTF8` (65001) for UTF-8
 @treturn[1] bool `true` on success (always `true` on Posix systems)
+@within Terminal_UTF-8
 */
 static int lst_setconsolecp(lua_State *L) {
     unsigned int cp = (unsigned int)luaL_checkinteger(L, 1);
@@ -1216,6 +1226,7 @@ static int lst_setconsolecp(lua_State *L) {
 Gets the current console output code page (Windows).
 @function getconsoleoutputcp
 @treturn[1] int the current code page (always 65001 on Posix systems)
+@within Terminal_UTF-8
 */
 static int lst_getconsoleoutputcp(lua_State *L) {
     unsigned int cp = 65001;
@@ -1233,6 +1244,7 @@ Sets the current console output code page (Windows).
 @function setconsoleoutputcp
 @tparam int cp the code page to set, use `system.CODEPAGE_UTF8` (65001) for UTF-8
 @treturn[1] bool `true` on success (always `true` on Posix systems)
+@within Terminal_UTF-8
 */
 static int lst_setconsoleoutputcp(lua_State *L) {
     unsigned int cp = (unsigned int)luaL_checkinteger(L, 1);

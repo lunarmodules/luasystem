@@ -10,6 +10,7 @@ local system = require 'system.core'
 --- UTF8 codepage.
 -- To be used with `system.setconsoleoutputcp` and `system.setconsolecp`.
 -- @field CODEPAGE_UTF8 The Windows CodePage for UTF8.
+-- @within Terminal_UTF-8
 system.CODEPAGE_UTF8 = 65001
 
 do
@@ -19,6 +20,7 @@ do
   -- Handles terminal/console flags, Windows codepage, and non-block flags on the streams.
   -- Backs up terminal/console flags only if a stream is a tty.
   -- @return table with backup of terminal settings
+  -- @within Terminal_Backup
   function system.termbackup()
     local backup = {
       __type = backup_indicator, -- cannot set a metatable, since autotermrestore uses it for GC
@@ -52,6 +54,7 @@ do
   --- Restores terminal settings from a backup
   -- @tparam table backup the backup of terminal settings, see `termbackup`.
   -- @treturn boolean true
+  -- @within Terminal_Backup
   function system.termrestore(backup)
     if type(backup) ~= "table" or backup.__type ~= backup_indicator then
       error("arg #1 to termrestore, expected backup table, got " .. type(backup), 2)
@@ -108,6 +111,7 @@ do -- autotermrestore
   -- @treturn[1] boolean true
   -- @treturn[2] nil if the backup was already created
   -- @treturn[2] string error message
+  -- @within Terminal_Backup
   function system.autotermrestore()
     if global_backup then
       return nil, "global terminal backup was already set up"
@@ -136,6 +140,7 @@ do
   -- Calls `termbackup` before calling the function and `termrestore` after.
   -- @tparam function f function to wrap
   -- @treturn function wrapped function
+  -- @within Terminal_Backup
   function system.termwrap(f)
     if type(f) ~= "function" then
       error("arg #1 to wrap, expected function, got " .. type(f), 2)
@@ -155,6 +160,7 @@ end
 --- Debug function for console flags (Windows).
 -- Pretty prints the current flags set for the handle.
 -- @param fh file handle (`io.stdin`, `io.stdout`, `io.stderr`)
+-- @within Terminal_Windows
 -- @usage -- Print the flags for stdin/out/err
 -- system.listconsoleflags(io.stdin)
 -- system.listconsoleflags(io.stdout)
@@ -194,6 +200,7 @@ end
 --- Debug function for terminal flags (Posix).
 -- Pretty prints the current flags set for the handle.
 -- @param fh file handle (`io.stdin`, `io.stdout`, `io.stderr`)
+-- @within Terminal_Posix
 -- @usage -- Print the flags for stdin/out/err
 -- system.listconsoleflags(io.stdin)
 -- system.listconsoleflags(io.stdout)
@@ -242,6 +249,7 @@ do
   -- @treturn[1] byte the byte value that was read.
   -- @treturn[2] nil if no key was read
   -- @treturn[2] string error message when the timeout was reached (`"timeout"`), or if `sleep` failed.
+  -- @within Terminal_Input
   function system.readkey(timeout, fsleep)
     if type(timeout) ~= "number" then
       error("arg #1 to readkey, expected timeout in seconds, got " .. type(timeout), 2)
@@ -288,6 +296,7 @@ do
   -- @treturn[2] string partial result in case of an error while reading a sequence, the sequence so far.
   -- The function retains its own internal buffer, so on the next call the incomplete buffer is used to
   -- complete the sequence.
+  -- @within Terminal_Input
   function system.readansi(timeout, fsleep)
     if type(timeout) ~= "number" then
       error("arg #1 to readansi, expected timeout in seconds, got " .. type(timeout), 2)
