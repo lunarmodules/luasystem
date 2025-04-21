@@ -27,9 +27,13 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### version x.x.x, unreleased
+
+- Fix: maximum key-delay, reduced from 0.2 to 0.1 seconds to reduce slugginess feel on some key presses.
+
 ### version 0.6.2, released 15-Apr-2025
 
- - Fix: autotermrestore didn't work because its metatable was overwritten.
+- Fix: autotermrestore didn't work because its metatable was overwritten.
 
 ### version 0.6.1, released 13-Apr-2025
 

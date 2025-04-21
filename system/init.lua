@@ -239,7 +239,7 @@ end
 do
   --- Reads a single byte from the console, with a timeout.
   -- This function uses `fsleep` to wait until either a byte is available or the timeout is reached.
-  -- The sleep period is exponentially backing off, starting at 0.0125 seconds, with a maximum of 0.2 seconds.
+  -- The sleep period is exponentially backing off, starting at 0.0125 seconds, with a maximum of 0.1 seconds.
   -- It returns immediately if a byte is available or if `timeout` is less than or equal to `0`.
   --
   -- Using `system.readansi` is preferred over this function. Since this function can leave stray/invalid
@@ -263,7 +263,7 @@ do
         return nil, err
       end
       timeout = timeout - interval
-      interval = math.min(0.2, interval * 2)
+      interval = math.min(0.1, interval * 2)
       key = system._readkey()
     end
 
