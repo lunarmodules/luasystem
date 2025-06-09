@@ -902,6 +902,14 @@ describe("Terminal:", function()
       end)
 
 
+      it("reads a control byte for single-byte control characters", function()
+        setbuffer("\000\031\127")
+        assert.are.same({"\000", "ctrl"}, {system.readansi(0)})
+        assert.are.same({"\031", "ctrl"}, {system.readansi(0)})
+        assert.are.same({"\127", "ctrl"}, {system.readansi(0)})
+      end)
+
+
       it("reads a multi-byte characters one at a time", function()
         setbuffer(string.char(226, 130, 172) ..        -- "€"   single
                   string.char(240, 159, 154, 128))     -- "🚀"  double
@@ -952,7 +960,7 @@ describe("Terminal:", function()
 
       it("returns a single <esc> character if no sequence is found", function()
         setbuffer("\27")
-        assert.are.same({"\27", "char"}, {system.readansi(0)})
+        assert.are.same({"\27", "ctrl"}, {system.readansi(0)})
       end)
 
 
