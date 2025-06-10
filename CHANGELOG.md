@@ -30,6 +30,7 @@ The scope of what is covered by the version number excludes:
 ### version x.x.x, unreleased
 
 - Fix: maximum key-delay, reduced from 0.2 to 0.1 seconds to reduce slugginess feel on some key presses.
+- Fix: `readansi` now only reports printable chars as characters
 
 ### version 0.6.2, released 15-Apr-2025
 
