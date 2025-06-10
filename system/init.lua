@@ -290,13 +290,20 @@ do
   -- @tparam number timeout the timeout in seconds.
   -- @tparam[opt=system.sleep] function fsleep the function to call for sleeping.
   -- @treturn[1] string the character that was received (can be multi-byte), or a complete ANSI sequence
-  -- @treturn[1] string the type of input: `"char"` for a single key, `"ansi"` for an ANSI sequence
+  -- @treturn[1] string the type of input: `"ctrl"` for 0-31 and 127 bytes, `"char"` for other UTF-8 characters, `"ansi"` for an ANSI sequence
   -- @treturn[2] nil in case of an error
   -- @treturn[2] string error message; `"timeout"` if the timeout was reached.
   -- @treturn[2] string partial result in case of an error while reading a sequence, the sequence so far.
   -- The function retains its own internal buffer, so on the next call the incomplete buffer is used to
   -- complete the sequence.
   -- @within Terminal_Input
+  -- @usage
+  -- local key, keytype = system.readansi(5)
+  -- if keytype == "char" then ... end -- printable character
+  -- if keytype ~= "char" then ... end -- non-printable character or sequence
+  -- if keytype == "ansi" then ... end -- a multi-byte sequence, but not a UTF8 character
+  -- if keytype ~= "ansi" then ... end -- a valid UTF8 character (which includes control characters)
+  -- if keytype == "ctrl" then ... end -- a single-byte ctrl character (0-31, 127)
   function system.readansi(timeout, fsleep)
     if type(timeout) ~= "number" then
       error("arg #1 to readansi, expected timeout in seconds, got " .. type(timeout), 2)
@@ -320,7 +327,7 @@ do
         if key2 == nil then
           -- no key available, return the escape key, on its own
           sequence = nil
-          return string.char(key), "char"
+          return string.char(key), "ctrl"
 
         elseif key2 == 91 then
           -- "[" means it is for sure an ANSI sequence
@@ -351,10 +358,10 @@ do
       else
         -- check UTF8 length
         utf8_length = key < 128 and 1 or key < 224 and 2 or key < 240 and 3 or key < 248 and 4
-        if utf8_length  == 1 then
+        if utf8_length == 1 then
           -- single byte character
           utf8_length = nil
-          return string.char(key), "char"
+          return string.char(key), ((key <= 31 or key == 127) and "ctrl" or "char")
         else
           -- UTF8 sequence detected
           sequence = { key }
