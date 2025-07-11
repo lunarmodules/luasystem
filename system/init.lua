@@ -256,19 +256,23 @@ do
     end
 
     local interval = 0.0125
-    local key = system._readkey()
+    local ok
+    local key, err = system._readkey()
     while key == nil and timeout > 0 do
-      local ok, err = (fsleep or system.sleep)(math.min(interval, timeout))
+      if err then
+        return nil, err
+      end
+      ok, err = (fsleep or system.sleep)(math.min(interval, timeout))
       if not ok then
         return nil, err
       end
       timeout = timeout - interval
       interval = math.min(0.1, interval * 2)
-      key = system._readkey()
+      key, err = system._readkey()
     end
 
-    if key then
-      return key
+    if key or err then
+      return key, err
     end
     return nil, "timeout"
   end
