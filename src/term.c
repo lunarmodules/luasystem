@@ -908,7 +908,18 @@ static int lst_readkey(lua_State *L) {
     }
 
     wchar_t wc = _getwch();
-    // printf("----\nread wchar_t: %x\n", wc);
+    // printf("----\nread wchar_t: %x\n", (unsigned int)wc);
+
+    if (wc == 0x00 || wc == 0xE0) {
+        // printf("Ignoring scan code: %x\n", (unsigned int)wc);
+        // On Windows, especially with key-repeat, we can get native scancodes even if we've set the console
+        // to ANSI mode. Something, something, terminal not keeping up... These are not valid wide characters,
+        // so we ignore them. Scan codes start with either 0x00 or 0xE0, and have a follow up byte, which we all ignore.
+        // These codes are unique, so we do not risk dropping valid data.
+        _getwch(); // Discard 2nd half of the scan code
+        return 0;
+    }
+
     if (wc == WEOF) {
         lua_pushnil(L);
         lua_pushliteral(L, "read error");
@@ -929,7 +940,7 @@ static int lst_readkey(lua_State *L) {
             }
 
             wchar_t wc2 = _getwch();
-            // printf("read wchar_t 2: %x\n", wc2);
+            // printf("read wchar_t 2: %x\n", (unsigned int)wc2);
             if (wc2 == WEOF) {
                 lua_pushnil(L);
                 lua_pushliteral(L, "read error");
