@@ -27,7 +27,7 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
-### version x.x.x, unreleased
+### version 0.6.3, released 11-Jul-2025
 
 - Fix: maximum key-delay, reduced from 0.2 to 0.1 seconds to reduce slugginess feel on some key presses.
   See [#69](https://github.com/lunarmodules/luasystem/pull/69).
