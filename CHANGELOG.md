@@ -30,7 +30,13 @@ The scope of what is covered by the version number excludes:
 ### version x.x.x, unreleased
 
 - Fix: maximum key-delay, reduced from 0.2 to 0.1 seconds to reduce slugginess feel on some key presses.
+  See [#69](https://github.com/lunarmodules/luasystem/pull/69).
 - Fix: `readansi` now only reports printable chars as characters
+  See [#70](https://github.com/lunarmodules/luasystem/pull/70).
+- Fix: readkey now ignores Windows scancodes if received.
+  See [#74](https://github.com/lunarmodules/luasystem/pull/74).
+- Fix: readkey now passes errors on.
+  See [#74](https://github.com/lunarmodules/luasystem/pull/74).
 
 ### version 0.6.2, released 15-Apr-2025
 
