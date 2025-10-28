@@ -60,7 +60,6 @@ static int lua_get_random_bytes(lua_State* L) {
         return 2;
     }
 
-    ssize_t n;
     ssize_t total_read = 0;
 
 #ifdef _WIN32
@@ -99,7 +98,7 @@ static int lua_get_random_bytes(lua_State* L) {
     }
 
     while (total_read < num_bytes) {
-        n = read(fd, buffer + total_read, num_bytes - total_read);
+        ssize_t n = read(fd, buffer + total_read, num_bytes - total_read);
 
         if (n < 0) {
             if (errno == EINTR) {
