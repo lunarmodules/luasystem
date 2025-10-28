@@ -1226,6 +1226,8 @@ static int lst_setconsolecp(lua_State *L) {
     int success = TRUE;
 #ifdef _WIN32
     SetConsoleCP(cp);
+#else
+    (void)cp;
 #endif
     lua_pushboolean(L, success);
     return 1;
@@ -1262,6 +1264,8 @@ static int lst_setconsoleoutputcp(lua_State *L) {
     int success = TRUE;
 #ifdef _WIN32
     SetConsoleOutputCP(cp);
+#else
+    (void)cp;
 #endif
     lua_pushboolean(L, success);
     return 1;
