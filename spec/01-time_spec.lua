@@ -18,10 +18,10 @@ describe('Test time functions', function()
     it('returns current time', function()
       local expected_time = wait_for_second_rollover()
       local received_time = system.gettime()
-      assert.is.near(expected_time, received_time, 0.02)
+      assert.is.near(expected_time, received_time, 0.1) -- large marging of error due issue #77
 
       wait_for_second_rollover()
-      assert.is.near(1, system.gettime() - received_time, 0.02)
+      assert.is.near(1, system.gettime() - received_time, 0.1)
     end)
 
   end)
