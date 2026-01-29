@@ -1085,6 +1085,7 @@ int utf8_to_wchar(const char *utf8, size_t len, mk_wchar_t *codepoint) {
 Get the width of a utf8 character for terminal display.
 @function utf8cwidth
 @tparam string|int utf8_char the utf8 character, or unicode codepoint, to check, only the width of the first character will be returned
+@tparam[opt=1] int ambiguous_width the width to return for ambiguous width characters (usually 1 or 2)
 @treturn[1] int the display width in columns of the first character in the string (0 for an empty string)
 @treturn[2] nil
 @treturn[2] string error message
@@ -1093,6 +1094,7 @@ Get the width of a utf8 character for terminal display.
 int lst_utf8cwidth(lua_State *L) {
     int width = 0;
     mk_wchar_t wc;
+    int ambiguous_width = luaL_optinteger(L, 2, 1);
 
     if (lua_type(L, 1) == LUA_TSTRING) {
         // Handle UTF8 as string input
@@ -1129,10 +1131,10 @@ int lst_utf8cwidth(lua_State *L) {
     }
 
     // Get the width of the wide character
-    width = mk_wcwidth(wc);
+    width = mk_wcwidth(wc, ambiguous_width);
     if (width == -1) {
         lua_pushnil(L);
-        lua_pushstring(L, "Character width determination failed");
+        lua_pushstring(L, "Control characters have no width");
         return 2;
     }
 
@@ -1147,6 +1149,7 @@ int lst_utf8cwidth(lua_State *L) {
 Get the width of a utf8 string for terminal display.
 @function utf8swidth
 @tparam string utf8_string the utf8 string to check
+@tparam[opt=1] int ambiguous_width the width to return for ambiguous width characters (1 or 2)
 @treturn[1] int the display width of the string in columns (0 for an empty string)
 @treturn[2] nil
 @treturn[2] string error message
@@ -1156,6 +1159,10 @@ int lst_utf8swidth(lua_State *L) {
     const char *utf8_str;
     size_t utf8_len;
     utf8_str = luaL_checklstring(L, 1, &utf8_len);
+    int ambiguous_width = luaL_optinteger(L, 2, 1);
+    if (ambiguous_width != 1 && ambiguous_width != 2) {
+        return luaL_argerror(L, 2, "Ambiguous width must be 1 or 2");
+    }
     int total_width = 0;
 
     if (utf8_len == 0) {
@@ -1175,10 +1182,10 @@ int lst_utf8swidth(lua_State *L) {
             return 2;
         }
 
-        int width = mk_wcwidth(wc);
+        int width = mk_wcwidth(wc, ambiguous_width);
         if (width == -1) {
             lua_pushnil(L);
-            lua_pushstring(L, "Character width determination failed");
+            lua_pushstring(L, "Control characters have no width");
             return 2;
         }
 

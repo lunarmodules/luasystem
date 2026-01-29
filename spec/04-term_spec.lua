@@ -512,21 +512,35 @@ describe("Terminal:", function()
   describe("utf8cwidth()", function()
 
     -- utf-8 strings
-    local ch1 = string.char(226, 130, 172)       -- "€"   single
+    local ch1 = string.char(65)                  -- "A"   single
     local ch2 = string.char(240, 159, 154, 128)  -- "🚀"  double
     local ch3 = string.char(228, 189, 160)       -- "你"  double
     local ch4 = string.char(229, 165, 189)       -- "好"  double
+    local ch5 = string.char(226, 130, 172)       -- "€"   ambiguous
 
     -- unicode codepoints
-    local cp1 = 8364    -- "€"   single
+    local cp1 = 65      -- "A"   single
     local cp2 = 128640  -- "🚀"  double
     local cp3 = 20320   -- "你"  double
     local cp4 = 22909   -- "好"  double
+    local cp5 = 8364    -- "€"   ambiguous
 
     it("handles zero width characters", function()
       assert.same({0}, {system.utf8cwidth("")}) -- empty string returns 0-size
-      assert.same({nil, 'Character width determination failed'}, {system.utf8cwidth("\a")})  -- bell character
-      assert.same({nil, 'Character width determination failed'}, {system.utf8cwidth("\27")}) -- escape character
+      assert.same({0}, {system.utf8cwidth("\0")}) -- null character
+
+      -- zero-width (from wcwidth_zero_width.c / wcwidth_update.lua)
+      local zw_sp   = string.char(0xE2, 0x80, 0x8B)   -- U+200B Zero Width Space
+      local zw_nj   = string.char(0xE2, 0x80, 0x8C)   -- U+200C Zero Width Non-Joiner
+      local zw_j    = string.char(0xE2, 0x80, 0x8D)   -- U+200D Zero Width Joiner
+      local zw_nb   = string.char(0xEF, 0xBB, 0xBF)   -- U+FEFF Zero Width No-Break Space (BOM)
+      local soft_hy = string.char(0xC2, 0xAD)        -- U+00AD Soft hyphen
+
+      assert.same({0}, {system.utf8cwidth(zw_sp)})
+      assert.same({0}, {system.utf8cwidth(zw_nj)})
+      assert.same({0}, {system.utf8cwidth(zw_j)})
+      assert.same({0}, {system.utf8cwidth(zw_nb)})
+      assert.same({0}, {system.utf8cwidth(soft_hy)})
     end)
 
     it("handles single width characters", function()
@@ -540,8 +554,16 @@ describe("Terminal:", function()
       assert.same({2}, {system.utf8cwidth(ch4)})
     end)
 
+    it("handles ambiguous width characters", function()
+      assert.same({99}, {system.utf8cwidth(ch5, 99)})
+    end)
+
+    it("ambiguous width defaults to 1", function()
+      assert.same({1}, {system.utf8cwidth(ch5, nil)})
+    end)
+
     it("returns the width of the first character in the string", function()
-      assert.same({nil, 'Character width determination failed'}, {system.utf8cwidth("\a" .. ch1)})  -- bell character + EURO
+      assert.same({nil, 'Control characters have no width'}, {system.utf8cwidth("\a" .. ch1)})  -- bell character + EURO
       assert.same({1}, {system.utf8cwidth(ch1 .. ch2)})
       assert.same({2}, {system.utf8cwidth(ch2 .. ch3 .. ch4)})
     end)
@@ -551,6 +573,12 @@ describe("Terminal:", function()
       assert.same({2}, {system.utf8cwidth(cp2)})
       assert.same({2}, {system.utf8cwidth(cp3)})
       assert.same({2}, {system.utf8cwidth(cp4)})
+      assert.same({99}, {system.utf8cwidth(cp5, 99)}) -- ambiguous width
+    end)
+
+    it("returns an error on control characters", function()
+      assert.same({nil, 'Control characters have no width'}, {system.utf8cwidth("\a")})  -- bell character
+      assert.same({nil, 'Control characters have no width'}, {system.utf8cwidth("\27")}) -- escape character
     end)
 
     it("returns an error on bad argument", function()
@@ -570,20 +598,35 @@ describe("Terminal:", function()
 
   describe("utf8swidth()", function()
 
-    local ch1 = string.char(226, 130, 172)       -- "€"   single
+    local ch1 = string.char(65)                  -- "A"   single
     local ch2 = string.char(240, 159, 154, 128)  -- "🚀"  double
     local ch3 = string.char(228, 189, 160)       -- "你"  double
     local ch4 = string.char(229, 165, 189)       -- "好"  double
+    local ch5 = string.char(226, 130, 172)       -- "€"   ambiguous
 
     it("handles zero width characters", function()
       assert.same({0}, {system.utf8swidth("")}) -- empty string returns 0-size
-      assert.same({nil, 'Character width determination failed'}, {system.utf8swidth("\a")})  -- bell character
-      assert.same({nil, 'Character width determination failed'}, {system.utf8swidth("\27")}) -- escape character
+      assert.same({nil, 'Control characters have no width'}, {system.utf8swidth("\a")})  -- bell character
+      assert.same({nil, 'Control characters have no width'}, {system.utf8swidth("\27")}) -- escape character
     end)
 
     it("handles multi-character UTF8 strings", function()
       assert.same({15}, {system.utf8swidth("hello " .. ch1 .. ch2 .. " world")})
       assert.same({16}, {system.utf8swidth("hello " .. ch3 .. ch4 .. " world")})
+    end)
+
+    it("handles ambiguous width characters", function()
+      assert.same({12}, {system.utf8swidth(ch5 .. "1234567890", 2)})
+    end)
+
+    it("ambiguous width defaults to 1", function()
+      assert.same({1}, {system.utf8swidth(ch5, nil)})
+    end)
+
+    it("ambiguous width must be 1 or 2", function()
+      assert.has.error(function()
+        system.utf8swidth(ch5, 3)
+      end, "bad argument #2 to 'utf8swidth' (Ambiguous width must be 1 or 2)")
     end)
 
   end)

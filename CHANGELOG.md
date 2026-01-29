@@ -27,6 +27,22 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### version x.x.x, unreleased
+
+- Fix: remove two unused-variable warnings.
+  See [#78](https://github.com/lunarmodules/luasystem/pull/78).
+- Fix: duplicate symbol when linking with luajit on windows
+  See [#81](https://github.com/lunarmodules/luasystem/pull/81).
+- Fix: fix the display-width functions that occasionally reported a bad width. The source code now
+  includes a code-generator that parses the official Unicode files to create static ranges in the
+  source code. Beyond that the ambiguous width can now be specified by the user, as a second parameter
+  to `utf8cwidth` and `utf8swidth`.
+  See [#82](https://github.com/lunarmodules/luasystem/pull/82).
+- Chore: added Lua 5.5 to CI matrix.
+  See [#79](https://github.com/lunarmodules/luasystem/pull/79).
+- Chore: relax test assertion wrt time.
+  See [#80](https://github.com/lunarmodules/luasystem/pull/80).
+
 ### version 0.6.3, released 11-Jul-2025
 
 - Fix: maximum key-delay, reduced from 0.2 to 0.1 seconds to reduce slugginess feel on some key presses.
