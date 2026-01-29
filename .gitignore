@@ -50,3 +50,5 @@ luac.out
 # VS Code files
 .vscode/
 
+# generated/downloaded unicode files
+src/unicode_data/
