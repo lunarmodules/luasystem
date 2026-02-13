@@ -49,6 +49,7 @@ describe("Random:", function()
   describe("rnd()", function()
 
     local has_math_type = type(math.type) == "function"
+    local is_luajit = (type(jit) == "table" and jit.version ~= nil)
 
     it("with no args returns a number in [0, 1)", function()
       local v, err = system.rnd()
@@ -155,28 +156,36 @@ describe("Random:", function()
     end)
 
 
-    it("throws for empty interval (m > n), like math.random", function()
-      local ok_math, _ = pcall(math.random, 10, 5)
-      assert.is_falsy(ok_math, "math.random(10, 5) should error")
-      local ok_rnd, _ = pcall(system.rnd, 10, 5)
-      assert.is_falsy(ok_rnd, "rnd(10, 5) should throw like math.random")
-    end)
+    if not is_luajit then
+      -- LuaJIT's math.random does not raise errors for these invalid-argument
+      -- cases (it accepts empty intervals, negatives, extra args, etc.),
+      -- while stock Lua does. We only run these strict "throws like math.random"
+      -- checks on non-LuaJIT runtimes.
+
+      it("throws for empty interval (m > n), like math.random", function()
+        local ok_math, _ = pcall(math.random, 10, 5)
+        assert.is_falsy(ok_math, "math.random(10, 5) should error")
+        local ok_rnd, _ = pcall(system.rnd, 10, 5)
+        assert.is_falsy(ok_rnd, "rnd(10, 5) should throw like math.random")
+      end)
 
 
-    it("throws for invalid one-arg (m < 1, m ~= 0), like math.random", function()
-      local ok_math, _ = pcall(math.random, -1)
-      assert.is_falsy(ok_math, "math.random(-1) should error")
-      local ok_rnd, _ = pcall(system.rnd, -1)
-      assert.is_falsy(ok_rnd, "rnd(-1) should throw like math.random")
-    end)
+      it("throws for invalid one-arg (m < 1, m ~= 0), like math.random", function()
+        local ok_math, _ = pcall(math.random, -1)
+        assert.is_falsy(ok_math, "math.random(-1) should error")
+        local ok_rnd, _ = pcall(system.rnd, -1)
+        assert.is_falsy(ok_rnd, "rnd(-1) should throw like math.random")
+      end)
 
 
-    it("throws for wrong number of arguments, like math.random", function()
-      local ok_math, _ = pcall(math.random, 1, 2, 3)
-      assert.is_falsy(ok_math, "math.random(1, 2, 3) should error")
-      local ok_rnd, _ = pcall(system.rnd, 1, 2, 3)
-      assert.is_falsy(ok_rnd, "rnd(1, 2, 3) should throw like math.random")
-    end)
+      it("throws for wrong number of arguments, like math.random", function()
+        local ok_math, _ = pcall(math.random, 1, 2, 3)
+        assert.is_falsy(ok_math, "math.random(1, 2, 3) should error")
+        local ok_rnd, _ = pcall(system.rnd, 1, 2, 3)
+        assert.is_falsy(ok_rnd, "rnd(1, 2, 3) should throw like math.random")
+      end)
+
+    end
 
   end)
 
