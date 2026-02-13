@@ -126,8 +126,10 @@ static int lua_get_random_bytes(lua_State* L) {
 /* Read 8 bytes into *out; return 0 on success, 2 on error (nil + msg pushed). */
 static int read_u64(lua_State *L, uint64_t *out) {
     unsigned char buf[8];
+
     int ret = fill_random_bytes(L, buf, 8);
     if (ret != 0) return ret;
+
     *out = (uint64_t)buf[0] | ((uint64_t)buf[1] << 8) | ((uint64_t)buf[2] << 16) |
            ((uint64_t)buf[3] << 24) | ((uint64_t)buf[4] << 32) | ((uint64_t)buf[5] << 40) |
            ((uint64_t)buf[6] << 48) | ((uint64_t)buf[7] << 56);
@@ -162,13 +164,11 @@ Random number mimicking Lua 5.4 math.random, using crypto-secure bytes.
 - One arg 0: returns a full-range random integer (whole lua_Integer range).
 - One arg m (m >= 1): returns an integer in [1, m] (inclusive).
 - Two args m, n: returns an integer in [m, n] (inclusive).
-On invalid arguments returns nil and an error message.
+On invalid arguments throws an error (same as math.random).
 @function rnd
 @tparam[opt] int m upper bound (or 0 for full-range), or lower bound when used with n
 @tparam[opt] int n upper bound (when used with m)
-@treturn[1] number|int float in [0,1) or integer in the requested range
-@treturn[2] nil
-@treturn[2] string error message
+@treturn number|int float in [0,1) or integer in the requested range
 */
 static int lua_rnd(lua_State *L) {
     int nargs = lua_gettop(L);
@@ -210,9 +210,7 @@ static int lua_rnd(lua_State *L) {
             return 1;
         }
         if (m < 1) {
-            lua_pushnil(L);
-            lua_pushstring(L, "interval is empty");
-            return 2;
+            return luaL_error(L, "interval is empty");
         }
         /* [1, m] -> range size m, values 0..m-1 then +1 */
         {
@@ -234,15 +232,11 @@ static int lua_rnd(lua_State *L) {
         RND_INT low = RND_CHECKINT(L, 1);
         RND_INT up  = RND_CHECKINT(L, 2);
         if (low > up) {
-            lua_pushnil(L);
-            lua_pushstring(L, "interval is empty");
-            return 2;
+            return luaL_error(L, "interval is empty");
         }
 #if LUA_VERSION_NUM >= 503
         if (low < 0 && up > 0 && (lua_Unsigned)(up - low) > (lua_Unsigned)LUA_MAXINTEGER) {
-            lua_pushnil(L);
-            lua_pushstring(L, "interval too large");
-            return 2;
+            return luaL_error(L, "interval too large");
         }
 #endif
         {
@@ -261,9 +255,7 @@ static int lua_rnd(lua_State *L) {
         }
     }
 
-    lua_pushnil(L);
-    lua_pushliteral(L, "wrong number of arguments");
-    return 2;
+    return luaL_error(L, "wrong number of arguments");
 
 #undef RND_INT
 #undef RND_CHECKINT
