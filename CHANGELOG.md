@@ -27,13 +27,13 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
-### version x.x.x, unreleased
+### version 0.7.0, released 17-Feb-2026
 
 - Fix: remove two unused-variable warnings.
   See [#78](https://github.com/lunarmodules/luasystem/pull/78).
 - Fix: duplicate symbol when linking with luajit on windows
   See [#81](https://github.com/lunarmodules/luasystem/pull/81).
-- Fix: fix the display-width functions that occasionally reported a bad width. The source code now
+- Feat: fix the display-width functions that occasionally reported a bad width. The source code now
   includes a code-generator that parses the official Unicode files to create static ranges in the
   source code. Beyond that the ambiguous width can now be specified by the user, as a second parameter
   to `utf8cwidth` and `utf8swidth`.
