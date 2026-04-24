@@ -64,10 +64,11 @@ static void termFormatError(lua_State *L, DWORD errorCode, const char* prefix) {
 static int pusherror(lua_State *L, const char *info)
 {
 	lua_pushnil(L);
-	if (info==NULL)
+	if (info==NULL) {
 		lua_pushstring(L, strerror(errno));
-	else
+    } else {
 		lua_pushfstring(L, "%s: %s", info, strerror(errno));
+    }
 	lua_pushinteger(L, errno);
 	return 3;
 }
@@ -458,8 +459,7 @@ static int lst_getconsoleflags(lua_State *L)
 
     if (GetConsoleMode(console_handle, &console_mode) == 0)
     {
-        lua_pushnil(L);
-        lua_pushliteral(L, "failed to get console mode");
+        termFormatError(L, GetLastError(), "failed to get console mode");
         return 2;
     }
 #else
@@ -970,8 +970,7 @@ static int lst_readkey(lua_State *L) {
     // printf("utf8_buffer_len: %d\n", utf8_buffer_len);
     utf8_buffer_index = 0;
     if (utf8_buffer_len <= 0) {
-        lua_pushnil(L);
-        lua_pushliteral(L, "UTF-8 conversion error");
+        termFormatError(L, GetLastError(), "UTF-8 conversion error");
         return 2;
     }
 
@@ -1208,12 +1207,18 @@ int lst_utf8swidth(lua_State *L) {
 Gets the current console code page (Windows).
 @function getconsolecp
 @treturn[1] int the current code page (always 65001 on Posix systems)
+@treturn[2] nil
+@treturn[2] string error message
 @within Terminal_UTF-8
 */
 static int lst_getconsolecp(lua_State *L) {
     unsigned int cp = 65001;
 #ifdef _WIN32
     cp = GetConsoleCP();
+    if (cp == 0) {
+        termFormatError(L, GetLastError(), "failed to get console code page");
+        return 2;
+    }
 #endif
     lua_pushinteger(L, cp);
     return 1;
@@ -1226,17 +1231,21 @@ Sets the current console code page (Windows).
 @function setconsolecp
 @tparam int cp the code page to set, use `system.CODEPAGE_UTF8` (65001) for UTF-8
 @treturn[1] bool `true` on success (always `true` on Posix systems)
+@treturn[2] nil
+@treturn[2] string error message
 @within Terminal_UTF-8
 */
 static int lst_setconsolecp(lua_State *L) {
     unsigned int cp = (unsigned int)luaL_checkinteger(L, 1);
-    int success = TRUE;
 #ifdef _WIN32
-    SetConsoleCP(cp);
+    if (!SetConsoleCP(cp)) {
+        termFormatError(L, GetLastError(), "failed to set console code page");
+        return 2;
+    }
 #else
     (void)cp;
 #endif
-    lua_pushboolean(L, success);
+    lua_pushboolean(L, 1);
     return 1;
 }
 
@@ -1246,12 +1255,18 @@ static int lst_setconsolecp(lua_State *L) {
 Gets the current console output code page (Windows).
 @function getconsoleoutputcp
 @treturn[1] int the current code page (always 65001 on Posix systems)
+@treturn[2] nil
+@treturn[2] string error message
 @within Terminal_UTF-8
 */
 static int lst_getconsoleoutputcp(lua_State *L) {
     unsigned int cp = 65001;
 #ifdef _WIN32
     cp = GetConsoleOutputCP();
+    if (cp == 0) {
+        termFormatError(L, GetLastError(), "failed to get console output code page");
+        return 2;
+    }
 #endif
     lua_pushinteger(L, cp);
     return 1;
@@ -1264,17 +1279,21 @@ Sets the current console output code page (Windows).
 @function setconsoleoutputcp
 @tparam int cp the code page to set, use `system.CODEPAGE_UTF8` (65001) for UTF-8
 @treturn[1] bool `true` on success (always `true` on Posix systems)
+@treturn[2] nil
+@treturn[2] string error message
 @within Terminal_UTF-8
 */
 static int lst_setconsoleoutputcp(lua_State *L) {
     unsigned int cp = (unsigned int)luaL_checkinteger(L, 1);
-    int success = TRUE;
 #ifdef _WIN32
-    SetConsoleOutputCP(cp);
+    if (!SetConsoleOutputCP(cp)) {
+        termFormatError(L, GetLastError(), "failed to set console output code page");
+        return 2;
+    }
 #else
     (void)cp;
 #endif
-    lua_pushboolean(L, success);
+    lua_pushboolean(L, 1);
     return 1;
 }
 
