@@ -27,6 +27,11 @@ The scope of what is covered by the version number excludes:
 
 ## Version history
 
+### version 0.x.x, unreleased
+
+- Fix: improve error messages and handling on Windows.
+  See [#85](https://github.com/lunarmodules/luasystem/pull/85).
+
 ### version 0.7.0, released 17-Feb-2026
 
 - Fix: remove two unused-variable warnings.
