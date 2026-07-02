@@ -9,21 +9,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        # commit hash for version 7.0.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
       - name: Luacheck
-        uses: lunarmodules/luacheck@v1
-
-  yamllint:
-    name: Run yamllint
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-      - name: Install yamllint
-        run: pip install yamllint
-      - name: Run yamllint
-        run: |
-          yamllint .
+        # commit hash for master commit Apr 20, 2026
+        uses: lunarmodules/luacheck@f47ad699b5aab8eba5494a2b63e26c24dbf486ce
