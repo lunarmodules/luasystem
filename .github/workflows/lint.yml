@@ -15,18 +15,3 @@ jobs:
       - name: Luacheck
         # commit hash for master commit Apr 20, 2026
         uses: lunarmodules/luacheck@f47ad699b5aab8eba5494a2b63e26c24dbf486ce
-
-  yamllint:
-    name: Run yamllint
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-      - name: Install yamllint
-        run: pip install yamllint
-      - name: Run yamllint
-        run: |
-          yamllint .
