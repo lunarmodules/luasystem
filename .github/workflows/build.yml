@@ -60,7 +60,8 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        # commit hash for version 7.0.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: Setup MSVC
         # the 'hishamhm/gh-actions-lua' step requires msvc to build PuC Rio Lua
@@ -95,11 +96,13 @@ jobs:
       #     dir \".\\.dependencies\Dependencies.exe\"\n
       #     .\\.dependencies\\Dependencies.exe -help\n
 
-      - uses: hishamhm/gh-actions-lua@master
+      - uses: luarocks/gh-actions-lua@6fff34a54b160acea12880a638eab0960507c1f5
+        # commit hash for unrelease commit past version v11; Lua 5.5 and Node fixes
         with:
           luaVersion: ${{ matrix.luaVersion }}
 
-      - uses: hishamhm/gh-actions-luarocks@master
+      - uses: luarocks/gh-actions-luarocks@86ccbcad8c77b22e94c96a2a08632192e2bcd62b
+        # commit hash for unrelease commit past version v6; Node fixes
         with:
           luaRocksVersion: "3.13.0"
 
@@ -120,7 +123,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Run tests on FreeBSD
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        # commit hash for version 7.0.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: Run tests inside FreeBSD VM
         uses: vmactions/freebsd-vm@v1
@@ -138,7 +143,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Run tests on OpenBSD
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        # commit hash for version 7.0.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: Run tests inside OpenBSD VM
         uses: vmactions/openbsd-vm@v1
@@ -156,7 +163,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Run tests on NetBSD
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        # commit hash for version 7.0.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: Run tests inside NetBSD VM
         uses: vmactions/netbsd-vm@v1
