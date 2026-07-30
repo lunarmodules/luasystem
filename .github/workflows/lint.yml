@@ -9,9 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        # commit hash for version 7.0.0
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Luacheck
-        # commit hash for master commit Apr 20, 2026
-        uses: lunarmodules/luacheck@f47ad699b5aab8eba5494a2b63e26c24dbf486ce
+        uses: lunarmodules/luacheck@f47ad699b5aab8eba5494a2b63e26c24dbf486ce # v1.2.0
