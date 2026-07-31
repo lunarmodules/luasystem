@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup MSVC
         # the 'hishamhm/gh-actions-lua' step requires msvc to build PuC Rio Lua
@@ -95,11 +95,11 @@ jobs:
       #     dir \".\\.dependencies\Dependencies.exe\"\n
       #     .\\.dependencies\\Dependencies.exe -help\n
 
-      - uses: luarocks/gh-actions-lua@6fff34a54b160acea12880a638eab0960507c1f5 # v11
+      - uses: luarocks/gh-actions-lua@fc6f8de246f8c01f6e1a56a1b851143e23370ff3 # v11
         with:
           luaVersion: ${{ matrix.luaVersion }}
 
-      - uses: luarocks/gh-actions-luarocks@86ccbcad8c77b22e94c96a2a08632192e2bcd62b # v6
+      - uses: luarocks/gh-actions-luarocks@95d2308a0aff36ad31ebadca493ed14853399842 # v6
         with:
           luaRocksVersion: "3.13.0"
 
@@ -121,7 +121,7 @@ jobs:
     name: Run tests on FreeBSD
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run tests inside FreeBSD VM
         uses: vmactions/freebsd-vm@77ed28d336d03fe19a3f4f7266c1d2c4714dd79d # v1
@@ -140,7 +140,7 @@ jobs:
     name: Run tests on OpenBSD
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run tests inside OpenBSD VM
         uses: vmactions/openbsd-vm@c941015845c0f0c429676840963dc63b226d4f69 # v1
@@ -159,7 +159,7 @@ jobs:
     name: Run tests on NetBSD
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run tests inside NetBSD VM
         uses: vmactions/netbsd-vm@e7ac71b97abbe8437cec8859a5acf72dfa6a8be0 # v1
