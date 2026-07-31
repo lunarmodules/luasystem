@@ -7,7 +7,7 @@ jobs:
 
   affected:
     uses:
-      lunarmodules/.github/.github/workflows/list_affected_rockspecs.yml@main
+      lunarmodules/.github/.github/workflows/list_affected_rockspecs.yml@d3b39c89365b06e9590297cfaa0b3c9e52c04b6d # main
 
   build:
     needs: affected
