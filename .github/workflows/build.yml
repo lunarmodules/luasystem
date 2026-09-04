@@ -95,7 +95,7 @@ jobs:
       #     dir \".\\.dependencies\Dependencies.exe\"\n
       #     .\\.dependencies\\Dependencies.exe -help\n
 
-      - uses: luarocks/gh-actions-lua@85e2287697275df96334743ac654241a8fd34ab3 # v11
+      - uses: luarocks/gh-actions-lua@56eba09993704b908cc3c7c2753e630d18cb9696 # v11
         with:
           luaVersion: ${{ matrix.luaVersion }}
 
@@ -124,7 +124,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run tests inside FreeBSD VM
-        uses: vmactions/freebsd-vm@83b151f58c6047089f4c80eb5ba2039d158ce093 # v1
+        uses: vmactions/freebsd-vm@f0552d3b69211736abd97f02ff3d4674c56b73b1 # v1
         with:
           usesh: true
           prepare: |
@@ -143,7 +143,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run tests inside OpenBSD VM
-        uses: vmactions/openbsd-vm@e6c68b637a12e83519688d115d57d5b0b53923cd # v1
+        uses: vmactions/openbsd-vm@86cdc08415d9d0865267e686561e276c52d62530 # v1
         with:
           usesh: true
           prepare: |
@@ -162,7 +162,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run tests inside NetBSD VM
-        uses: vmactions/netbsd-vm@00081e82b14bc40114eb97f32b4455306828516b # v1
+        uses: vmactions/netbsd-vm@6334c835de4c04a59fe59f0f8f071e02a2f0bab3 # v1
         with:
           usesh: true
           prepare: |
