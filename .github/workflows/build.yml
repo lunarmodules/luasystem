@@ -124,7 +124,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run tests inside FreeBSD VM
-        uses: vmactions/freebsd-vm@f0552d3b69211736abd97f02ff3d4674c56b73b1 # v1
+        uses: vmactions/freebsd-vm@8b0f1a8fc0ea0def307835c258940ca358fe6480 # v1
         with:
           usesh: true
           prepare: |
@@ -162,7 +162,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run tests inside NetBSD VM
-        uses: vmactions/netbsd-vm@7f23a491dcc69c34195721ab67934917707f84c7 # v1.4.9
+        uses: vmactions/netbsd-vm@20ee93a005c9fc78743e6e05269f4cb023b87413 # v1.5.0
         with:
           usesh: true
           prepare: |
