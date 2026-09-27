@@ -4,6 +4,12 @@
 #include <lua.h>
 #include <lauxlib.h>
 
+#if !defined(LUAJIT_VERSION) && defined(__has_include)
+#if __has_include(<luajit.h>)
+#include <luajit.h>
+#endif
+#endif
+
 #if LUA_VERSION_NUM == 501 && !defined(LUAJIT_VERSION)
 void luaL_setfuncs(lua_State *L, const luaL_Reg *l, int nup);
 void *luaL_testudata(lua_State *L, int ud, const char *tname);
